@@ -314,28 +314,29 @@ class BNO055(object):
                 raise RuntimeError('Register write error: 0x{0}'.format(binascii.hexlify(resp)))
 
     def _read_bytes(self, address, length):
-        # Read a number of unsigned byte values starting from the provided address.
-        if self._i2c_device is not None:
-            # I2C read.
-            return bytearray(self._i2c_device.readList(address, length))
-        else:
-            # Build and send serial register read command.
-            command = bytearray(4)
-            command[0] = 0xAA  # Start byte
-            command[1] = 0x01  # Read
-            command[2] = address & 0xFF
-            command[3] = length & 0xFF
-            resp = self._serial_send(command)
-            # Verify register read succeeded.
-            if resp[0] != 0xBB:
-                 raise RuntimeError('Register read error: 0x{0}'.format(binascii.hexlify(resp)))
-            # Read the returned bytes.
-            length = resp[1]
-            resp = bytearray(self._serial.read(length))
-            logger.debug('Received: 0x{0}'.format(binascii.hexlify(resp)))
-            if resp is None or len(resp) != length:
-                raise RuntimeError('Timeout waiting to read data, is the BNO055 connected?')
-            return resp
+        # # Read a number of unsigned byte values starting from the provided address.
+        # if self._i2c_device is not None:
+            # # I2C read.
+            # return bytearray(self._i2c_device.readList(address, length))
+        # else:
+            # # Build and send serial register read command.
+            # command = bytearray(4)
+            # command[0] = 0xAA  # Start byte
+            # command[1] = 0x01  # Read
+            # command[2] = address & 0xFF
+            # command[3] = length & 0xFF
+            # resp = self._serial_send(command)
+            # # Verify register read succeeded.
+            # if resp[0] != 0xBB:
+                 # raise RuntimeError('Register read error: 0x{0}'.format(binascii.hexlify(resp)))
+            # # Read the returned bytes.
+            # length = resp[1]
+            # resp = bytearray(self._serial.read(length))
+            # logger.debug('Received: 0x{0}'.format(binascii.hexlify(resp)))
+            # if resp is None or len(resp) != length:
+                # raise RuntimeError('Timeout waiting to read data, is the BNO055 connected?')
+            # return resp
+		return bytearray(self._i2c_device.readList(address, length))
 
     def _read_byte(self, address):
         # Read an 8-bit unsigned value from the provided register address.
@@ -403,7 +404,7 @@ class BNO055(object):
         # Set to normal power mode.
         self._write_byte(BNO055_PWR_MODE_ADDR, POWER_MODE_NORMAL)
         # Default to internal oscillator.
-        self._write_byte(BNO055_SYS_TRIGGER_ADDR, 0x0)
+        self._write_byte(BNO055_SYS_TRIGGER_ADDR, 0x80)
         # Enter normal operation mode.
         self._operation_mode()
         return True
@@ -627,16 +628,48 @@ class BNO055(object):
         # Go back to normal operation mode.
         self._operation_mode()
 
+    # def _read_vector(self, address, count=3):
+        # # Read count number of 16-bit signed values starting from the provided
+        # # address. Returns a tuple of the values that were read.
+        # data = self._read_bytes(address, count*2)
+        # for i in range(len(data)):
+            # print int(data[i])
+        # result = [0]*count
+        
+        # for i in range(count):
+            # print int(data[i*2+1]),int(data[i*2]),((data[i*2+1] << 8) | data[i*2]) & 0xFFFF
+            # result[i] = ((data[i*2+1] << 8) | data[i*2]) & 0xFFFF
+            # if result[i] > 32767:
+                # result[i] -= 65536
+        # return result    
+        
     def _read_vector(self, address, count=3):
         # Read count number of 16-bit signed values starting from the provided
         # address. Returns a tuple of the values that were read.
-        data = self._read_bytes(address, count*2)
+        
+        # data = self._read_bytes(address, count*2)
+        # for i in range(len(data)):
+            # print int(data[i])
         result = [0]*count
+        
+        # reg1_data=self._i2c_device.readU16(reg1_addr)
+        # reg2_data=self._i2c_device.readU16(reg2_addr)
+        # reg3_data=self._i2c_device.readU16(reg3_addr)
+        
+        # print reg1_data%255,reg1_data/255,reg1_data
+        # print reg2_data%255,reg2_data/255,reg2_data
+        # print reg3_data%255,reg3_data/255,reg3_data
+        data =[]
+        for i in range(count*2):
+            data.append(self._i2c_device.readU8(address+i))
+
         for i in range(count):
+            # print int(data[i*2+1]),int(data[i*2]),((data[i*2+1] << 8) | data[i*2]) & 0xFFFF
             result[i] = ((data[i*2+1] << 8) | data[i*2]) & 0xFFFF
             if result[i] > 32767:
                 result[i] -= 65536
         return result
+        # return [0,0,0]
 
     def read_euler(self):
         """Return the current absolute orientation as a tuple of heading, roll,
