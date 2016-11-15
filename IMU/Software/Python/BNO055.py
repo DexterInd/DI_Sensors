@@ -404,7 +404,7 @@ class BNO055(object):
         # Set to normal power mode.
         self._write_byte(BNO055_PWR_MODE_ADDR, POWER_MODE_NORMAL)
         # Default to internal oscillator.
-        self._write_byte(BNO055_SYS_TRIGGER_ADDR, 0x80)
+        self._write_byte(BNO055_SYS_TRIGGER_ADDR, 0x00)
         # Enter normal operation mode.
         self._operation_mode()
         return True
@@ -663,6 +663,9 @@ class BNO055(object):
         for i in range(count*2):
             data.append(self._i2c_device.readU8(address+i))
 
+        # for i in range(len(data)):
+            # print int(data[i])
+            
         for i in range(count):
             # print int(data[i*2+1]),int(data[i*2]),((data[i*2+1] << 8) | data[i*2]) & 0xFFFF
             result[i] = ((data[i*2+1] << 8) | data[i*2]) & 0xFFFF
@@ -676,6 +679,35 @@ class BNO055(object):
         and pitch euler angles in degrees.
         """
         heading, roll, pitch = self._read_vector(BNO055_EULER_H_LSB_ADDR)
+        
+        fact=16.0
+        if heading >360*fact or heading < 0:
+            # print heading,bin(heading),heading & 0x7FFF,(heading & 0x7FFF)/16.0,(heading >> 15)&1,(heading >> 7)&1
+            if (heading >> 15)&1:
+                heading = heading & 0x7FFF
+                # print "c1",heading
+            if (heading >> 7)&1:
+                heading = heading & 0xFF7F
+                # print "c2",heading
+        if roll >90*fact or roll < -90*fact:
+            # print roll,bin(roll),roll & 0x7FFF,(roll & 0x7FFF)/16.0,(roll >> 15)&1,(roll >> 7)&1
+            if (roll >> 15)&1:
+                roll = roll & 0x7FFF
+                # print "c1",roll
+            if (roll >> 7)&1:
+                roll = roll & 0xFF7F
+                # print "c2",roll
+        if pitch >180*fact or pitch < -180*fact: 
+            # print pitch,bin(pitch),pitch & 0x7FFF,(pitch & 0x7FFF)/16.0,(pitch >> 15)&1,(pitch >> 7)&1
+            if (pitch >> 15)&1:
+                pitch = pitch & 0x7FFF
+                # print "c1",pitch
+            if (pitch >> 7)&1:
+                pitch = pitch & 0xFF7F
+                # print "c2",pitch     
+        # if heading < -1000:
+            # break
+            
         return (heading/16.0, roll/16.0, pitch/16.0)
 
     def read_magnetometer(self):
