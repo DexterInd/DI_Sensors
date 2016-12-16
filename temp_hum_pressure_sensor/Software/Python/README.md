@@ -1,14 +1,14 @@
 ## Python Library for Temperature_Pressure_Humidity Sensor
 
-The Temperature_Pressure_Humidity Sensor connects with the GrovePi,GoPiGo and PivotPi.
+The Temperature_Pressure_Humidity Sensor connects with the GrovePi, GoPiGo and PivotPi.
 
 This sensor uses a BME280 chip to measure the Temperature, Pressure and Humidity.
 
 **_Files:_**
-- **BME280.py** : Main Python library to read data from BME280 chip
-- **temp_press_humidity.py** : Python Library to provide the basic functions for using the Temperature_Pressure_Humidity Sensor
-- **example.py** : Example to test all the basic functions of the Temperature_Pressure_Humidity Sensor
-- **setup.py** : Installation file for the Temperature_Pressure_Humidity Sensor (use only if you are not using Dexter Industries SD Card)
+- **BME280.py** : Main Python library to read data from BME280 chip.
+- **temp_press_humidity.py** : Python Library to provide the basic functions for using the Temperature_Pressure_Humidity Sensor.
+- **example.py** : Example to test all the basic functions of the Temperature_Pressure_Humidity Sensor.
+- **setup.py** : Installation file for the Temperature_Pressure_Humidity Sensor (use only if you are not using Dexter Industries SD Card).
 - **requirements.txt** : Additional packages to be installed by the script setup.py.
 - **I2C.py** : Library to handle I2C communication across platforms.
 - **Platform.py** : Script to detect the platform in which the sensor is used.
