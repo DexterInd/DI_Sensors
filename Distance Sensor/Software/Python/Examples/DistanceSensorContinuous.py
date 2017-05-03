@@ -9,12 +9,9 @@
 # Python example program for the VL53L0X Distance Sensor
 
 import time
-import VL53L0X
+import distance_sensor
 
-sensor = VL53L0X.VL53L0X()
-
-sensor.init()
-sensor.setTimeout(500)
+sensor = distance_sensor.DistanceSensor()
 
 # Start continuous back-to-back mode (take readings as
 # fast as possible).  To use continuous timed mode
