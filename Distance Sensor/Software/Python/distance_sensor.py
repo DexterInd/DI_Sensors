@@ -14,7 +14,7 @@ import smbus
 import time
 
 
-class VL53L0X(object):
+class DistanceSensor(object):
     '''VL53L0X laser distance sensor.'''
     
     # constants
@@ -112,8 +112,10 @@ class VL53L0X(object):
     def millis(self):
         return int(round(time.time() * 1000))
     
-    def __init__(self):
+    def __init__(self, timeout = 500):
         self.i2c_bus = smbus.SMBus(1) # use I2C bus 1. use 0 for the original Raspberry Pi.
+        self.init()                   # initialize the sensor
+        self.setTimeout(timeout)      # set the timeout
     
     def write8(self, reg, val):
         self.i2c_bus.write_byte_data(self.ADDRESS, reg, val)
