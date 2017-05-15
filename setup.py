@@ -13,6 +13,7 @@ setuptools.setup(
     description="Drivers and examples for using the DI_Sensors in Python",
     author="Dexter Industries",
     url="http://www.dexterindustries.com/DI_Sensors/",
-    py_modules=['grove_rgb_lcd.grove_rgb_lcd','Distance Sensor.Software.Python.distance_sensor'],
+    package_dir = {"grove_rgb_lcd" : "grove_rgb_lcd/", "distance_sensor" : "Distance_Sensor/Software/Python", "DHT" : "DHT_Sensor/",},
+    packages=["grove_rgb_lcd", "distance_sensor", "DHT"]
     #install_requires=open('requirements.txt').readlines(),
 )
