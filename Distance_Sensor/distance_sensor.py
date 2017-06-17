@@ -114,7 +114,10 @@ class DistanceSensor(object):
     
     def __init__(self, timeout = 500):
         self.i2c_bus = smbus.SMBus(1) # use I2C bus 1. use 0 for the original Raspberry Pi.
-        self.init()                   # initialize the sensor
+        try:
+            self.init()               # initialize the sensor
+        except Exception as e:
+            raise e
         self.setTimeout(timeout)      # set the timeout
     
     def write8(self, reg, val):
