@@ -36,6 +36,7 @@ fi
 # install the python driver modules
 cd Python
 sudo python setup.py install
+sudo python3 setup.py install
 
 # python install cleanup
 sudo rm -rf build
