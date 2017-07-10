@@ -12,7 +12,9 @@ from __future__ import print_function
 from __future__ import division
 
 import time
-import inertial_measurement_unit
+from DI_Sensors import inertial_measurement_unit
+
+print("Example program for reading a Dexter Industries IMU Sensor on a GoPiGo3 AD1 port.")
 
 imu = inertial_measurement_unit.InertialMeasurementUnit(bus = "GPG3_AD1")
 
