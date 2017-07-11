@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from DI_Sensors import BME280
+from di_sensors import BME280
 
 
 class TempHumPress(object):

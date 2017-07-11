@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from DI_Sensors import VL53L0X
+from di_sensors import VL53L0X
 import time
 
 

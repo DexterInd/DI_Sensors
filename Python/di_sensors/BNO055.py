@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from DI_Sensors import dexter_i2c
+from di_sensors import dexter_i2c
 import time
 
 # Constants

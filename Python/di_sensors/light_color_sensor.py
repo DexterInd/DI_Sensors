@@ -9,8 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from DI_Sensors import PCA9570
-from DI_Sensors import TCS34725
+from di_sensors import TCS34725, PCA9570
 import time
 
 

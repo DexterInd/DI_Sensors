@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from DI_Sensors import BNO055
+from di_sensors import BNO055
 
 
 class InertialMeasurementUnit(object):
