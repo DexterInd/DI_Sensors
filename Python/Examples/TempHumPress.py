@@ -12,7 +12,7 @@ from __future__ import print_function
 from __future__ import division
 
 import time
-from DI_Sensors import temp_hum_press
+from di_sensors import temp_hum_press
 
 print("Example program for reading a Dexter Industries Temperature Humidity Pressure Sensor on an I2C port.")
 

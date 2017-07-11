@@ -12,7 +12,7 @@ from __future__ import print_function
 from __future__ import division
 
 import time
-from DI_Sensors import light_color_sensor
+from di_sensors import light_color_sensor
 
 print("Example program for reading a Dexter Industries Light Color Sensor on an I2C port.")
 

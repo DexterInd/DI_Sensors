@@ -12,7 +12,7 @@ from __future__ import print_function
 from __future__ import division
 
 import time
-from DI_Sensors import distance_sensor
+from di_sensors import distance_sensor
 
 print("Example program for reading a Dexter Industries Distance Sensor on an I2C port.")
 
