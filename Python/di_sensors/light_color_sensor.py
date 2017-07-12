@@ -9,8 +9,12 @@
 from __future__ import print_function
 from __future__ import division
 
-from di_sensors import TCS34725, PCA9570
+from di_sensors import TCS34725
 import time
+
+PCA9570LED = False # set to True for Light Color Sensor boards v1.1.0 and earlier for the PCA9570 to control the LED
+if PCA9570LED:
+    from di_sensors import PCA9570
 
 
 class LightColorSensor(object):
@@ -25,7 +29,8 @@ class LightColorSensor(object):
         led_state (default False) -- The LED state
         bus (default "RPI_1") -- The I2C bus"""
         self.TCS34725 = TCS34725.TCS34725(sensor_integration_time, sensor_gain, bus)
-        self.PCA9570 = PCA9570.PCA9570(bus)
+        if PCA9570LED:
+            self.PCA9570 = PCA9570.PCA9570(bus)
         self.set_led(led_state)
     
     # set the state of the LED
@@ -36,10 +41,13 @@ class LightColorSensor(object):
         value -- The LED state
         delay (default True) -- Delay for twice the time it takes to sample. This ensures that the read immediately following the LED change will be correct.
         """
-        if value:
-            self.PCA9570.set_pins(0x00)
+        if PCA9570LED:
+            if value:
+                self.PCA9570.set_pins(0x00)
+            else:
+                self.PCA9570.set_pins(0x01)
         else:
-            self.PCA9570.set_pins(0x01)
+            self.TCS34725.set_interrupt(value)
         
         if delay:
             # Delay for twice the integration time to ensure the LED state change has taken effect and a full sample has been made before the next reading.

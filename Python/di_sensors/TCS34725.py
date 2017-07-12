@@ -127,6 +127,15 @@ class TCS34725(object):
         gain -- The gain constant. Valid values are GAIN_1X, GAIN_4X, GAIN_16X, and GAIN_60X"""
         self.i2c_bus.write_reg_8((COMMAND_BIT | CONTROL), gain)
     
+    def set_interrupt(self, state):
+        self.i2c_bus.write_reg_8((COMMAND_BIT | PERS), PERS_NONE)
+        enable = self.i2c_bus.read_reg_8u((COMMAND_BIT | ENABLE))
+        if state:
+            enable |= ENABLE_AIEN
+        else:
+            enable &= ~ENABLE_AIEN
+        self.i2c_bus.write_reg_8((COMMAND_BIT | ENABLE), enable)
+    
     def get_raw_data(self, delay = True):
         """Read the Red Green Blue and Clear values from the sensor
         
