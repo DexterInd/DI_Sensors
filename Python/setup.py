@@ -7,14 +7,40 @@
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information see https://github.com/DexterInd/GoPiGo3/blob/master/LICENSE.md
 
+try:
+	with open('package_description.rst', 'r') as file_description:
+		description = file_description.read()
+
+except IOError:
+	print(str(IOError))
+	print("make sure you have [package_description.rst] file in the same directory as [setup.py]")
+
 from setuptools import setup, find_packages
 setup(
-    name="DI_Sensors",
-    license="MIT",
-    description="Drivers and examples for using DI_Sensors in Python",
-    author="Dexter Industries",
-    version="1.0.0",
-    keywords=[
+    name = "DI_Sensors",
+    version = "1.0.0",
+
+    description = "Drivers and examples for using DI_Sensors in Python",
+    long_description = description,
+
+    author = "Dexter Industries",
+    author_email = "contact@dexterindustries.com",
+
+    license = "MIT",
+    classifiers = [
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    'Intended Audience :: Education',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: POSIX :: Linux',
+    'Programming Language :: Python :: 2',
+    'Programming Language :: Python :: 3',
+    'Topic :: Software Development :: Embedded Systems',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    ],
+    url = "https://github.com/DexterInd/DI_Sensors",
+
+    keywords = [
         "Dexter",
         "Distance Sensor",
         "Inertial Measurement Unit",
@@ -24,8 +50,7 @@ setup(
         "RGB LCD",
         "DHT Sensor",
     ],
-    url="http://www.dexterindustries.com/DI_Sensors/",
-    packages=find_packages()
+    packages = find_packages()
 
 )
 #    package_dir = {"grove_rgb_lcd" : "grove_rgb_lcd/", "distance_sensor" : "Distance_Sensor/Software/Python", "DHT" : "DHT_Sensor/",},
