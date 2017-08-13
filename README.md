@@ -21,7 +21,7 @@ Installation
 Run this command to install or update:
 
 ```
-curl --silent https://raw.githubusercontent.com/DexterInd/Raspbian_For_Robots/blob/master/upd_script/fetch_sensors.sh | bash
+curl --silent https://raw.githubusercontent.com/DexterInd/Raspbian_For_Robots/master/upd_script/fetch_sensors.sh | bash
 ```
 
 License
