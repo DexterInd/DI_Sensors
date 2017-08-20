@@ -17,8 +17,8 @@ class DHT extends DigitalSensor {
 
     REG_CMD = 40;
 
-    constructor(pin, address, bus = 'RPI_1', moduleType = DHT.DHT11, scale = DHT.SCALE_C) {
-        super(pin, bus, address);
+    constructor(pin, address, bus = 'RPI_1', moduleType = DHT.DHT11, scale = DHT.SCALE_C, opts = {}) {
+        super(pin, bus, address, opts);
 
         this.moduleType = moduleType;
         this.scale = scale;
