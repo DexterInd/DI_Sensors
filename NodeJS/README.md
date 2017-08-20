@@ -5,7 +5,7 @@ Dexter Industries Sensors
 Compatibility
 -------------
 
-The following Grove compatible devices are supported in Python:
+The following Grove compatible devices are supported:
 
 * Dexter Industries:
   * Distance Sensor
