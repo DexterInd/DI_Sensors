@@ -74,6 +74,7 @@ class DexterI2C {
             try {
                 return this.device.groveI2cTransfer(this.port, this.address, dataOut, inBytesLen);
             } catch (err) {
+                console.log(err);
                 throw new Error('[Errno 5] I/O error');
             }
         } else if (this.busName === 'BP3_1' || this.busName === 'BP3_2' || this.busName === 'BP3_3' || this.busName === 'BP3_4') {
@@ -82,6 +83,30 @@ class DexterI2C {
         }
 
         return false;
+    }
+
+    // IS THIS REALLY NEEDED!?
+    get(length, buffer) {
+        if (this.busName === 'GPG3_AD1' || this.busName === 'GPG3_AD2') {
+            try {
+                /*
+                switch (this.busName) {
+                default:
+                case 'GPG3_AD1':
+                    return this.device.spiRead32(this.device.SPI_MESSAGE_TYPE.GET_GROVE_VALUE_1);
+                case 'GPG3_AD2':
+                    return this.device.spiRead32(this.device.SPI_MESSAGE_TYPE.GET_GROVE_VALUE_2);
+                }
+                */
+                return this.device.groveI2cTransfer(this.port, this.address, [], 9);
+            } catch (err) {
+                console.log(err);
+                throw new Error('[Errno 5] I/O error');
+            }
+        } else {
+            return this.i2cBus.i2cReadSync(this.address, length, buffer);
+        }
+        // TODO: Add support to BrickPi
     }
 
     write8(val) {
@@ -157,6 +182,9 @@ class DexterI2C {
     }
 
     writeRegList(reg, list) {
+        if (typeof reg !== 'object') {
+            reg = [reg];
+        }
         this.transfer(reg.concat(list));
     }
 
@@ -166,7 +194,7 @@ class DexterI2C {
 
     readBytes(length = this.BYTES_LENGTH) {
         const buffer = new Buffer(length);
-        return this.i2cBus.i2cReadSync(this.address, length, buffer);
+        return this.get(length, buffer);
     }
 
     read8u() {

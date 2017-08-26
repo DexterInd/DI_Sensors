@@ -105,6 +105,7 @@ class VL53L0X extends Sensor {
         try {
             this.reset(address);
         } catch (err) {
+            console.log(err);
             this.reset(this.ADDRESS);
         }
 
@@ -118,6 +119,7 @@ class VL53L0X extends Sensor {
             this.i2c.setAddress(address);
             this.i2c.writeReg8(this.SOFT_RESET_GO2_SOFT_RESET_N, 0x00);
         } catch (err) {
+            console.log(err);
             // do nothing
         }
 
@@ -156,6 +158,7 @@ class VL53L0X extends Sensor {
             this.ADDRESS = address;
             this.i2c.setAddress(this.ADDRESS);
         } catch (err) {
+            console.log(err);
             this.i2c.setAddress(address);
             this.i2c.writeReg8(this.I2C_SLAVE_DEVICE_ADDRESS, address);
             this.ADDRESS = address;

@@ -12,6 +12,7 @@
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
     "prepublish": "npm run clean && npm run lint && npm run build && npm run test"
   },
+  "main": "lib/index.js",
   "files": [
     "lib",
     "src"
@@ -58,6 +59,7 @@
   "dependencies": {
     "spi-device": "^0.2.6",
     "i2c-bus": "^1.2.2",
+    "dht-sensor": "^0.0.4",
     "sleep": "^5.1.1",
     "mathjs": "^3.14.2",
     "lodash": "^4.17.4",

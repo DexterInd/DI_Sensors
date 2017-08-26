@@ -5,21 +5,17 @@
 // Released under the MIT license (http://choosealicense.com/licenses/mit/).
 // For more information see https://github.com/DexterInd/GoPiGo3/blob/master/LICENSE.md
 
-const DigitalSensor = require('./base/digitalSensor');
+const DHTDevice = require('dht-sensor');
 
-class DHT extends DigitalSensor {
-    DHT11 = 0;
-    DHT22 = 1;
-    DHT21 = 2;
-    AM2301 = 3;
+class DHT {
+    DHT11 = 11;
+    DHT22 = 22;
+    AM2302 = 22;
     SCALE_C = 'c';
     SCALE_F = 'f';
 
-    REG_CMD = 40;
-
-    constructor(pin, address, bus = 'RPI_1', moduleType = DHT.DHT11, scale = DHT.SCALE_C, opts = {}) {
-        super(pin, bus, address, opts);
-
+    constructor(pin, moduleType = DHT.DHT11, scale = DHT.SCALE_C) {
+        this.pin = pin;
         this.moduleType = moduleType;
         this.scale = scale;
     }
@@ -66,37 +62,16 @@ class DHT extends DigitalSensor {
     }
 
     read() {
-        this.i2c.writeRegList(this.REG_CMD, [this.pin, this.moduleType, 0]);
+        const data = DHTDevice.read(this.moduleType, this.pin);
+        let temp =  +(Number(parseFloat(data.temperature).toFixed(2)));
+        const hum = +(Number(parseFloat(data.humidity).toFixed(2)));
 
-        this.i2c.mwait(500);
-        this.i2c.readByte();
-        this.i2c.mwait(200);
-
-        const bytes = this.i2c.readBytes(9);
-
-        if (bytes instanceof Buffer) {
-            let hex;
-            const tempBytes = bytes.slice(1, 5).reverse();
-            const humBytes = bytes.slice(5, 9).reverse();
-
-            hex = `0x${tempBytes.toString('hex')}`;
-            let temp = (hex & 0x7fffff | 0x800000) * 1.0 / (2 ** 23) * (2 ** ((hex >> 23 & 0xff) - 127));
-            temp = +(Number(parseFloat(temp - 0.5).toFixed(2)));
-            if (this.scale === this.SCALE_F) {
-                temp = this.convertCtoF(temp);
-            }
-
-            hex = `0x${humBytes.toString('hex')}`;
-            let hum = (hex & 0x7fffff | 0x800000) * 1.0 / (2 ** 23) * (2 ** ((hex >> 23 & 0xff) - 127));
-            hum = +(Number(parseFloat(hum - 2).toFixed(2)));
-
-            const heatIndex = +(Number(parseFloat(this.getHeatIndex(temp, hum, this.scale)).toFixed(2)));
-            // From: https://github.com/adafruit/DHT-sensor-library/blob/master/DHT.cpp
-
-            return [temp, hum, heatIndex];
+        if (this.scale === this.SCALE_F) {
+            temp = this.convertCtoF(temp);
         }
 
-        return false;
+        const heatIndex = +(Number(parseFloat(this.getHeatIndex(temp, hum, this.scale)).toFixed(2)));
+        return [temp, hum, heatIndex];
     }
 }
 
