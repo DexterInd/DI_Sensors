@@ -84,7 +84,7 @@ class TCS34725 extends Sensor {
 
     enable() {
         this.i2c.writeReg8((this.COMMAND_BIT | this.ENABLE), this.ENABLE_PON);
-        this.i2c.uwait(1);
+        this.i2c.mwait(1);
         this.i2c.writeReg8((this.COMMAND_BIT | this.ENABLE), (this.ENABLE_PON | this.ENABLE_AEN));
     }
 
@@ -123,7 +123,7 @@ class TCS34725 extends Sensor {
     getRawData(delay = true) {
         if (delay) {
             // Delay for the integration time to allow reading immediately after the previous read.
-            this.i2c.uwait(((256 - this.integrationTimeVal) * 24));
+            this.i2c.mwait(((256 - this.integrationTimeVal) * 24));
         }
 
         const div = ((256 - this.integrationTimeVal) * 1024);

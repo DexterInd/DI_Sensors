@@ -30,10 +30,10 @@ class RgbLcd {
         const refreshCmd = !noRefresh ? 0x01 : 0x02;
 
         this.textCommand(refreshCmd); // clear or no-refresh
-        this.txtDevice.i2c.uwait(5);
+        this.txtDevice.i2c.mwait(5);
         this.textCommand(0x08 | 0x04); // display on, no cursor
         this.textCommand(0x28); // 2 lines
-        this.txtDevice.uwait(5);
+        this.txtDevice.mwait(5);
         let count = 0;
         let row = 0;
         for (let i = 0, len = text.length; i < len; i++) {

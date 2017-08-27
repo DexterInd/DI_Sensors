@@ -38,8 +38,8 @@ class LightColorSensor {
         }
 
         if (delay) {
-            this.lightColorDevice.i2c.uwait(
-                (((256 - this.lightColorDevice.integrationTimeVal) * 0.0024) * 2)
+            this.lightColorDevice.i2c.mwait(
+                (((256 - this.lightColorDevice.integrationTimeVal) * 24) * 2)
             );
         }
     }

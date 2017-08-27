@@ -147,11 +147,11 @@ class BME280 extends Sensor {
         // Load calibration values
         this._loadCalibration();
         this.i2c.writeReg8(this.REG_CONTROL, 0x24); // Sleep mode
-        this.i2c.uwait(2);
+        this.i2c.mwait(2);
 
         // Set the standby time
         this.i2c.writeReg8(this.REG_CONTROL, ((standby << 5) | (filter << 2)));
-        this.i2c.uwait(2);
+        this.i2c.mwait(2);
 
         // Set the sample modes
         this.i2c.writeReg8(this.REG_CONTROL_HUM, hMode); // Set Humidity Oversample
@@ -195,7 +195,7 @@ class BME280 extends Sensor {
     _readRawTemp() {
         // read raw temperature data once it's available
         while (this.i2c.readReg8u(this.REG_STATUS) & 0x08) {
-            this.i2c.uwait(2);
+            this.i2c.mwait(2);
         }
         const data = this.i2c.readRegList(this.REG_TEMP_DATA, 3);
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4;
@@ -204,7 +204,7 @@ class BME280 extends Sensor {
     _readRawPressure() {
         // read raw pressure data once it's available
         while (this.i2c.readReg8u(this.REG_STATUS) & 0x08) {
-            this.i2c.uwait(2);
+            this.i2c.mwait(2);
         }
         const data = this.i2c.readRegList(this.REG_PRESSURE_DATA, 3);
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4;
@@ -213,7 +213,7 @@ class BME280 extends Sensor {
     _readRawHumidity() {
         // read raw humidity data once it's available
         while (this.i2c.readReg8u(this.REG_STATUS) & 0x08) {
-            this.i2c.uwait(2);
+            this.i2c.mwait(2);
         }
         const data = this.i2c.readRegList(this.REG_HUMIDITY_DATA, 2);
         return (data[0] << 8) | data[1];

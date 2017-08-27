@@ -134,7 +134,7 @@ class VL53L0X extends Sensor {
             if (t2 - t1 >= 0.1) {
                 throw new Error('I/O Error');
             }
-            this.i2c.uwait(1);
+            this.i2c.mwait(1);
         }
 
         this.i2c.writeReg8(this.SOFT_RESET_GO2_SOFT_RESET_N, 0x01);
@@ -147,7 +147,7 @@ class VL53L0X extends Sensor {
             if (t2 - t1 >= 0.1) {
                 throw new Error('I/O Error');
             }
-            this.i2c.uwait(1);
+            this.i2c.mwait(1);
         }
     }
 

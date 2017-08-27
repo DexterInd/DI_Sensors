@@ -85,30 +85,6 @@ class DexterI2C {
         return false;
     }
 
-    // IS THIS REALLY NEEDED!?
-    get(length, buffer) {
-        if (this.busName === 'GPG3_AD1' || this.busName === 'GPG3_AD2') {
-            try {
-                /*
-                switch (this.busName) {
-                default:
-                case 'GPG3_AD1':
-                    return this.device.spiRead32(this.device.SPI_MESSAGE_TYPE.GET_GROVE_VALUE_1);
-                case 'GPG3_AD2':
-                    return this.device.spiRead32(this.device.SPI_MESSAGE_TYPE.GET_GROVE_VALUE_2);
-                }
-                */
-                return this.device.groveI2cTransfer(this.port, this.address, [], 9);
-            } catch (err) {
-                console.log(err);
-                throw new Error('[Errno 5] I/O error');
-            }
-        } else {
-            return this.i2cBus.i2cReadSync(this.address, length, buffer);
-        }
-        // TODO: Add support to BrickPi
-    }
-
     write8(val) {
         val = parseInt(val, 0);
         this.transfer([val]);
