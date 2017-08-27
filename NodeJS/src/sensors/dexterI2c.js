@@ -9,7 +9,7 @@ const I2C = require('i2c-bus');
 const sleep = require('sleep');
 
 class DexterI2C {
-    BYTES_LENGTH = 4;
+    static BYTES_LENGTH = 4;
 
     constructor(bus, address, opts) {
         this.device = opts.device || undefined;
@@ -168,7 +168,7 @@ class DexterI2C {
         return this.readBytes(1);
     }
 
-    readBytes(length = this.BYTES_LENGTH) {
+    readBytes(length = DexterI2C.BYTES_LENGTH) {
         const buffer = new Buffer(length);
         return this.get(length, buffer);
     }

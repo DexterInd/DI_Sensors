@@ -9,67 +9,67 @@ const Sensor = require('./base/sensor');
 
 class BME280 extends Sensor {
     // BME280 default address.
-    ADDRESS = 0x76;
+    static ADDRESS = 0x76;
 
     // Operating Modes
-    OSAMPLE_1 = 1;
-    OSAMPLE_2 = 2;
-    OSAMPLE_4 = 3;
-    OSAMPLE_8 = 4;
-    OSAMPLE_16 = 5;
+    static OSAMPLE_1 = 1;
+    static OSAMPLE_2 = 2;
+    static OSAMPLE_4 = 3;
+    static OSAMPLE_8 = 4;
+    static OSAMPLE_16 = 5;
 
     // Standby Settings
-    STANDBY_0P5 = 0;
-    STANDBY_62P5 = 1;
-    STANDBY_125 = 2;
-    STANDBY_250 = 3;
-    STANDBY_500 = 4;
-    STANDBY_1000 = 5;
-    STANDBY_10 = 6;
-    STANDBY_20 = 7;
+    static STANDBY_0P5 = 0;
+    static STANDBY_62P5 = 1;
+    static STANDBY_125 = 2;
+    static STANDBY_250 = 3;
+    static STANDBY_500 = 4;
+    static STANDBY_1000 = 5;
+    static STANDBY_10 = 6;
+    static STANDBY_20 = 7;
 
     // Filter Settings
-    FILTER_OFF = 0;
-    FILTER_2 = 1;
-    FILTER_4 = 2;
-    FILTER_8 = 3;
-    FILTER_16 = 4;
+    static FILTER_OFF = 0;
+    static FILTER_2 = 1;
+    static FILTER_4 = 2;
+    static FILTER_8 = 3;
+    static FILTER_16 = 4;
 
     // BME280 Registers
-    REG_DIG_T1 = 0x88;  // Trimming parameter registers
-    REG_DIG_T2 = 0x8A;
-    REG_DIG_T3 = 0x8C;
+    static REG_DIG_T1 = 0x88;  // Trimming parameter registers
+    static REG_DIG_T2 = 0x8A;
+    static REG_DIG_T3 = 0x8C;
 
-    REG_DIG_P1 = 0x8E;
-    REG_DIG_P2 = 0x90;
-    REG_DIG_P3 = 0x92;
-    REG_DIG_P4 = 0x94;
-    REG_DIG_P5 = 0x96;
-    REG_DIG_P6 = 0x98;
-    REG_DIG_P7 = 0x9A;
-    REG_DIG_P8 = 0x9C;
-    REG_DIG_P9 = 0x9E;
+    static REG_DIG_P1 = 0x8E;
+    static REG_DIG_P2 = 0x90;
+    static REG_DIG_P3 = 0x92;
+    static REG_DIG_P4 = 0x94;
+    static REG_DIG_P5 = 0x96;
+    static REG_DIG_P6 = 0x98;
+    static REG_DIG_P7 = 0x9A;
+    static REG_DIG_P8 = 0x9C;
+    static REG_DIG_P9 = 0x9E;
 
-    REG_DIG_H1 = 0xA1;
-    REG_DIG_H2 = 0xE1;
-    REG_DIG_H3 = 0xE3;
-    REG_DIG_H4 = 0xE4;
-    REG_DIG_H5 = 0xE5;
-    REG_DIG_H6 = 0xE6;
-    REG_DIG_H7 = 0xE7;
+    static REG_DIG_H1 = 0xA1;
+    static REG_DIG_H2 = 0xE1;
+    static REG_DIG_H3 = 0xE3;
+    static REG_DIG_H4 = 0xE4;
+    static REG_DIG_H5 = 0xE5;
+    static REG_DIG_H6 = 0xE6;
+    static REG_DIG_H7 = 0xE7;
 
-    REG_CHIPID = 0xD0;
-    REG_VERSION = 0xD1;
-    REG_SOFTRESET = 0xE0;
+    static REG_CHIPID = 0xD0;
+    static REG_VERSION = 0xD1;
+    static REG_SOFTRESET = 0xE0;
 
-    REG_STATUS = 0xF3;
-    REG_CONTROL_HUM = 0xF2;
-    REG_CONTROL = 0xF4;
-    REG_CONFIG = 0xF5;
+    static REG_STATUS = 0xF3;
+    static REG_CONTROL_HUM = 0xF2;
+    static REG_CONTROL = 0xF4;
+    static REG_CONFIG = 0xF5;
     // REG_DATA = 0xF7
-    REG_PRESSURE_DATA = 0xF7;
-    REG_TEMP_DATA     = 0xFA;
-    REG_HUMIDITY_DATA = 0xFD;
+    static REG_PRESSURE_DATA = 0xF7;
+    static REG_TEMP_DATA     = 0xFA;
+    static REG_HUMIDITY_DATA = 0xFD;
 
     constructor(bus = 'RPI_1', tMode = BME280.OSAMPLE_1, hMode = BME280.OSAMPLE_1, pMode = BME280.OSAMPLE_1, standby = BME280.STANDBY_250, filter = BME280.FILTER_OFF) {
         super(bus, BME280.ADDRESS, {
@@ -146,76 +146,76 @@ class BME280 extends Sensor {
 
         // Load calibration values
         this._loadCalibration();
-        this.i2c.writeReg8(this.REG_CONTROL, 0x24); // Sleep mode
+        this.i2c.writeReg8(BME280.REG_CONTROL, 0x24); // Sleep mode
         this.i2c.mwait(2);
 
         // Set the standby time
-        this.i2c.writeReg8(this.REG_CONTROL, ((standby << 5) | (filter << 2)));
+        this.i2c.writeReg8(BME280.REG_CONTROL, ((standby << 5) | (filter << 2)));
         this.i2c.mwait(2);
 
         // Set the sample modes
-        this.i2c.writeReg8(this.REG_CONTROL_HUM, hMode); // Set Humidity Oversample
-        this.i2c.writeReg8(this.REG_CONTROL, ((tMode << 5) | (pMode << 2) | 3)); //  Set Temp/Pressure Oversample and enter Normal mode
+        this.i2c.writeReg8(BME280.REG_CONTROL_HUM, hMode); // Set Humidity Oversample
+        this.i2c.writeReg8(BME280.REG_CONTROL, ((tMode << 5) | (pMode << 2) | 3)); //  Set Temp/Pressure Oversample and enter Normal mode
         this.tFine = 0.0;
     }
 
     _loadCalibration() {
         // Read calibration data
 
-        this.digT1 = this.i2c.readReg16u(this.REG_DIG_T1);
-        this.digT2 = this.i2c.readReg16s(this.REG_DIG_T2);
-        this.digT3 = this.i2c.readReg16s(this.REG_DIG_T3);
+        this.digT1 = this.i2c.readReg16u(BME280.REG_DIG_T1);
+        this.digT2 = this.i2c.readReg16s(BME280.REG_DIG_T2);
+        this.digT3 = this.i2c.readReg16s(BME280.REG_DIG_T3);
 
-        this.digP1 = this.i2c.readReg16u(this.REG_DIG_P1);
-        this.digP2 = this.i2c.readReg16s(this.REG_DIG_P2);
-        this.digP3 = this.i2c.readReg16s(this.REG_DIG_P3);
-        this.digP4 = this.i2c.readReg16s(this.REG_DIG_P4);
-        this.digP5 = this.i2c.readReg16s(this.REG_DIG_P5);
-        this.digP6 = this.i2c.readReg16s(this.REG_DIG_P6);
-        this.digP7 = this.i2c.readReg16s(this.REG_DIG_P7);
-        this.digP8 = this.i2c.readReg16s(this.REG_DIG_P8);
-        this.digP9 = this.i2c.readReg16s(this.REG_DIG_P9);
+        this.digP1 = this.i2c.readReg16u(BME280.REG_DIG_P1);
+        this.digP2 = this.i2c.readReg16s(BME280.REG_DIG_P2);
+        this.digP3 = this.i2c.readReg16s(BME280.REG_DIG_P3);
+        this.digP4 = this.i2c.readReg16s(BME280.REG_DIG_P4);
+        this.digP5 = this.i2c.readReg16s(BME280.REG_DIG_P5);
+        this.digP6 = this.i2c.readReg16s(BME280.REG_DIG_P6);
+        this.digP7 = this.i2c.readReg16s(BME280.REG_DIG_P7);
+        this.digP8 = this.i2c.readReg16s(BME280.REG_DIG_P8);
+        this.digP9 = this.i2c.readReg16s(BME280.REG_DIG_P9);
 
-        this.digH1 = this.i2c.readReg8u(this.REG_DIG_H1);
-        this.digH2 = this.i2c.readReg16s(this.REG_DIG_H2);
-        this.digH3 = this.i2c.readReg8u(this.REG_DIG_H3);
-        this.digH6 = this.i2c.readReg8s(this.REG_DIG_H7);
+        this.digH1 = this.i2c.readReg8u(BME280.REG_DIG_H1);
+        this.digH2 = this.i2c.readReg16s(BME280.REG_DIG_H2);
+        this.digH3 = this.i2c.readReg8u(BME280.REG_DIG_H3);
+        this.digH6 = this.i2c.readReg8s(BME280.REG_DIG_H7);
 
-        let h4 = this.i2c.readReg8s(this.REG_DIG_H4);
+        let h4 = this.i2c.readReg8s(BME280.REG_DIG_H4);
         h4 <<= 4;
-        this.digH4 = h4 | (this.i2c.readReg8u(this.REG_DIG_H5) & 0x0F);
+        this.digH4 = h4 | (this.i2c.readReg8u(BME280.REG_DIG_H5) & 0x0F);
 
-        let h5 = this.i2c.readReg_8s(this.REG_DIG_H6);
+        let h5 = this.i2c.readReg_8s(BME280.REG_DIG_H6);
         h5 <<= 4;
         this.digH5 = h5 | (
-            this.i2c.readReg8u(this.REG_DIG_H5) >> 4 & 0x0F
+            this.i2c.readReg8u(BME280.REG_DIG_H5) >> 4 & 0x0F
         );
     }
 
     _readRawTemp() {
         // read raw temperature data once it's available
-        while (this.i2c.readReg8u(this.REG_STATUS) & 0x08) {
+        while (this.i2c.readReg8u(BME280.REG_STATUS) & 0x08) {
             this.i2c.mwait(2);
         }
-        const data = this.i2c.readRegList(this.REG_TEMP_DATA, 3);
+        const data = this.i2c.readRegList(BME280.REG_TEMP_DATA, 3);
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4;
     }
 
     _readRawPressure() {
         // read raw pressure data once it's available
-        while (this.i2c.readReg8u(this.REG_STATUS) & 0x08) {
+        while (this.i2c.readReg8u(BME280.REG_STATUS) & 0x08) {
             this.i2c.mwait(2);
         }
-        const data = this.i2c.readRegList(this.REG_PRESSURE_DATA, 3);
+        const data = this.i2c.readRegList(BME280.REG_PRESSURE_DATA, 3);
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4;
     }
 
     _readRawHumidity() {
         // read raw humidity data once it's available
-        while (this.i2c.readReg8u(this.REG_STATUS) & 0x08) {
+        while (this.i2c.readReg8u(BME280.REG_STATUS) & 0x08) {
             this.i2c.mwait(2);
         }
-        const data = this.i2c.readRegList(this.REG_HUMIDITY_DATA, 2);
+        const data = this.i2c.readRegList(BME280.REG_HUMIDITY_DATA, 2);
         return (data[0] << 8) | data[1];
     }
 

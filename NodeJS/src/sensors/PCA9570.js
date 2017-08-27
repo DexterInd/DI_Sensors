@@ -8,7 +8,7 @@
 const Sensor = require('./base/sensor');
 
 class PCA9570 extends Sensor {
-    ADDRESS = 0x24;
+    static ADDRESS = 0x24;
 
     constructor(bus = 'RPI_1') {
         super(bus, PCA9570.ADDRESS);

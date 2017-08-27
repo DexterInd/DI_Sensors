@@ -8,11 +8,11 @@
 const DHTDevice = require('dht-sensor');
 
 class DHT {
-    DHT11 = 11;
-    DHT22 = 22;
-    AM2302 = 22;
-    SCALE_C = 'c';
-    SCALE_F = 'f';
+    static DHT11 = 11;
+    static DHT22 = 22;
+    static AM2302 = 22;
+    static SCALE_C = 'c';
+    static SCALE_F = 'f';
 
     constructor(pin, moduleType = DHT.DHT11, scale = DHT.SCALE_C) {
         this.pin = pin;
@@ -30,7 +30,7 @@ class DHT {
 
     getHeatIndex(temp, hum, scale) {
         // http://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
-        const needsConversion = typeof scale === 'undefined' || scale === this.SCALE_C;
+        const needsConversion = typeof scale === 'undefined' || scale === DHT.SCALE_C;
 
         temp = needsConversion ? this.convertCtoF(temp) : temp;
 
@@ -66,7 +66,7 @@ class DHT {
         let temp =  +(Number(parseFloat(data.temperature).toFixed(2)));
         const hum = +(Number(parseFloat(data.humidity).toFixed(2)));
 
-        if (this.scale === this.SCALE_F) {
+        if (this.scale === DHT.SCALE_F) {
             temp = this.convertCtoF(temp);
         }
 

@@ -11,9 +11,9 @@ const EventEmitter = require('events');
 const DexterI2C = require('../dexterI2c');
 
 class Sensor extends EventEmitter {
-    WATCH_DELAY = 100;
+    static WATCH_DELAY = 100;
     // ms
-    STREAM_DELAY = 100;
+    static STREAM_DELAY = 100;
     // ms
 
     constructor(bus, address, opts) {
@@ -23,8 +23,8 @@ class Sensor extends EventEmitter {
         this.lastValue = 0;
         this.currentValue = 0;
         this.streamInterval = this.watchInterval = undefined;
-        this.watchDelay = this.WATCH_DELAY;
-        this.streamDelay = this.STREAM_DELAY;
+        this.watchDelay = Sensor.WATCH_DELAY;
+        this.streamDelay = Sensor.STREAM_DELAY;
     }
 
     read() {}
