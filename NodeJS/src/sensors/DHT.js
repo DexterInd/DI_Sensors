@@ -14,8 +14,7 @@ class DHT {
     static SCALE_C = 'c';
     static SCALE_F = 'f';
 
-    constructor(pin, moduleType = DHT.DHT11, scale = DHT.SCALE_C) {
-        this.pin = pin;
+    constructor(moduleType = DHT.DHT11, scale = DHT.SCALE_C) {
         this.moduleType = moduleType;
         this.scale = scale;
     }
@@ -62,7 +61,9 @@ class DHT {
     }
 
     read() {
-        const data = DHTDevice.read(this.moduleType, this.pin);
+        // 2 = RapsberryPi platform ID
+        // 15 = Serial PIN
+        const data = DHTDevice.read(2, this.moduleType, 15);
         let temp =  +(Number(parseFloat(data.temperature).toFixed(2)));
         const hum = +(Number(parseFloat(data.humidity).toFixed(2)));
 

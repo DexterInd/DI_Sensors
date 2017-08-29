@@ -10,7 +10,8 @@
     "cover": "cross-env BABEL_ENV=commonjs istanbul cover _mocha -- --compilers js:babel-register --recursive",
     "lint": "eslint src test",
     "build": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-    "prepublish": "npm run clean && npm run lint && npm run build && npm run test"
+    "prepublish": "npm run clean && npm run lint && npm run build && npm run test",
+    "preinstall" : "cd ./src/DHT_drivers && npm install && cd ../"
   },
   "main": "lib/index.js",
   "files": [
@@ -59,10 +60,10 @@
   "dependencies": {
     "spi-device": "^0.2.6",
     "i2c-bus": "^1.2.2",
-    "dht-sensor": "^0.0.4",
     "sleep": "^5.1.1",
     "mathjs": "^3.14.2",
     "lodash": "^4.17.4",
-    "lock-me": "^1.0.2"
+    "lock-me": "^1.0.2",
+    "dht-sensor": "./src/DHT_drivers/"
   }
 }
