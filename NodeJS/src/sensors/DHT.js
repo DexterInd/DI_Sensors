@@ -24,7 +24,7 @@ class DHT {
     }
 
     convertFtoC(temp) {
-        return (temp - 32) * 1.8;
+        return (temp - 32) / 1.8;
     }
 
     getHeatIndex(temp, hum, scale) {
