@@ -1,14 +1,10 @@
 # dht-sensor
-node.js module to read the DHT series of humidity and temperature sensors on a Raspberry Pi 2.
+node.js module to read the DHT series of humidity and temperature sensors.
 
-### Setup
-``` bash
-$ npm install dht-sensor --save
-```
 ### Example
 ``` javascript
-var dht = require('dht-sensor');
-var current = dht.read(11, 18); // 11 : DHT11, 18 : BCM GPIO  
+const dht = require('dht-sensor');
+const current = dht.read(2, 11, 15); // 2: RaspberryPi (platform ID), 11: DHT11 (module type), 15: (pin)
 
 console.log(current.humidity);
 console.log(current.temperature);
