@@ -1,7 +1,7 @@
 {
-  "name": "dht-sensor",
-  "version": "0.0.1",
-  "description": "node.js module to read the DHT series of humidity and temperature sensors on a Raspberry Pi.",
+  "name": "dht-drivers",
+  "version": "0.0.2",
+  "description": "Node.js module to read the DHT series of humidity and temperature sensors on a Raspberry Pi.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
