@@ -18,11 +18,12 @@ The following Grove compatible devices are supported in Python:
 
 Installation
 ------------
-Run this command to install or update:
 
+In order to quick install the `DI_Sensors` repository, open up a terminal and type the following command:
 ```
-curl --silent https://raw.githubusercontent.com/DexterInd/Raspbian_For_Robots/master/upd_script/fetch_sensors.sh | bash
+sudo curl -L dexterindustries.com/update_sensors | bash
 ```
+The same command can be used for updating the `DI_Sensors` to the latest version.
 
 License
 -------
