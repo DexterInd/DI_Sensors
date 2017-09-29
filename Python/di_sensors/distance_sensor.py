@@ -12,43 +12,78 @@ from __future__ import division
 from di_sensors import VL53L0X
 import time
 
-
 class DistanceSensor(object):
-    """Drivers for the Dexter Industries Distance Sensor"""
-    
+    """
+    Class for interfacing with the `Distance Sensor`_.
+    """
+
     def __init__(self, bus = "RPI_1"):
-        """Initialize the sensor
-        
-        Keyword arguments:
-        bus (default "RPI_1") -- The I2C bus"""
+        """
+        Constructor for initializing a :py:class:`~di_sensors.distance_sensor.DistanceSensor` class.
+
+        :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :raises ~exceptions.OSError: When the distance sensor is not connected to the designed bus/port. Most probably, this means the distance sensor is not connected at all.
+
+        """
+
         self.VL53L0X = VL53L0X.VL53L0X(bus = bus)
-        
+
         # set to long range (about 2 meters)
         self.VL53L0X.set_signal_rate_limit(0.1)
         self.VL53L0X.set_vcsel_pulse_period(self.VL53L0X.VcselPeriodPreRange, 18)
         self.VL53L0X.set_vcsel_pulse_period(self.VL53L0X.VcselPeriodFinalRange, 14)
-    
+
     def start_continuous(self, period_ms = 0):
-        """Start taking continuous measurements
-        
-        Keyword arguments:
-        period_ms (default 0) -- The time in ms between measurements"""
+        """
+        Start taking continuous measurements.
+        Once this method is called, then the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous` method should be called periodically, depending on the value that was set to ``period_ms`` parameter.
+
+        :param int period_ms = 0: The time between measurements. Can be set to anywhere between **20 ms** and **5 secs**.
+        :raises ~exceptions.OSError: When it cannot communicate with the device.
+
+        The advantage of this method over the simple :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_single` method is that this method allows for faster reads. Therefore, this method should be used by those that
+        want maximum performance from the sensor.
+
+        Also, the greater the value set to ``period_ms``, the higher is the accuracy of the distance sensor.
+
+        """
         self.VL53L0X.start_continuous(period_ms)
-    
+
     def read_range_continuous(self):
-        """Read range while taking continuous measurements
-        
-        Returns distance in mm"""
+        """
+        Read the detected range while the sensor is taking continuous measurements at the set rate.
+
+        :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
+        :rtype: int
+        :raises ~exceptions.OSError: When the distance sensor is not reachable or when the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous` hasn't been called before. This exception gets raised also when the user is trying to poll data faster than how it was initially set with the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous` method.
+
+        .. important::
+
+            If this method is called in a shorter timeframe than the period that was set through :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous`, a :py:exc:`~exceptions.OSError` exception is thrown.
+
+            There's also a timeout on this method that's set to **0.5 secs**. Having this timeout set to **0.5 secs** means that the :py:exc:`~exceptions.OSError` gets thrown when the ``period_ms`` parameter of the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous`
+            method is bigger than **500 ms**.
+
+        """
         return self.VL53L0X.read_range_continuous_millimeters()
-    
+
     def read_range_single(self):
-        """Read range with a single measurement
-        
-        Returns distance in mm"""
+        """
+        Read the detected range with a single measurement. This is less precise/fast than its counterpart :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous`, but it's easier to use.
+
+        :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
+        :rtype: int
+        :raises ~exceptions.OSError: When the distance sensor is not reachable.
+
+        """
         return self.VL53L0X.read_range_single_millimeters()
-    
+
     def timeout_occurred(self):
-        """Check if timeout occured
-        
-        Returns True if timeout, otherwise False"""
+        """
+        Checks if a timeout has occurred on the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous` method.
+
+        :returns: Whether a timeout has occurred or not.
+        :rtype: boolean
+
+        """
         return self.VL53L0X.timeout_occurred()

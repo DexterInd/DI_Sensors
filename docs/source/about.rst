@@ -21,7 +21,7 @@ Who are we and what we do.
 What's this documentation about.
 ********************************
 
-This documentation is all about the sensors that `Dexter Industries`_ produces and maintains - that's where the **DI** acronym comes from.
+This documentation is all about the sensors that `Dexter Industries`_ produces and maintains - that's where the **DI** acronym comes from. All the source code for these sensors has been written in Python.
 Within this documentation, you will find instructions on:
 
    * How to get started with the DI-Sensors - in general it refers to how to install them on your Raspberry Pi.
