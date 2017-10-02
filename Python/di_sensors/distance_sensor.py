@@ -22,7 +22,7 @@ class DistanceSensor(object):
         Constructor for initializing a :py:class:`~di_sensors.distance_sensor.DistanceSensor` class.
 
         :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :raises ~exceptions.OSError: When the distance sensor is not connected to the designed bus/port. Most probably, this means the distance sensor is not connected at all.
+        :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port. Most probably, this means the distance sensor is not connected at all.
 
         """
 
@@ -83,7 +83,7 @@ class DistanceSensor(object):
         Checks if a timeout has occurred on the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous` method.
 
         :returns: Whether a timeout has occurred or not.
-        :rtype: boolean
+        :rtype: bool
 
         """
         return self.VL53L0X.timeout_occurred()
