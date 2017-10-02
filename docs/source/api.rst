@@ -47,11 +47,11 @@ LightColorSensor
    :special-members:
    :exclude-members: __weakref__
 
-================
-LightColorSensor
-================
+============
+TempHumPress
+============
 
-.. autoclass:: di_sensors.light_color_sensor.LightColorSensor
+.. autoclass:: di_sensors.temp_hum_press.TempHumPress
   :members:
   :special-members:
   :exclude-members: __weakref__
@@ -59,3 +59,4 @@ LightColorSensor
 
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
+.. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
