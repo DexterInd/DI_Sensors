@@ -205,18 +205,18 @@ class BNO055(object):
 
     def __init__(self, bus = "RPI_1", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
         """Initialize the sensor
-        
+
         Keyword arguments:
         bus (default "RPI_1") -- The I2C bus
         address (default ADDRESS_A) -- The BNO055 I2C address
         mode (default OPERATION_MODE_NDOF) -- The operation mode
         units (default 0) -- The value unit selection bits"""
-        
+
         # create an I2C bus object and set the address
         self.i2c_bus = dexter_i2c.Dexter_I2C(bus = bus, address = address)
-        
+
         self._mode = mode
-        
+
         # Send a thow-away command and ignore any response or I2C errors
         # just to make sure the BNO055 is in a good state and ready to accept
         # commands (this seems to be necessary after a hard power down).
@@ -225,54 +225,54 @@ class BNO055(object):
         except IOError:
             # pass on an I2C IOError
             pass
-        
+
         # switch to config mode
         self._config_mode()
         self.i2c_bus.write_reg_8(REG_PAGE_ID, 0)
-        
+
         # check the chip ID
         bno_id = self.i2c_bus.read_reg_8u(REG_CHIP_ID)
         if bno_id != ID:
             raise RuntimeError("BNO055 failed to respond")
-        
+
         # reset the device using the reset command
         self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x20)
-        
+
         # wait 650ms after reset for chip to be ready (recommended in datasheet)
         time.sleep(0.65)
-        
+
         # set to normal power mode
         self.i2c_bus.write_reg_8(REG_PWR_MODE, POWER_MODE_NORMAL)
-        
+
         # default to internal oscillator
         self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x00)
-        
+
         # set the unit selection bits
         self.i2c_bus.write_reg_8(REG_UNIT_SEL, units)
-        
+
         # switch to normal operation mode
         self._operation_mode()
-    
+
     def _config_mode(self):
         # switch to configuration mode
         self.set_mode(OPERATION_MODE_CONFIG)
-    
+
     def _operation_mode(self):
         # switch to operation mode (to read sensor data)
         self.set_mode(self._mode)
-    
+
     def set_mode(self, mode):
         """Set operation mode for the sensor
-        
+
         Keyword arguments:
         mode -- the operation mode. See BNO055 datasheet tables 3-3 and 3-5."""
         self.i2c_bus.write_reg_8(REG_OPR_MODE, mode & 0xFF)
         # delay for 30 milliseconds according to datasheet
         time.sleep(0.03)
-    
+
     def get_revision(self):
         """Get revision numbers
-        
+
         Returns a tuple with revision numbers for Software revision, Bootloader
             version, Accelerometer ID, Magnetometer ID, and Gyro ID."""
         # Read revision values.
@@ -285,10 +285,10 @@ class BNO055(object):
         sw = ((sw_msb << 8) | sw_lsb) & 0xFFFF
         # Return the results as a tuple of all 5 values.
         return (sw, bl, accel, mag, gyro)
-    
+
     def set_external_crystal(self, external_crystal):
         """Set the BNO055 to use the internal/external oscillator
-        
+
         Keyword arguments:
         external_crystal -- use external crystal?"""
         # Switch to configuration mode.
@@ -300,13 +300,13 @@ class BNO055(object):
             self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x00)
         # Go back to normal operation mode.
         self._operation_mode()
-    
+
     def get_system_status(self, run_self_test = True):
         """Get the sensor system status
-        
+
         Keyword arguments:
         run_self_test (default True) -- Run a self test? This will make the sensor go into config mode which will stop the fusion engine.
-        
+
         Returns a tuple with status information. Three values will be returned:
           - System status register value with the following meaning:
               0 = Idle
@@ -351,23 +351,36 @@ class BNO055(object):
             self._operation_mode()
         else:
             self_test = None
-        
+
         # read status and error values
         status = self.i2c_bus.read_reg_8u(REG_SYS_STAT)
         error = self.i2c_bus.read_reg_8u(REG_SYS_ERR)
-        
+
         # return the results as a tuple of all 3 values
         return (status, self_test, error)
-    
+
     def get_calibration_status(self):
-        """Get calibration status
-        
-        Returns the calibration status of the sensors as a 4 tuple with
-        calibration status as follows:
-          - System, 3=fully calibrated, 0=not calibrated
-          - Gyroscope, 3=fully calibrated, 0=not calibrated
-          - Accelerometer, 3=fully calibrated, 0=not calibrated
-          - Magnetometer, 3=fully calibrated, 0=not calibrated
+        """
+        Get calibration status of the `InertialMeasurementUnit Sensor`_.
+
+        The moment the sensor is powered, this method should be called almost continuously until the sensor is fully calibrated.
+        For calibrating the sensor faster, it's enough to hold the sensor for a couple of seconds on each "face" of an imaginary cube.
+
+        For each component of the system, there is a number that says how much the component has been calibrated:
+
+          * **System**, ``3`` = fully calibrated, ``0`` = not calibrated.
+          * **Gyroscope**, ``3`` = fully calibrated, ``0`` = not calibrated.
+          * **Accelerometer**, ``3`` = fully calibrated, ``0`` = not calibrated.
+          * **Magnetometer**, ``3`` = fully calibrated, ``0`` = not calibrated.
+
+        :returns:  A tuple where each member shows how much a component of the IMU is calibrated. See the above description of the method.
+        :rtype: (int,int,int,int)
+        :raises ~exceptions.OSError: When the `InertialMeasurementUnit Sensor`_ is not reachable.
+
+        .. important::
+
+            The sensor needs a new calibration each time it's powered up.
+
         """
         # Return the calibration status register value.
         cal_status = self.i2c_bus.read_reg_8u(REG_CALIB_STAT)
@@ -377,10 +390,10 @@ class BNO055(object):
         mag = cal_status & 0x03
         # Return the results as a tuple of all 3 values.
         return (sys, gyro, accel, mag)
-    
+
     def get_calibration(self):
         """Get calibration data
-        
+
         Returns the sensor's calibration data as an array of 22 bytes.
         Can be saved and then reloaded with set_calibration to quickly
         calibrate from a previously calculated set of calibration data.
@@ -392,10 +405,10 @@ class BNO055(object):
         # Go back to normal operation mode.
         self._operation_mode()
         return cal_data
-    
+
     def set_calibration(self, data):
         """Set calibration data
-        
+
         Keyword arguments:
         data -- a 22 byte list of calibration data to write to the sensor that was previously read with get_calibration.
         """
@@ -408,10 +421,10 @@ class BNO055(object):
         self.i2c_bus.write_reg_list(ACCEL_OFFSET_X_LSB, data)
         # Go back to normal operation mode.
         self._operation_mode()
-    
+
     def get_axis_remap(self):
         """Get axis remap information
-        
+
         Returns a tuple with the axis remap register values. This will return
         6 values with the following meaning:
           - X axis remap (a value of AXIS_REMAP_X, AXIS_REMAP_Y, or AXIS_REMAP_Z.
@@ -424,11 +437,11 @@ class BNO055(object):
                          normal or negative/inverted.  The default is positive.)
           - Y axis sign (see above)
           - Z axis sign (see above)
-        
+
         Note that by default the axis orientation of the BNO chip looks like
         the following (taken from section 3.4, page 24 of the datasheet).  Notice
         the dot in the corner that corresponds to the dot on the BNO chip:
-        
+
                            | Z axis
                            |
                            |   / X axis
@@ -450,11 +463,11 @@ class BNO055(object):
         z_sign = sign_config & 0x01
         # Return the results as a tuple of all 3 values.
         return (x, y, z, x_sign, y_sign, z_sign)
-    
+
     def set_axis_remap(self, x, y, z, x_sign=AXIS_REMAP_POSITIVE,
            y_sign=AXIS_REMAP_POSITIVE, z_sign=AXIS_REMAP_POSITIVE):
         """Set axis remap
-        
+
         Keyword arguments:
         x -- set to one of AXIS_REMAP_X, AXIS_REMAP_Y, or AXIS_REMAP_Z
         y --                     ''
@@ -462,7 +475,7 @@ class BNO055(object):
         x_sign -- set to AXIS_REMAP_POSITIVE or AXIS_REMAP_NEGATIVE
         y_sign --                    ''
         z_sign --                    ''
-        
+
         See the get_axis_remap documentation and datasheet section 3.4 for more information
         """
         # Switch to configuration mode.
@@ -481,7 +494,7 @@ class BNO055(object):
         self.i2c_bus.write_reg_8(REG_AXIS_MAP_SIGN, sign_config)
         # Go back to normal operation mode.
         self._operation_mode()
-    
+
     def _read_vector(self, reg, count = 3):
         # Read count number of 16-bit signed values starting from the provided
         # register. Returns a tuple of the values that were read.
@@ -492,60 +505,60 @@ class BNO055(object):
             if result[i] & 0x8000: #> 32767:
                 result[i] -= 0x10000 #65536
         return result
-    
+
     def read_euler(self):
         """Read the absolute orientation
-        
+
         Returns the current absolute orientation as a tuple of heading, roll, and pitch euler angles in degrees."""
         heading, roll, pitch = self._read_vector(REG_EULER_H_LSB)
         return (heading/16.0, roll/16.0, pitch/16.0)
-    
+
     def read_magnetometer(self):
         """Read the magnetometer
-        
+
         Returns the current magnetometer reading as a tuple of X, Y, Z values in micro-Teslas."""
         x, y, z = self._read_vector(REG_MAG_DATA_X_LSB)
         return (x/16.0, y/16.0, z/16.0)
-    
+
     def read_gyroscope(self):
         """Read the gyroscope
-        
+
         Returns the current gyroscope (angular velocity) reading as a tuple of X, Y, Z values in degrees per second."""
         (x, y, z) = self._read_vector(REG_GYRO_DATA_X_LSB)
         return (x/16.0, y/16.0, z/16.0)
-    
+
     def read_accelerometer(self):
         """Read the accelerometer
-        
+
         Returns the current accelerometer reading as a tuple of X, Y, Z values in meters/second^2."""
         x, y, z = self._read_vector(REG_ACCEL_DATA_X_LSB)
         return (x/100.0, y/100.0, z/100.0)
-    
+
     def read_linear_acceleration(self):
         """Read linear acceleration
-        
+
         Returns the current linear acceleration (acceleration from movement not from gravity) reading as a tuple of X, Y, Z values in meters/second^2."""
         x, y, z = self._read_vector(REG_LINEAR_ACCEL_DATA_X_LSB)
         return (x/100.0, y/100.0, z/100.0)
-    
+
     def read_gravity(self):
         """Read gravity
-        
+
         Returns the current gravity reading as a tuple of X, Y, Z values in meters/second^2."""
         x, y, z = self._read_vector(REG_GRAVITY_DATA_X_LSB)
         return (x/100.0, y/100.0, z/100.0)
-    
+
     def read_quaternion(self):
         """Read the quaternion values
-        
+
         Returns the current orientation as a tuple of X, Y, Z, W quaternion values."""
         w, x, y, z = self._read_vector(REG_QUATERNION_DATA_W_LSB, 4)
         # Scale values, see 3.6.5.5 in the datasheet.
         scale = (1.0 / (1<<14))
         return (x*scale, y*scale, z*scale, w*scale)
-    
+
     def read_temp(self):
         """Read the temperature
-        
+
         Returns the current temperature in degrees celsius."""
         return self.i2c_bus.read_reg_8s(REG_TEMP)

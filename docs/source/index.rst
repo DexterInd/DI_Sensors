@@ -7,6 +7,8 @@
 Dexter Industries DI-Sensors Documentation!
 ###########################################
 
+.. image:: https://i.imgur.com/V1LUKyql.jpg
+
 .. toctree::
    :maxdepth: 2
    :numbered:
@@ -15,8 +17,8 @@ Dexter Industries DI-Sensors Documentation!
    about
    quickstart
    api
-   examples
-
+   devguide
+   faq
 
 Indices and tables
 ==================

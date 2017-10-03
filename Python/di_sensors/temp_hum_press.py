@@ -22,7 +22,7 @@ class TempHumPress(object):
         Constructor for initializing link with the `Temperature Humidity Pressure Sensor`_.
 
         :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :raises IOError: When the sensor cannot be reached.
+        :raises ~exceptions.OSError: When the sensor cannot be reached.
 
         """
         self.BME280 = BME280.BME280(bus = bus, t_mode = BME280.OSAMPLE_2, p_mode = BME280.OSAMPLE_4, h_mode = BME280.OSAMPLE_4, standby = BME280.STANDBY_10, filter = BME280.FILTER_8)
@@ -33,7 +33,7 @@ class TempHumPress(object):
 
         :returns: Temperature in Celsius degrees.
         :rtype: float
-        :raises IOError: When the sensor cannot be reached.
+        :raises ~exceptions.OSError: When the sensor cannot be reached.
 
         """
         return self.BME280.read_temperature()
@@ -44,7 +44,7 @@ class TempHumPress(object):
 
         :returns: Temperature in Fahrenheit degrees.
         :rtype: float
-        :raises IOError: When the sensor cannot be reached.
+        :raises ~exceptions.OSError: When the sensor cannot be reached.
 
         """
         return self.BME280.read_temperature_f()
@@ -55,7 +55,7 @@ class TempHumPress(object):
 
         :returns: The air pressure in pascals.
         :rtype: float
-        :raises IOError: When the sensor cannot be reached.
+        :raises ~exceptions.OSError: When the sensor cannot be reached.
 
         """
         return self.BME280.read_pressure()
@@ -66,7 +66,7 @@ class TempHumPress(object):
 
         :returns: Percentage of the relative humidity.
         :rtype: float
-        :raises IOError: When the sensor cannot be reached.
+        :raises ~exceptions.OSError: When the sensor cannot be reached.
 
         """
         return self.BME280.read_humidity()

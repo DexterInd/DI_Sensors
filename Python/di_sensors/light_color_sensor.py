@@ -30,7 +30,8 @@ class LightColorSensor(object):
         :param int sensor_gain = di_sensors.TCS34725.GAIN_16X: The gain constant of the sensor. Valid values are :py:const:`di_sensors.TCS34725.GAIN_1X`, :py:const:`di_sensors.TCS34725.GAIN_4X`, :py:const:`di_sensors.TCS34725.GAIN_16X` or :py:const:`di_sensors.TCS34725.GAIN_60X`.
         :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned on.
         :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :raises IOError: When the `Light Color Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Light Color Sensor`_ is not reachable.
+        :raises ~exceptions.RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `Light Color Sensor`_.
 
         """
         self.TCS34725 = TCS34725.TCS34725(sensor_integration_time, sensor_gain, bus)
@@ -45,7 +46,7 @@ class LightColorSensor(object):
 
         :param bool value: If set to ``True``, then the LED turns on, otherwise it stays off.
         :param bool delay = True: When it's set to ``True``, the LED turns on after *2 * time_to_take_sample* seconds have passed. This ensures that the next read following the LED change will be correct.
-        :raises IOError: When the `Light Color Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Light Color Sensor`_ is not reachable.
 
         """
         if PCA9570LED:
@@ -67,7 +68,7 @@ class LightColorSensor(object):
         :param bool delay = True: Delay for the time it takes to sample. This allows immediately consecutive readings that aren't redundant. Used in conjuction with the :py:meth:`~di_sensors.light_color_sensor.set_led` method.
         :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear).
         :rtype: (float,float,float,float) where the range of each element is between 0 and 1.
-        :raises IOError: If the `Light Color Sensor`_ can't be reached.
+        :raises ~exceptions.OSError: If the `Light Color Sensor`_ can't be reached.
 
         """
 
