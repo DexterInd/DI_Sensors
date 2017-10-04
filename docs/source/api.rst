@@ -27,7 +27,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
     * The ``"RPI_1"`` bus - this bus can be used on all 4 platforms we have (the GoPiGo3, GoPiGo, BrickPi3 & GrovePi). This bus corresponds to the ``"I2C"`` port.
     * The ``"GPG3_AD1"``/``"GPG3_AD2"`` buses - these buses can **only** be used on the GoPiGo3 platform. The advantage of using these ones is that the interface between the Raspberry Pi and the sensor is more stable. These buses correspond to the ``"AD1"`` and ``"AD2"`` ports of the GoPiGo3.
 
-For seeing where the ``"AD1"``/``"AD2"`` are located on the GoPiGo3, please check the GoPiGo3's `documentation <http://gopigo3.readthedocs.io/en/latest>`__.
+For seeing where the ``"AD1"``/``"AD2"`` are located on the GoPiGo3, please check the GoPiGo3's `documentation <http://gopigo3.readthedocs.io>`__.
 
 ==============
 DistanceSensor
