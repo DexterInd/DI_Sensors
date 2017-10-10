@@ -12,17 +12,17 @@ from __future__ import print_function
 from __future__ import division
 
 import time
-from di_sensors import light_color_sensor
+from di_sensors.light_color_sensor import LightColorSensor
 
 print("Example program for reading a Dexter Industries Light Color Sensor on an I2C port.")
 
-lcs = light_color_sensor.LightColorSensor(led_state = True)
+lcs = LightColorSensor(led_state = True)
 
 while True:
     # Read the R, G, B, C color values
-    r, g, b, c = lcs.get_raw_colors()
-    
+    red, green, blue, clear = lcs.get_raw_colors()
+
     # Print the values
-    print('Red: %5.3f Green: %5.3f Blue: %5.3f Clear: %5.3f' % (r, g, b, c))
-    
+    print("Red: {:5.3f} Green: {:5.3f} Blue: {:5.3f} Clear: {:5.3f}".format(red, green, blue, clear))
+
     time.sleep(0.02)
