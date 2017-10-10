@@ -14,9 +14,9 @@ from __future__ import division
 import time
 from di_sensors.distance_sensor import DistanceSensor
 
-print("Example program for reading a Dexter Industries Distance Sensor on a GoPiGo3 AD1 port.")
+print("Example program for reading a Dexter Industries Distance Sensor on an I2C port.")
 
-dsensor = DistanceSensor("GPG3_AD1")
+dsensor = DistanceSensor()
 
 while True:
     # read the distance as a single-shot sample

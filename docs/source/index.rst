@@ -16,6 +16,7 @@ Dexter Industries DI-Sensors Documentation!
 
    about
    quickstart
+   examples/index
    api
    devguide
    faq
