@@ -13,7 +13,7 @@ and then run the following script.
 
 The advantage of this script over the one in the following section is that the time taken for reading the distance
 can be fine-tuned by the user - for instance, it can be made to run as fast as possible (see the API to see how fast it can read) or it can be made to go very slow.
-Each fine-tune has its benefits and disadvantages, so the user has to experiment with the sensor and determine what setting best suits him.
+Each fine-tune has its benefits and disadvantages, so the user has to experiment with the sensor and determine what setting suits him best.
 
 .. literalinclude:: ../../../Python/Examples/DistanceSensorContinuous.py
    :language: python
