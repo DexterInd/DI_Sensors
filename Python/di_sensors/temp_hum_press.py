@@ -32,7 +32,7 @@ class TempHumPress(object):
         """Read the temperature in fahrenheit
         
         Returns the temperature in fahrenheit"""
-        return (self.temperature_celcius() * ((9.0 / 5.0) + 32.0))
+        return self.BME280.read_temperature_f()
     
     def get_pressure(self):
         """Read the pressure in pascals
