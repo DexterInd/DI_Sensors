@@ -5,7 +5,7 @@ About DI-Sensors
 ################
 
 **************************
-Who are we and what we do.
+Who we are and what we do.
 **************************
 
 .. the image size was extracted from the image manually
