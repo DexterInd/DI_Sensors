@@ -17,12 +17,12 @@ from di_sensors.distance_sensor import DistanceSensor
 print("Example program for reading a Dexter Industries Distance Sensor on an I2C port.")
 
 # establish communication with the DistanceSensor
-dsensor = DistanceSensor()
+ds = DistanceSensor()
 
 # set the sensor in fast-polling-mode
-dsensor.start_continuous()
+ds.start_continuous()
 
 while True:
     # read the distance in millimeters
-    read_distance = dsensor.read_range_continuous()
+    read_distance = ds.read_range_continuous()
     print("distance from object: {} mm".format(read_distance))

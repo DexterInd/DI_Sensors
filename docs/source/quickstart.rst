@@ -21,7 +21,7 @@ In order to run code found in this documentation, you need to head over to our o
 What I can use the sensors with
 *******************************
 
-All these sensors can be used with the following 3 platforms:
+All these sensors can be used with the following platforms:
 
    * The `BrickPi3`_.
 
@@ -56,7 +56,7 @@ In order to install the DI-Sensors package you need to open up a terminal on you
 Enter the command and follow the instructions given, if provided.
 This command can also be used for updating the package with the latest changes.
 
-To find more about our source code, please visit the `DI-Sensors repository`_ on GitHub.
+To find more about our source code, please visit the `DI_Sensors repository`_ on GitHub.
 
 .. _shop: https://www.dexterindustries.com/shop/
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
