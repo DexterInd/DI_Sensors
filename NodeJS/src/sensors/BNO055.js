@@ -228,6 +228,9 @@ class BNO055 extends Sensor {
         // set the unit selection bits
         this.i2c.writeReg8(BNO055.REG_UNIT_SEL, units);
 
+        // set temperature source to gyroscope, as it seems to be more accurate.
+        this.i2c.writeReg8(BNO055.REG_TEMP_SOURCE, 0x01);
+
         // switch to normal operation mode
         this._operationMode();
     }
