@@ -1,6 +1,6 @@
 {
   "name": "di-sensors",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Drivers and examples for using DI_Sensors in Node.js",
   "scripts": {
     "clean": "rimraf lib",
