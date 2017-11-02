@@ -249,7 +249,10 @@ class BNO055(object):
 
         # set the unit selection bits
         self.i2c_bus.write_reg_8(REG_UNIT_SEL, units)
-
+        
+        # set temperature source to gyroscope, as it seems to be more accurate.
+        self.i2c_bus.write_reg_8(REG_TEMP_SOURCE, 0x01)
+        
         # switch to normal operation mode
         self._operation_mode()
 
@@ -401,7 +404,7 @@ class BNO055(object):
         # Switch to configuration mode, as mentioned in section 3.10.4 of datasheet.
         self._config_mode()
         # Read the 22 bytes of calibration data
-        cal_data = self.i2c_bus.read_reg_list(ACCEL_OFFSET_X_LSB, 22)
+        cal_data = self.i2c_bus.read_reg_list(REG_ACCEL_OFFSET_X_LSB, 22)
         # Go back to normal operation mode.
         self._operation_mode()
         return cal_data
@@ -418,7 +421,7 @@ class BNO055(object):
         # Switch to configuration mode, as mentioned in section 3.10.4 of datasheet.
         self._config_mode()
         # Set the 22 bytes of calibration data.
-        self.i2c_bus.write_reg_list(ACCEL_OFFSET_X_LSB, data)
+        self.i2c_bus.write_reg_list(REG_ACCEL_OFFSET_X_LSB, data)
         # Go back to normal operation mode.
         self._operation_mode()
 
