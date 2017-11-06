@@ -49,6 +49,7 @@ class TempHumPress(object):
         """
         return self.BME280.read_temperature_f()
 
+
     def get_pressure(self):
         """
         Read the air pressure in pascals.
