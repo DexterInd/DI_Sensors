@@ -203,7 +203,7 @@ OPERATION_MODE_NDOF         = 0x0C
 
 class BNO055(object):
 
- def __init__(self, bus = "RPI_1", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
+    def __init__(self, bus = "RPI_1", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
         """Initialize the sensor
 
         Keyword arguments:
