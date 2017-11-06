@@ -64,6 +64,7 @@ class LightColorSensor(object):
     def get_raw_colors(self, delay = True):
         """
         Read the sensor values.
+
         :param bool delay = True: Delay for the time it takes to sample. If the delay is set to be added, then we are ensured to get fresh values on every call. Used in conjuction with the :py:meth:`~di_sensors.light_color_sensor.set_led` method.
         :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear).
         :rtype: (float,float,float,float) where the range of each element is between 0 and 1.

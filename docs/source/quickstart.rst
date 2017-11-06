@@ -8,11 +8,7 @@ Getting Started
 Buying our sensors
 ******************
 
-<<<<<<< HEAD
-In order to use this documentation, you fist need to head over to our online `shop`_ and get yourself one of the following sensors:
-=======
 In order to run code found in this documentation, you need to head over to our online `shop`_ and get yourself one of the following sensors:
->>>>>>> 192a9f824de17c803d96511c581aafe97714650a
 
    * The DI `IMU Sensor`_.
    * The DI `Light and Color Sensor`_.
