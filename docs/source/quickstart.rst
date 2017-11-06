@@ -8,7 +8,11 @@ Getting Started
 Buying our sensors
 ******************
 
+<<<<<<< HEAD
 In order to use this documentation, you fist need to head over to our online `shop`_ and get yourself one of the following sensors:
+=======
+In order to run code found in this documentation, you need to head over to our online `shop`_ and get yourself one of the following sensors:
+>>>>>>> 192a9f824de17c803d96511c581aafe97714650a
 
    * The DI `IMU Sensor`_.
    * The DI `Light and Color Sensor`_.
@@ -21,7 +25,7 @@ In order to use this documentation, you fist need to head over to our online `sh
 What I can use the sensors with
 *******************************
 
-All these sensors can be used with the following 3 platforms:
+All these sensors can be used with the following platforms:
 
    * The `BrickPi3`_.
 
@@ -56,7 +60,7 @@ In order to install the DI-Sensors package you need to open up a terminal on you
 Enter the command and follow the instructions given, if provided.
 This command can also be used for updating the package with the latest changes.
 
-To find more about our source code, please visit the `DI-Sensors repository`_ on GitHub.
+To find more about our source code, please visit the `DI_Sensors repository`_ on GitHub.
 
 .. _shop: https://www.dexterindustries.com/shop/
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
@@ -66,4 +70,6 @@ To find more about our source code, please visit the `DI-Sensors repository`_ on
 .. _brickpi3: https://www.dexterindustries.com/shop/brickpi-starter-kit/
 .. _gopigo3: https://www.dexterindustries.com/shop/gopigo3-robot-base-kit/
 .. _grovepi: https://www.dexterindustries.com/shop/grovepi-starter-kit-raspberry-pi/
-.. _di-sensors repository: https://github.com/DexterInd/DI_Sensors.git
+
+.. _di_sensors repository: https://github.com/DexterInd/DI_Sensors.git
+

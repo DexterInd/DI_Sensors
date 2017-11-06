@@ -5,7 +5,7 @@ About DI-Sensors
 ################
 
 **************************
-Who are we and what we do.
+Who we are and what we do.
 **************************
 
 .. the image size was extracted from the image manually
@@ -21,13 +21,13 @@ Who are we and what we do.
 What's this documentation about.
 ********************************
 
-This documentation is all about the sensors that `Dexter Industries`_ produces and maintains - that's where the **DI** acronym comes from. All the source code for these sensors has been written in Python.
+The documentation details how to use the sensors that `Dexter Industries`_ produces and maintains - that's where the **DI** acronym comes from. All the source code for these sensors has been written in Python.
 Within this documentation, you will find instructions on:
 
    * How to get started with the DI-Sensors - in general it refers to how to install them on your Raspberry Pi.
-   * How to get going with the examples found in our repository. In the `DI-Sensors repository`_ that we maintain and care about, you can find all the source code for our sensors and example programs.
+   * How to get going with the examples found in our repository. In the `DI_Sensors repository`_, you can find all the source code for our sensors and example programs.
    * How to use our DI-Sensors - we offer a thorough API on the sensors we have.
 
 
-.. _di-sensors repository: https://github.com/DexterInd/DI_Sensors.git
+.. _di_sensors repository: https://github.com/DexterInd/DI_Sensors.git
 .. _dexter industries: https://www.dexterindustries.com

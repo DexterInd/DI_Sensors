@@ -235,26 +235,17 @@ class BNO055(object):
         if ID != self.i2c_bus.read_reg_8u(REG_CHIP_ID):
             raise RuntimeError("BNO055 failed to respond")
 
-        if self.i2c_bus.read_reg_8u(REG_TEMP_SOURCE) != 0x01:
-            # print("Doing init")
+        # reset the device using the reset command
+        self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x20)
 
-            # reset the device using the reset command
-            self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x20)
+        # wait 650ms after reset for chip to be ready (recommended in datasheet)
+        time.sleep(0.65)
 
-            # wait 650ms after reset for chip to be ready (recommended in datasheet)
-            time.sleep(0.65)
+        # set to normal power mode
+        self.i2c_bus.write_reg_8(REG_PWR_MODE, POWER_MODE_NORMAL)
 
-            # set to normal power mode
-            self.i2c_bus.write_reg_8(REG_PWR_MODE, POWER_MODE_NORMAL)
-
-            # default to internal oscillator
-            self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x00)
-
-            # set temperature source to gyroscope, as it seems to be more accurate.
-            self.i2c_bus.write_reg_8(REG_TEMP_SOURCE, 0x01)
-        else:
-            pass
-            #print("Skipping init")
+        # default to internal oscillator
+        self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, 0x00)
 
         # set the unit selection bits
         self.i2c_bus.write_reg_8(REG_UNIT_SEL, units)
