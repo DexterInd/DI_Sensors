@@ -59,7 +59,7 @@ class DistanceSensor(object):
 
         .. important::
 
-            If this method is called in a shorter timeframe than the period that was set through :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous`, a :py:exc:`~exceptions.OSError` exception is thrown.
+            If this method is called in a shorter timeframe than the period that was set through :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous`, an :py:exc:`~exceptions.OSError` exception is thrown.
 
             There's also a timeout on this method that's set to **0.5 secs**. Having this timeout set to **0.5 secs** means that the :py:exc:`~exceptions.OSError` gets thrown when the ``period_ms`` parameter of the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous`
             method is bigger than **500 ms**.

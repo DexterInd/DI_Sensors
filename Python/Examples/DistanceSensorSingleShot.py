@@ -12,14 +12,13 @@ from __future__ import print_function
 from __future__ import division
 
 import time
-from di_sensors import distance_sensor
+from di_sensors.distance_sensor import DistanceSensor
 
-print("Example program for reading a Dexter Industries Distance Sensor on a GoPiGo3 AD1 port.")
+print("Example program for reading a Dexter Industries Distance Sensor on an I2C port.")
 
-ds = distance_sensor.DistanceSensor("GPG3_AD1")
+ds = DistanceSensor()
 
 while True:
     # read the distance as a single-shot sample
-    print("%4dmm" % ds.read_range_single())
-    if ds.timeout_occurred():
-        print(" TIMEOUT")
+    read_distance = ds.read_range_single()
+    print("distance from object: {} mm".format(read_distance))
