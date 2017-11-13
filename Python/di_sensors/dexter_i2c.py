@@ -11,6 +11,10 @@ from __future__ import division
 
 import time
 
+
+# Enable one of the communication libraries
+# This is not meant to change on a regular basis
+# If Periphery doesn't work for you, uncomment either pigpio or smbus
 #RPI_1_Module = "pigpio"
 #RPI_1_Module = "smbus"
 RPI_1_Module = "periphery"
