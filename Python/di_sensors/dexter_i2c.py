@@ -12,6 +12,23 @@ from __future__ import division
 import time
 
 
+# Enabling one of the communication libraries
+# This is not meant to change on a regular basis
+# If Periphery doesn't work for you, uncomment either pigpio or smbus
+#RPI_1_Module = "pigpio"
+#RPI_1_Module = "smbus"
+RPI_1_Module = "periphery"
+
+if RPI_1_Module == "pigpio":
+    import pigpio
+elif RPI_1_Module == "smbus":
+    import smbus
+elif RPI_1_Module == "periphery":
+    from periphery import I2C
+else:
+    raise IOError("RPI_1 module not supported")
+
+
 class Dexter_I2C(object):
     """Dexter Industries I2C drivers for hardware and software I2C busses"""
 
@@ -25,14 +42,14 @@ class Dexter_I2C(object):
         if bus == "RPI_1":
             self.bus_name = bus
 
-            self.hw_module_pigpio = False
-            if self.hw_module_pigpio:
-                import pigpio
+            if RPI_1_Module == "pigpio":
                 self.i2c_bus = pigpio.pi()
                 self.i2c_bus_handle = None
-            else:
-                import smbus
+            elif RPI_1_Module == "smbus":
                 self.i2c_bus = smbus.SMBus(1)
+            elif RPI_1_Module == "periphery":
+                self.bus_name = bus
+                self.i2c_bus = I2C("/dev/i2c-1")
         elif bus == "GPG3_AD1" or bus == "GPG3_AD2":
             self.bus_name = bus
 
@@ -66,13 +83,20 @@ class Dexter_I2C(object):
 
         self.big_endian = big_endian
 
+    def reconfig_bus(self):
+        """Reconfigure I2C bus
+
+        Reconfigure I2C port. If the port configuration got reset, call this method to reconfigure it."""
+        if self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
+            self.gpg3.set_grove_type(self.port, self.gpg3.GROVE_TYPE.I2C)
+
     def set_address(self, address):
         """Set I2C address
 
         Keyword arguments:
         address -- the slave I2C address"""
         self.address = address
-        if self.bus_name == "RPI_1" and self.hw_module_pigpio:
+        if self.bus_name == "RPI_1" and RPI_1_Module == "pigpio":
             if self.i2c_bus_handle:
                 self.i2c_bus.i2c_close(self.i2c_bus_handle)
             self.i2c_bus_handle = self.i2c_bus.i2c_open(1, address, 0)
@@ -86,7 +110,7 @@ class Dexter_I2C(object):
 
         Returns list of bytes read"""
         if self.bus_name == "RPI_1":
-            if self.hw_module_pigpio:
+            if RPI_1_Module == "pigpio":
                 if(len(outArr) >= 2 and inBytes == 0):
                     self.i2c_bus.i2c_write_i2c_block_data(self.i2c_bus_handle, outArr[0], outArr[1:])
                 elif(len(outArr) == 1 and inBytes == 0):
@@ -97,17 +121,31 @@ class Dexter_I2C(object):
                     return self.i2c_bus.i2c_read_byte(self.i2c_bus_handle)
                 else:
                     raise IOError("I2C operation not supported")
-            else:
+            elif RPI_1_Module == "smbus":
                 if(len(outArr) >= 2 and inBytes == 0):
                     self.i2c_bus.write_i2c_block_data(self.address, outArr[0], outArr[1:])
                 elif(len(outArr) == 1 and inBytes == 0):
                     self.i2c_bus.write_byte(self.address, outArr[0])
                 elif(len(outArr) == 1 and inBytes >= 1):
                     return self.i2c_bus.read_i2c_block_data(self.address, outArr[0], inBytes)
-                elif(len(outArr) == 0 and inBytes >= 1):
+                elif(len(outArr) == 0 and inBytes == 1):
                     return self.i2c_bus.read_byte(self.address)
                 else:
                     raise IOError("I2C operation not supported")
+            elif RPI_1_Module == "periphery":
+                msgs = []
+                offset = 0
+                if(len(outArr) > 0):
+                    msgs.append(self.i2c_bus.Message(outArr))
+                    offset = 1
+                if(inBytes):
+                    r = [0 for b in range(inBytes)]
+                    msgs.append(self.i2c_bus.Message(r, read = True))
+                if(len(msgs) >= 1):
+                    self.i2c_bus.transfer(self.address, msgs)
+                if(inBytes):
+                    return msgs[offset].data
+                return
 
         elif self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
             try:
@@ -240,6 +278,31 @@ class Dexter_I2C(object):
             return val - 0x10000
         return val
 
+    def read_32u(self, big_endian = None):
+        """Read a 32-bit unsigned value
+
+        Keyword arguments:
+        big_endian (default None) -- True (big endian), False (little endian), or None (use the pre-defined endianness for the object)
+
+        Returns the value
+        """
+        val = self.transfer([], 4)
+        if big_endian == None:
+            big_endian = self.big_endian
+        if big_endian:
+            return (val[0] << 24) | (val[1] << 16) | (val[2] << 8) | val[3]
+        else:
+            return (val[3] << 24) | (val[2] << 16) | (val[1] << 8) | val[0]
+
+    def read_list(self, len):
+        """Read a list of bytes
+
+        Keyword arguments:
+        len -- the number of bytes to read
+
+        Returns a list of the bytes read"""
+        return self.transfer([], len)
+
     def read_reg_list(self, reg, len):
         """Read a list of bytes from a register
 
@@ -249,10 +312,3 @@ class Dexter_I2C(object):
 
         Returns a list of the bytes read"""
         return self.transfer([reg], len)
-
-    def reconfig_bus(self):
-        """Reconfigure I2C bus
-
-        Reconfigure I2C port. If the port configuration got reset, call this method to reconfigure it."""
-        if self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
-            self.gpg3.set_grove_type(self.port, self.gpg3.GROVE_TYPE.I2C)
