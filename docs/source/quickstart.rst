@@ -67,4 +67,3 @@ To find more about our source code, please visit the `DI_Sensors repository`_ on
 .. _gopigo3: https://www.dexterindustries.com/shop/gopigo3-robot-base-kit/
 .. _grovepi: https://www.dexterindustries.com/shop/grovepi-starter-kit-raspberry-pi/
 .. _di_sensors repository: https://github.com/DexterInd/DI_Sensors.git
-
