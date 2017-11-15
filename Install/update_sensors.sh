@@ -37,3 +37,4 @@ sudo python3 setup.py install
 popd
 
 sudo pip install python-periphery
+sudo pip3 install python-periphery
