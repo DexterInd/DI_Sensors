@@ -5,7 +5,11 @@ About DI-Sensors
 ################
 
 **************************
+<<<<<<< HEAD
+Who are we and what we do.
+=======
 Who we are and what we do.
+>>>>>>> 192a9f824de17c803d96511c581aafe97714650a
 **************************
 
 .. the image size was extracted from the image manually
