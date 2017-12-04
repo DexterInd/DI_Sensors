@@ -12,7 +12,6 @@ from __future__ import division
 from di_sensors import VL53L0X
 import time
 
-
 class DistanceSensor(object):
     """
     Class for interfacing with the `Distance Sensor`_.
@@ -69,7 +68,6 @@ class DistanceSensor(object):
 
     def read_range_single(self):
         """
-
         Read the detected range with a single measurement. This is less precise/fast than its counterpart :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous`, but it's easier to use.
 
         :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
