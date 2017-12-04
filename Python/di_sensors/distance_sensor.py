@@ -25,7 +25,6 @@ class DistanceSensor(object):
         :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port. Most probably, this means the distance sensor is not connected at all.
 
         """
-
         self.VL53L0X = VL53L0X.VL53L0X(bus = bus)
 
         # set to long range (about 2 meters)

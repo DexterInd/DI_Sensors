@@ -32,8 +32,17 @@
 # ones.
 import os
 import sys
+from mock import Mock as MagicMock
 
 sys.path.insert(0, os.path.abspath('../../Python'))
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return MagicMock()
+
+MOCK_MODULES = ['periphery']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
