@@ -19,9 +19,16 @@ The following Grove compatible devices are supported in Python:
 Installation
 ------------
 
-In order to quick install the `DI_Sensors` repository, open up a terminal and type the following command:
+In order to quick install the `DI_Sensors` repository, open up a terminal and type one of the 2 following commands:
+
+1. For installing the python packages of the `DI_Sensors` with root privileges (except any other settings that can come with), use the following command:
 ```
-sudo curl -kL dexterindustries.com/update_sensors | bash
+sudo sh -c "curl -kL dexterindustries.com/update_sensors | bash"
+```
+
+2. For installing the python packages of the `DI_Sensors` without root privileges (except any other settings that can come with), use the following command:
+```
+curl -kL dexterindustries.com/update_sensors | bash
 ```
 The same command can be used for updating the `DI_Sensors` to the latest version.
 
