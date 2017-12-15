@@ -1,4 +1,4 @@
-DI_Sensors
+DI_Sensors [![Documentation Status](http://readthedocs.org/projects/di-sensors/badge/?version=master)](http://di-sensors.readthedocs.io/en/master/?badge=master)
 ============
 Dexter Industries Sensors
 
