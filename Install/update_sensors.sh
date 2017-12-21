@@ -27,14 +27,14 @@ else
 fi
 
 pushd $SENSOR_DIR/Python
-sudo python setup.py install
-sudo python3 setup.py install
+python setup.py install
+python3 setup.py install
 popd
 
 pushd $SENSOR_DIR/Python/di_sensors/DHT_Sensor
-sudo python setup.py install
-sudo python3 setup.py install
+python setup.py install
+python3 setup.py install
 popd
 
-sudo pip install python-periphery
-sudo pip3 install python-periphery
+pip install python-periphery
+pip3 install python-periphery

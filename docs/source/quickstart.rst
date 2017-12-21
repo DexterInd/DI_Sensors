@@ -51,7 +51,7 @@ In order to install the DI-Sensors package you need to open up a terminal on you
 
 .. code-block:: bash
 
-   sudo curl -kL dexterindustries.com/update_sensors | bash
+   sudo sh -c "curl -kL dexterindustries.com/update_sensors | bash"
 
 Enter the command and follow the instructions given, if provided.
 This command can also be used for updating the package with the latest changes.
