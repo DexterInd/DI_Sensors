@@ -14,7 +14,7 @@ The following Grove compatible devices are supported in Python:
 
   * **[Light Color Sensor](https://www.dexterindustries.com/shop/light-color-sensor/)** - The Light & Color Sensor attaches to the GrovePi, GoPiGo and BrickPi to measure light levels and detect different colors. It can be used to build projects like a rubiks cube solver, weather station, or plant monitoring station.
 
-  * **[Temperature Humidity Pressure Sensor](https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/) **- The Temperature Humidity and Pressure Sensor attaches to the GrovePi, GoPiGo and BrickPi to measure environmental conditions. It can be used to build projects like a classroom weather station or plant monitoring station.
+  * **[Temperature Humidity Pressure Sensor](https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/)**- The Temperature Humidity and Pressure Sensor attaches to the GrovePi, GoPiGo and BrickPi to measure environmental conditions. It can be used to build projects like a classroom weather station or plant monitoring station.
 
 * Grove:
   * RGB LCD
