@@ -70,7 +70,7 @@ class DistanceSensor(object):
         """
         Read the detected range with a single measurement. This is less precise/fast than its counterpart :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous`, but it's easier to use.
 
-        :param boolean safe_infinity = True: As sometimes the distance sensor returns a small value when there's nothing in front of it, we need to poll again and again to confirm the presence of an obstacle. Setting safe_infinity to False will avoid that extra polling.
+        :param boolean safe_infinity = True: As sometimes the distance sensor returns a small value when there's nothing in front of it, we need to poll again and again to confirm the presence of an obstacle. Setting ``safe_infinity`` to ``False`` will avoid that extra polling.
 
         :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
         :rtype: int
