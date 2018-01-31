@@ -66,16 +66,30 @@ class DistanceSensor(object):
         """
         return self.VL53L0X.read_range_continuous_millimeters()
 
-    def read_range_single(self):
+    def read_range_single(self, safe_infinity=True):
         """
         Read the detected range with a single measurement. This is less precise/fast than its counterpart :py:meth:`~di_sensors.distance_sensor.DistanceSensor.read_range_continuous`, but it's easier to use.
+
+        :param boolean safe_infinity = True: As sometimes the distance sensor returns a small value when there's nothing in front of it, we need to poll again and again to confirm the presence of an obstacle. Setting safe_infinity to False will avoid that extra polling.
 
         :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
         :rtype: int
         :raises ~exceptions.OSError: When the distance sensor is not reachable.
 
         """
-        return self.VL53L0X.read_range_single_millimeters()
+        value = self.VL53L0X.read_range_single_millimeters()
+
+        # Because it happens that the distance sensor will return a small value
+        # when it should read infinity, if we do read a small value,
+        # then poll again and again to ensure it's an actual small value
+        if safe_infinity and value < 8190:
+            for i in range(3):
+                value = self.VL53L0X.read_range_single_millimeters()
+                if value >= 8190:
+                        return value
+
+        return value
+
 
     def timeout_occurred(self):
         """
