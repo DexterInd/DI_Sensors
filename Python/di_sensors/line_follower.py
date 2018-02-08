@@ -52,7 +52,7 @@ class LineFollower(object):
         #    time.sleep(0.0013)
         #array = self.i2c_bus.read_list(ReadBytes)
         
-        array = self.i2c_bus.read_reg_list(mode, ReadBytes)
+        array = self.i2c_bus.read_list(mode, ReadBytes)
         
         for g in range(3):
             for s in range(4):
@@ -65,7 +65,7 @@ class LineFollower(object):
         #self.i2c_bus.write_8(0x11)
         #array = self.i2c_bus.read_list(20)
         
-        array = self.i2c_bus.read_reg_list(0x11, 20)
+        array = self.i2c_bus.read_list(0x11, 20)
         
         name = ""
         for c in range(20):
@@ -79,7 +79,7 @@ class LineFollower(object):
         #self.i2c_bus.write_8(0x12)
         #array = self.i2c_bus.read_list(20)
         
-        array = self.i2c_bus.read_reg_list(0x12, 20)
+        array = self.i2c_bus.read_list(0x12, 20)
         
         name = ""
         for c in range(20):
@@ -91,5 +91,5 @@ class LineFollower(object):
     
     def get_version_firmware(self):
         self.i2c_bus.write_8(0x13)
-        return self.i2c_bus.read_32u()
+        return self.i2c_bus.read_32()
     
