@@ -232,10 +232,10 @@ class BNO055(object):
         self.i2c_bus.write_reg_8(REG_PAGE_ID, 0)
 
         # check the chip ID
-        if ID != self.i2c_bus.read_reg_8u(REG_CHIP_ID):
+        if ID != self.i2c_bus.read_8(REG_CHIP_ID):
             raise RuntimeError("BNO055 failed to respond")
 
-        if self.i2c_bus.read_reg_8u(REG_TEMP_SOURCE) != 0x01:
+        if self.i2c_bus.read_8(REG_TEMP_SOURCE) != 0x01:
             # print("Doing init")
 
             # reset the device using the reset command
@@ -288,12 +288,12 @@ class BNO055(object):
         Returns a tuple with revision numbers for Software revision, Bootloader
             version, Accelerometer ID, Magnetometer ID, and Gyro ID."""
         # Read revision values.
-        accel = self.i2c_bus.read_reg_8u(REG_ACCEL_REV_ID)
-        mag = self.i2c_bus.read_reg_8u(REG_MAG_REV_ID)
-        gyro = self.i2c_bus.read_reg_8u(REG_GYRO_REV_ID)
-        bl = self.i2c_bus.read_reg_8u(REG_BL_REV_ID)
-        sw_lsb = self.i2c_bus.read_reg_8u(REG_SW_REV_ID_LSB)
-        sw_msb = self.i2c_bus.read_reg_8u(REG_SW_REV_ID_MSB)
+        accel = self.i2c_bus.read_8(REG_ACCEL_REV_ID)
+        mag = self.i2c_bus.read_8(REG_MAG_REV_ID)
+        gyro = self.i2c_bus.read_8(REG_GYRO_REV_ID)
+        bl = self.i2c_bus.read_8(REG_BL_REV_ID)
+        sw_lsb = self.i2c_bus.read_8(REG_SW_REV_ID_LSB)
+        sw_msb = self.i2c_bus.read_8(REG_SW_REV_ID_MSB)
         sw = ((sw_msb << 8) | sw_lsb) & 0xFFFF
         # Return the results as a tuple of all 5 values.
         return (sw, bl, accel, mag, gyro)
@@ -353,20 +353,20 @@ class BNO055(object):
             # Switch to configuration mode if running self test.
             self._config_mode()
             # Perform a self test.
-            sys_trigger = self.i2c_bus.read_reg_8u(REG_SYS_TRIGGER)
+            sys_trigger = self.i2c_bus.read_8(REG_SYS_TRIGGER)
             self.i2c_bus.write_reg_8(REG_SYS_TRIGGER, sys_trigger | 0x1)
             # Wait for self test to finish.
             time.sleep(1.0)
             # Read test result.
-            self_test = self.i2c_bus.read_reg_8u(REG_SELFTEST_RESULT)
+            self_test = self.i2c_bus.read_8(REG_SELFTEST_RESULT)
             # Go back to operation mode.
             self._operation_mode()
         else:
             self_test = None
 
         # read status and error values
-        status = self.i2c_bus.read_reg_8u(REG_SYS_STAT)
-        error = self.i2c_bus.read_reg_8u(REG_SYS_ERR)
+        status = self.i2c_bus.read_8(REG_SYS_STAT)
+        error = self.i2c_bus.read_8(REG_SYS_ERR)
 
         # return the results as a tuple of all 3 values
         return (status, self_test, error)
@@ -395,7 +395,7 @@ class BNO055(object):
 
         """
         # Return the calibration status register value.
-        cal_status = self.i2c_bus.read_reg_8u(REG_CALIB_STAT)
+        cal_status = self.i2c_bus.read_8(REG_CALIB_STAT)
         sys = (cal_status >> 6) & 0x03
         gyro = (cal_status >> 4) & 0x03
         accel = (cal_status >> 2) & 0x03
@@ -413,7 +413,7 @@ class BNO055(object):
         # Switch to configuration mode, as mentioned in section 3.10.4 of datasheet.
         self._config_mode()
         # Read the 22 bytes of calibration data
-        cal_data = self.i2c_bus.read_reg_list(REG_ACCEL_OFFSET_X_LSB, 22)
+        cal_data = self.i2c_bus.read_list(REG_ACCEL_OFFSET_X_LSB, 22)
         # Go back to normal operation mode.
         self._operation_mode()
         return cal_data
@@ -464,12 +464,12 @@ class BNO055(object):
                   |____________|/
         """
         # Get the axis remap register value.
-        map_config = self.i2c_bus.read_reg_8u(REG_AXIS_MAP_CONFIG)
+        map_config = self.i2c_bus.read_8(REG_AXIS_MAP_CONFIG)
         z = (map_config >> 4) & 0x03
         y = (map_config >> 2) & 0x03
         x = map_config & 0x03
         # Get the axis remap sign register value.
-        sign_config = self.i2c_bus.read_reg_8u(REG_AXIS_MAP_SIGN)
+        sign_config = self.i2c_bus.read_8(REG_AXIS_MAP_SIGN)
         x_sign = (sign_config >> 2) & 0x01
         y_sign = (sign_config >> 1) & 0x01
         z_sign = sign_config & 0x01
@@ -510,7 +510,7 @@ class BNO055(object):
     def _read_vector(self, reg, count = 3):
         # Read count number of 16-bit signed values starting from the provided
         # register. Returns a tuple of the values that were read.
-        data = self.i2c_bus.read_reg_list(reg, count*2)
+        data = self.i2c_bus.read_list(reg, count*2)
         result = [0]*count
         for i in range(count):
             result[i] = (((data[(i * 2) + 1] & 0xFF) << 8) | (data[(i * 2)] & 0xFF)) & 0xFFFF
@@ -573,4 +573,4 @@ class BNO055(object):
         """Read the temperature
 
         Returns the current temperature in degrees celsius."""
-        return self.i2c_bus.read_reg_8s(REG_TEMP)
+        return self.i2c_bus.read_8(REG_TEMP, signed = True)
