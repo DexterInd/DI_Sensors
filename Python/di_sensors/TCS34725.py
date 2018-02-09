@@ -82,7 +82,7 @@ class TCS34725(object):
         self.i2c_bus = dexter_i2c.Dexter_I2C(bus = bus, address = ADDRESS, big_endian = False)
         
         # Make sure we're connected to the right sensor.
-        chip_id = self.i2c_bus.read_reg_8u((COMMAND_BIT | ID))
+        chip_id = self.i2c_bus.read_8((COMMAND_BIT | ID))
         if chip_id != 0x44:
             raise RuntimeError('Incorrect chip ID.')
         
@@ -103,7 +103,7 @@ class TCS34725(object):
     def disable(self):
         """Disable the sensor"""
         # Clear the power and enable bits.
-        reg = self.i2c_bus.read_reg_8u((COMMAND_BIT | ENABLE))
+        reg = self.i2c_bus.read_8((COMMAND_BIT | ENABLE))
         reg &= ~(ENABLE_PON | ENABLE_AEN)
         self.i2c_bus.write_reg_8((COMMAND_BIT | ENABLE), reg)
     
@@ -129,7 +129,7 @@ class TCS34725(object):
     
     def set_interrupt(self, state):
         self.i2c_bus.write_reg_8((COMMAND_BIT | PERS), PERS_NONE)
-        enable = self.i2c_bus.read_reg_8u((COMMAND_BIT | ENABLE))
+        enable = self.i2c_bus.read_8((COMMAND_BIT | ENABLE))
         if state:
             enable |= ENABLE_AIEN
         else:
@@ -150,10 +150,10 @@ class TCS34725(object):
         div = ((256 - self.integration_time_val) * 1024)
         
         # Read each color register.
-        r = self.i2c_bus.read_reg_16u((COMMAND_BIT | RDATAL)) / div
-        g = self.i2c_bus.read_reg_16u((COMMAND_BIT | GDATAL)) / div
-        b = self.i2c_bus.read_reg_16u((COMMAND_BIT | BDATAL)) / div
-        c = self.i2c_bus.read_reg_16u((COMMAND_BIT | CDATAL)) / div
+        r = self.i2c_bus.read_16((COMMAND_BIT | RDATAL)) / div
+        g = self.i2c_bus.read_16((COMMAND_BIT | GDATAL)) / div
+        b = self.i2c_bus.read_16((COMMAND_BIT | BDATAL)) / div
+        c = self.i2c_bus.read_16((COMMAND_BIT | CDATAL)) / div
         if r > 1:
             r = 1
         if g > 1:

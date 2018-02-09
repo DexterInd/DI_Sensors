@@ -134,53 +134,53 @@ class BME280(object):
     def _load_calibration(self):
         # Read calibration data
         
-        self.dig_T1 = self.i2c_bus.read_reg_16u(REG_DIG_T1)
-        self.dig_T2 = self.i2c_bus.read_reg_16s(REG_DIG_T2)
-        self.dig_T3 = self.i2c_bus.read_reg_16s(REG_DIG_T3)
+        self.dig_T1 = self.i2c_bus.read_16(REG_DIG_T1)
+        self.dig_T2 = self.i2c_bus.read_16(REG_DIG_T2, signed = True)
+        self.dig_T3 = self.i2c_bus.read_16(REG_DIG_T3, signed = True)
         
-        self.dig_P1 = self.i2c_bus.read_reg_16u(REG_DIG_P1)
-        self.dig_P2 = self.i2c_bus.read_reg_16s(REG_DIG_P2)
-        self.dig_P3 = self.i2c_bus.read_reg_16s(REG_DIG_P3)
-        self.dig_P4 = self.i2c_bus.read_reg_16s(REG_DIG_P4)
-        self.dig_P5 = self.i2c_bus.read_reg_16s(REG_DIG_P5)
-        self.dig_P6 = self.i2c_bus.read_reg_16s(REG_DIG_P6)
-        self.dig_P7 = self.i2c_bus.read_reg_16s(REG_DIG_P7)
-        self.dig_P8 = self.i2c_bus.read_reg_16s(REG_DIG_P8)
-        self.dig_P9 = self.i2c_bus.read_reg_16s(REG_DIG_P9)
+        self.dig_P1 = self.i2c_bus.read_16(REG_DIG_P1)
+        self.dig_P2 = self.i2c_bus.read_16(REG_DIG_P2, signed = True)
+        self.dig_P3 = self.i2c_bus.read_16(REG_DIG_P3, signed = True)
+        self.dig_P4 = self.i2c_bus.read_16(REG_DIG_P4, signed = True)
+        self.dig_P5 = self.i2c_bus.read_16(REG_DIG_P5, signed = True)
+        self.dig_P6 = self.i2c_bus.read_16(REG_DIG_P6, signed = True)
+        self.dig_P7 = self.i2c_bus.read_16(REG_DIG_P7, signed = True)
+        self.dig_P8 = self.i2c_bus.read_16(REG_DIG_P8, signed = True)
+        self.dig_P9 = self.i2c_bus.read_16(REG_DIG_P9, signed = True)
         
-        self.dig_H1 = self.i2c_bus.read_reg_8u(REG_DIG_H1)
-        self.dig_H2 = self.i2c_bus.read_reg_16s(REG_DIG_H2)
-        self.dig_H3 = self.i2c_bus.read_reg_8u(REG_DIG_H3)
-        self.dig_H6 = self.i2c_bus.read_reg_8s(REG_DIG_H7)
+        self.dig_H1 = self.i2c_bus.read_8(REG_DIG_H1)
+        self.dig_H2 = self.i2c_bus.read_16(REG_DIG_H2, signed = True)
+        self.dig_H3 = self.i2c_bus.read_8(REG_DIG_H3)
+        self.dig_H6 = self.i2c_bus.read_8(REG_DIG_H7, signed = True)
         
-        h4 = self.i2c_bus.read_reg_8s(REG_DIG_H4)
+        h4 = self.i2c_bus.read_8(REG_DIG_H4, signed = True)
         h4 = (h4 << 4)
-        self.dig_H4 = h4 | (self.i2c_bus.read_reg_8u(REG_DIG_H5) & 0x0F)
+        self.dig_H4 = h4 | (self.i2c_bus.read_8(REG_DIG_H5) & 0x0F)
         
-        h5 = self.i2c_bus.read_reg_8s(REG_DIG_H6)
+        h5 = self.i2c_bus.read_8(REG_DIG_H6, signed = True)
         h5 = (h5 << 4)
         self.dig_H5 = h5 | (
-        self.i2c_bus.read_reg_8u(REG_DIG_H5) >> 4 & 0x0F)
+        self.i2c_bus.read_8(REG_DIG_H5) >> 4 & 0x0F)
     
     def _read_raw_temp(self):
         # read raw temperature data once it's available
-        while (self.i2c_bus.read_reg_8u(REG_STATUS) & 0x08):
+        while (self.i2c_bus.read_8(REG_STATUS) & 0x08):
             time.sleep(0.002)
-        data = self.i2c_bus.read_reg_list(REG_TEMP_DATA, 3)
+        data = self.i2c_bus.read_list(REG_TEMP_DATA, 3)
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4
     
     def _read_raw_pressure(self):
         # read raw pressure data once it's available
-        while (self.i2c_bus.read_reg_8u(REG_STATUS) & 0x08):
+        while (self.i2c_bus.read_8(REG_STATUS) & 0x08):
             time.sleep(0.002)
-        data = self.i2c_bus.read_reg_list(REG_PRESSURE_DATA, 3)
+        data = self.i2c_bus.read_list(REG_PRESSURE_DATA, 3)
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4
     
     def _read_raw_humidity(self):
         # read raw humidity data once it's available
-        while (self.i2c_bus.read_reg_8u(REG_STATUS) & 0x08):
+        while (self.i2c_bus.read_8(REG_STATUS) & 0x08):
             time.sleep(0.002)
-        data = self.i2c_bus.read_reg_list(REG_HUMIDITY_DATA, 2)
+        data = self.i2c_bus.read_list(REG_HUMIDITY_DATA, 2)
         return (data[0] << 8) | data[1]
     
     def read_temperature(self):

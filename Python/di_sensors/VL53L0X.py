@@ -151,7 +151,7 @@ class VL53L0X(object):
             self.i2c_bus.set_address(self.ADDRESS)
 
     def init(self):
-        self.i2c_bus.write_reg_8(VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, (self.i2c_bus.read_reg_8u(VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV) | 0x01)) # set bit 0
+        self.i2c_bus.write_reg_8(VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, (self.i2c_bus.read_8(VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV) | 0x01)) # set bit 0
 
         # "Set I2C standard mode"
         self.i2c_bus.write_reg_8(0x88, 0x00)
@@ -159,13 +159,13 @@ class VL53L0X(object):
         self.i2c_bus.write_reg_8(0x80, 0x01)
         self.i2c_bus.write_reg_8(0xFF, 0x01)
         self.i2c_bus.write_reg_8(0x00, 0x00)
-        self.stop_variable = self.i2c_bus.read_reg_8u(0x91)
+        self.stop_variable = self.i2c_bus.read_8(0x91)
         self.i2c_bus.write_reg_8(0x00, 0x01)
         self.i2c_bus.write_reg_8(0xFF, 0x00)
         self.i2c_bus.write_reg_8(0x80, 0x00)
 
         # disable SIGNAL_RATE_MSRC (bit 1) and SIGNAL_RATE_PRE_RANGE (bit 4) limit checks
-        self.i2c_bus.write_reg_8(MSRC_CONFIG_CONTROL, (self.i2c_bus.read_reg_8u(MSRC_CONFIG_CONTROL) | 0x12))
+        self.i2c_bus.write_reg_8(MSRC_CONFIG_CONTROL, (self.i2c_bus.read_8(MSRC_CONFIG_CONTROL) | 0x12))
 
         # set final range signal rate limit to 0.25 MCPS (million counts per second)
         self.set_signal_rate_limit(0.25)
@@ -183,7 +183,7 @@ class VL53L0X(object):
         # The SPAD map (RefGoodSpadMap) is read by VL53L0X_get_info_from_device() in
         # the API, but the same data seems to be more easily readable from
         # GLOBAL_CONFIG_SPAD_ENABLES_REF_0 through _6, so read it from there
-        ref_spad_map = self.i2c_bus.read_reg_list(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, 6)
+        ref_spad_map = self.i2c_bus.read_list(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, 6)
 
         # -- VL53L0X_set_reference_spads() begin (assume NVM values are valid)
 
@@ -315,7 +315,7 @@ class VL53L0X(object):
         # -- VL53L0X_SetGpioConfig() begin
 
         self.i2c_bus.write_reg_8(SYSTEM_INTERRUPT_CONFIG_GPIO, 0x04)
-        self.i2c_bus.write_reg_8(GPIO_HV_MUX_ACTIVE_HIGH, self.i2c_bus.read_reg_8u(GPIO_HV_MUX_ACTIVE_HIGH) & ~0x10) # active low
+        self.i2c_bus.write_reg_8(GPIO_HV_MUX_ACTIVE_HIGH, self.i2c_bus.read_8(GPIO_HV_MUX_ACTIVE_HIGH) & ~0x10) # active low
         self.i2c_bus.write_reg_8(SYSTEM_INTERRUPT_CLEAR, 0x01)
 
         # -- VL53L0X_SetGpioConfig() end
@@ -378,7 +378,7 @@ class VL53L0X(object):
         self.i2c_bus.write_reg_8(0x00, 0x00)
 
         self.i2c_bus.write_reg_8(0xFF, 0x06)
-        self.i2c_bus.write_reg_8(0x83, self.i2c_bus.read_reg_8u(0x83) | 0x04)
+        self.i2c_bus.write_reg_8(0x83, self.i2c_bus.read_8(0x83) | 0x04)
         self.i2c_bus.write_reg_8(0xFF, 0x07)
         self.i2c_bus.write_reg_8(0x81, 0x01)
 
@@ -387,19 +387,19 @@ class VL53L0X(object):
         self.i2c_bus.write_reg_8(0x94, 0x6b)
         self.i2c_bus.write_reg_8(0x83, 0x00)
         self.start_timeout()
-        while (self.i2c_bus.read_reg_8u(0x83) == 0x00):
+        while (self.i2c_bus.read_8(0x83) == 0x00):
             if (self.check_timeout_expired()):
                 return 0, 0, False
 
         self.i2c_bus.write_reg_8(0x83, 0x01)
-        tmp = self.i2c_bus.read_reg_8u(0x92)
+        tmp = self.i2c_bus.read_8(0x92)
 
         count = tmp & 0x7f
         type_is_aperture = (tmp >> 7) & 0x01
 
         self.i2c_bus.write_reg_8(0x81, 0x00)
         self.i2c_bus.write_reg_8(0xFF, 0x06)
-        self.i2c_bus.write_reg_8(0x83, self.i2c_bus.read_reg_8u(0x83  & ~0x04))
+        self.i2c_bus.write_reg_8(0x83, self.i2c_bus.read_8(0x83  & ~0x04))
         self.i2c_bus.write_reg_8(0xFF, 0x01)
         self.i2c_bus.write_reg_8(0x00, 0x01)
 
@@ -463,7 +463,7 @@ class VL53L0X(object):
     # Get sequence step enables
     # based on VL53L0X_get_sequence_step_enables()
     def get_sequence_step_enables(self):
-        sequence_config = self.i2c_bus.read_reg_8u(SYSTEM_SEQUENCE_CONFIG)
+        sequence_config = self.i2c_bus.read_8(SYSTEM_SEQUENCE_CONFIG)
         SequenceStepEnables = {"tcc":0, "msrc":0, "dss":0, "pre_range":0, "final_range":0}
         SequenceStepEnables["tcc"]         = (sequence_config >> 4) & 0x1
         SequenceStepEnables["dss"]         = (sequence_config >> 3) & 0x1
@@ -480,15 +480,15 @@ class VL53L0X(object):
         SequenceStepTimeouts = {"pre_range_vcsel_period_pclks":0, "final_range_vcsel_period_pclks":0, "msrc_dss_tcc_mclks":0, "pre_range_mclks":0, "final_range_mclks":0, "msrc_dss_tcc_us":0, "pre_range_us":0, "final_range_us":0}
         SequenceStepTimeouts["pre_range_vcsel_period_pclks"] = self.get_vcsel_pulse_period(self.VcselPeriodPreRange)
 
-        SequenceStepTimeouts["msrc_dss_tcc_mclks"] = self.i2c_bus.read_reg_8u(MSRC_CONFIG_TIMEOUT_MACROP) + 1
+        SequenceStepTimeouts["msrc_dss_tcc_mclks"] = self.i2c_bus.read_8(MSRC_CONFIG_TIMEOUT_MACROP) + 1
         SequenceStepTimeouts["msrc_dss_tcc_us"] = self.timeout_mclks_to_microseconds(SequenceStepTimeouts["msrc_dss_tcc_mclks"], SequenceStepTimeouts["pre_range_vcsel_period_pclks"])
 
-        SequenceStepTimeouts["pre_range_mclks"] = self.decode_timeout(self.i2c_bus.read_reg_16u(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI))
+        SequenceStepTimeouts["pre_range_mclks"] = self.decode_timeout(self.i2c_bus.read_16(PRE_RANGE_CONFIG_TIMEOUT_MACROP_HI))
         SequenceStepTimeouts["pre_range_us"] = self.timeout_mclks_to_microseconds(SequenceStepTimeouts["pre_range_mclks"], SequenceStepTimeouts["pre_range_vcsel_period_pclks"])
 
         SequenceStepTimeouts["final_range_vcsel_period_pclks"] = self.get_vcsel_pulse_period(self.VcselPeriodFinalRange)
 
-        SequenceStepTimeouts["final_range_mclks"] = self.decode_timeout(self.i2c_bus.read_reg_16u(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI))
+        SequenceStepTimeouts["final_range_mclks"] = self.decode_timeout(self.i2c_bus.read_16(FINAL_RANGE_CONFIG_TIMEOUT_MACROP_HI))
 
         if (pre_range):
             SequenceStepTimeouts["final_range_mclks"] -= SequenceStepTimeouts["pre_range_mclks"]
@@ -507,9 +507,9 @@ class VL53L0X(object):
     # based on VL53L0X_get_vcsel_pulse_period()
     def get_vcsel_pulse_period(self, type):
         if type == self.VcselPeriodPreRange:
-            return self.decode_vcsel_period(self.i2c_bus.read_reg_8u(PRE_RANGE_CONFIG_VCSEL_PERIOD))
+            return self.decode_vcsel_period(self.i2c_bus.read_8(PRE_RANGE_CONFIG_VCSEL_PERIOD))
         elif type == self.VcselPeriodFinalRange:
-            return self.decode_vcsel_period(self.i2c_bus.read_reg_8u(FINAL_RANGE_CONFIG_VCSEL_PERIOD))
+            return self.decode_vcsel_period(self.i2c_bus.read_8(FINAL_RANGE_CONFIG_VCSEL_PERIOD))
         else:
             return 255
 
@@ -637,7 +637,7 @@ class VL53L0X(object):
         self.i2c_bus.write_reg_8(SYSRANGE_START, 0x01 | vhv_init_byte) # VL53L0X_REG_SYSRANGE_MODE_START_STOP
 
         self.start_timeout()
-        while ((self.i2c_bus.read_reg_8u(RESULT_INTERRUPT_STATUS) & 0x07) == 0):
+        while ((self.i2c_bus.read_8(RESULT_INTERRUPT_STATUS) & 0x07) == 0):
             if self.check_timeout_expired():
                 return False
 
@@ -670,7 +670,7 @@ class VL53L0X(object):
 
             # VL53L0X_SetInterMeasurementPeriodMilliSeconds() begin
 
-            osc_calibrate_val = self.i2c_bus.read_reg_16u(OSC_CALIBRATE_VAL)
+            osc_calibrate_val = self.i2c_bus.read_16(OSC_CALIBRATE_VAL)
 
             if osc_calibrate_val != 0:
                 period_ms *= osc_calibrate_val
@@ -689,14 +689,14 @@ class VL53L0X(object):
     # single-shot range measurement)
     def read_range_continuous_millimeters(self):
         self.start_timeout()
-        while ((self.i2c_bus.read_reg_8u(RESULT_INTERRUPT_STATUS) & 0x07) == 0):
+        while ((self.i2c_bus.read_8(RESULT_INTERRUPT_STATUS) & 0x07) == 0):
             if self.check_timeout_expired():
                 self.did_timeout = True
                 raise IOError("read_range_continuous_millimeters timeout")
 
         # assumptions: Linearity Corrective Gain is 1000 (default)
         # fractional ranging is not enabled
-        range = self.i2c_bus.read_reg_16u(RESULT_RANGE_STATUS + 10)
+        range = self.i2c_bus.read_16(RESULT_RANGE_STATUS + 10)
 
         self.i2c_bus.write_reg_8(SYSTEM_INTERRUPT_CLEAR, 0x01)
 
@@ -843,7 +843,7 @@ class VL53L0X(object):
         # "Perform the phase calibration. This is needed after changing on vcsel period."
         # VL53L0X_perform_phase_calibration() begin
 
-        sequence_config = self.i2c_bus.read_reg_8u(SYSTEM_SEQUENCE_CONFIG)
+        sequence_config = self.i2c_bus.read_8(SYSTEM_SEQUENCE_CONFIG)
         self.i2c_bus.write_reg_8(SYSTEM_SEQUENCE_CONFIG, 0x02)
         self.perform_single_ref_calibration(0x0)
         self.i2c_bus.write_reg_8(SYSTEM_SEQUENCE_CONFIG, sequence_config)
@@ -868,7 +868,7 @@ class VL53L0X(object):
 
         # "Wait until start bit has been cleared"
         self.start_timeout()
-        while (self.i2c_bus.read_reg_8u(SYSRANGE_START) & 0x01):
+        while (self.i2c_bus.read_8(SYSRANGE_START) & 0x01):
             if self.check_timeout_expired():
                 self.did_timeout = true
                 raise IOError("read_range_single_millimeters timeout")
