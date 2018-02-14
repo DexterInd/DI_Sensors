@@ -8,11 +8,12 @@ try:
     from di_sensors import distance_sensor
 
 except:
-    try:
-        from mock_package import distance_sensor
-        print ("Loading library without distance sensor")
-    except:
-        pass
+    print("DI Sensors library not found")
+    # try:
+    #     from mock_package import distance_sensor
+    # print ("Loading library without distance sensor")
+    # except:
+    #     pass
 
 # import easy_sensors
 from I2C_mutex import Mutex
