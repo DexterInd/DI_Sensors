@@ -61,8 +61,6 @@ class LineFollower(object):
                     array[(g * 4) + s] = (1023 - temp) / 1023.0
         return array[:LSB_Offset]
 
-    read_sensor = read_sensors
-    
     def get_manufacturer(self):
         #self.i2c_bus.write_8(0x11)
         #array = self.i2c_bus.read_list(20)
