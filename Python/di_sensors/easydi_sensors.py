@@ -1,3 +1,18 @@
+# https://www.dexterindustries.com
+#
+# Copyright (c) 2017 Dexter Industries
+# Released under the MIT license (http://choosealicense.com/licenses/mit/).
+# For more information see https://github.com/DexterInd/DI_Sensors/blob/master/LICENSE.md
+#
+
+# EASIER WRAPPERS FOR:
+# IMU SENSOR,
+# LIGHT AND COLOR SENSOR
+# TEMPERATURE, HUMIDITY and PRESSURE SENSOR
+
+# MUTEX SUPPORT WHEN NEEDED
+
+
 from di_sensors import inertial_measurement_unit
 from di_sensors import BNO055
 from di_sensors import light_color_sensor
@@ -8,14 +23,11 @@ from math import atan2, pi
 from time import sleep
 import math
 
-
+'''
+MUTEX HANDLING
+'''
 mutex = I2C_mutex.Mutex(debug = False)
 overall_mutex = mutex.overall_mutex()
-
-ports = {
-    "AD1": "GPG3_AD1",
-    "AD2": "GPG3_AD2"
-}
 
 def _ifMutexAcquire(mutex_enabled = False):
     """
@@ -34,6 +46,13 @@ def _ifMutexRelease(mutex_enabled = False):
     if mutex_enabled or overall_mutex==True:
         mutex.release()
 
+''' 
+PORT TRANSLATION
+'''
+ports = {
+    "AD1": "GPG3_AD1",
+    "AD2": "GPG3_AD2"
+}
 
 class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
     '''
