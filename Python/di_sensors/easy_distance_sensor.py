@@ -1,6 +1,6 @@
 # https://www.dexterindustries.com
 #
-# Copyright (c) 2017 Dexter Industries
+# Copyright (c) 2018 Dexter Industries
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information see https://github.com/DexterInd/DI_Sensors/blob/master/LICENSE.md
 #
