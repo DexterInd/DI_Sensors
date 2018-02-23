@@ -49,7 +49,6 @@ setup(
         "Temperature Humidity Pressure Sensor",
         "RGB LCD",
         "DHT Sensor",
-        "Line Follower",
     ],
     packages = find_packages()
 
