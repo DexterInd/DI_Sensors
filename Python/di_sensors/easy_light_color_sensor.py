@@ -22,7 +22,7 @@ from math import sqrt
 '''
 MUTEX HANDLING
 '''
-from di_sensors.easy_mutex import *
+from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 
 ''' 
 PORT TRANSLATION

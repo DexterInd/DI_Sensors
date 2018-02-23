@@ -25,7 +25,7 @@ except:
 
 import time
 
-from di_sensors.easy_mutex import *
+from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 
 
 class EasyDistanceSensor(distance_sensor.DistanceSensor):

@@ -16,7 +16,7 @@
 from di_sensors import temp_hum_press
 from time import sleep
 
-from di_sensors.easy_mutex import *
+from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 
 ''' 
 PORT TRANSLATION
