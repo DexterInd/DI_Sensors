@@ -23,28 +23,9 @@ except:
     # except:
     #     pass
 
-# import easy_sensors
-from I2C_mutex import Mutex
 import time
 
-mutex = Mutex(debug=False)
-overall_mutex = mutex.overall_mutex()
-
-def _ifMutexAcquire(mutex_enabled=False):
-    """
-    Acquires the I2C if the ``use_mutex`` parameter of the constructor was set to ``True``.
-    Always acquires if system-wide mutex has been set.
-
-    """
-    if mutex_enabled or overall_mutex==True:
-        mutex.acquire()
-
-def _ifMutexRelease(mutex_enabled=False):
-    """
-    Releases the I2C if the ``use_mutex`` parameter of the constructor was set to ``True``.
-    """
-    if mutex_enabled or overall_mutex==True:
-        mutex.release()
+from di_sensors.easy_mutex import *
 
 
 class EasyDistanceSensor(distance_sensor.DistanceSensor):
@@ -84,14 +65,14 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         self.descriptor = "Distance Sensor"
         self.use_mutex = use_mutex
 
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             distance_sensor.DistanceSensor.__init__(self)
         except Exception as e:
             print("Distance Sensor init: {}".format(e))
             raise
         finally:
-             _ifMutexRelease(self.use_mutex)
+             ifMutexRelease(self.use_mutex)
 
     # Returns the values in cms
     def read_mm(self):
@@ -118,14 +99,14 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         # smaller than 8m or bigger than 5 mm.
         # if sensor insists on that value, then pass it on
         while (mm > 8000 or mm < 5) and attempt < 3:
-            _ifMutexAcquire(self.use_mutex)
+            ifMutexAcquire(self.use_mutex)
             try:
                 mm = self.read_range_single()
             except Exception as e:
                 print(e)
                 mm = 0
             finally:
-                _ifMutexRelease(self.use_mutex)
+                ifMutexRelease(self.use_mutex)
             attempt = attempt + 1
             time.sleep(0.001)
 

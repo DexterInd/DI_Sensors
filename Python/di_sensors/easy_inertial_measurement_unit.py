@@ -22,25 +22,7 @@ from time import sleep
 '''
 MUTEX HANDLING
 '''
-mutex = I2C_mutex.Mutex(debug = False)
-overall_mutex = mutex.overall_mutex()
-
-def _ifMutexAcquire(mutex_enabled = False):
-    """
-    Acquires the I2C if the ``use_mutex`` parameter of the constructor was set to ``True``.
-    Always acquires if system-wide mutex has been set.
-    
-    """
-    if mutex_enabled or overall_mutex==True:
-        mutex.acquire()
-
-def _ifMutexRelease(mutex_enabled = False):
-    """
-    Releases the I2C if the ``use_mutex`` parameter of the constructor was set to ``True``.
-
-    """
-    if mutex_enabled or overall_mutex==True:
-        mutex.release()
+from di_sensors.easy_mutex import *
 
 ''' 
 PORT TRANSLATION
@@ -66,7 +48,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         except KeyError:
             bus = "RPI_1"
 
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             print("INSTANTIATING ON PORT {} OR BUS {} WITH MUTEX {}".format(port, bus, use_mutex))
             super(self.__class__, self).__init__(bus = bus)
@@ -84,7 +66,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             raise
         finally:
             sleep(0.1)  # add a delay to let the IMU stabilize before control panel can pull from it
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
 
     def reconfig_bus(self):
         self.BNO055.i2c_bus.reconfig_bus()
@@ -93,20 +75,20 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         print("calibrating")
         status = -1
         while status < 3:
-            _ifMutexAcquire(self.use_mutex)
+            ifMutexAcquire(self.use_mutex)
             try:
                 new_status = self.BNO055.get_calibration_status()[3]
             except:
                 new_status = -1
             finally:
-                _ifMutexRelease(self.use_mutex)
+                ifMutexRelease(self.use_mutex)
             if new_status != status:
                 print(new_status)
                 status = new_status
 
     def get_calibration_status(self):
         print("get calibration status")
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             status = self.BNO055.get_calibration_status()[3]
         except Exception as e:
@@ -114,7 +96,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             print(e)
             status = -1
         finally:
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
         return status
 
     def get_heading(self, in_heading):
@@ -135,7 +117,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
 
     def safe_read_euler(self):
         # print("safe_read_euler")
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             x, y, z = self.read_euler()
         except Exception as e:
@@ -143,17 +125,17 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             # x, y, z = 0, 0, 0
             raise
         finally:
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
         return x,y,z
 
     def safe_read_magnetometer(self):
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             x, y, z = self.read_magnetometer()
         except Exception as e:
             x, y, z = 0, 0, 0
         finally:
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
         return x,y,z
 
     def get_north_point(self):
@@ -164,13 +146,13 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         :return: The heading of the north point measured in degrees. The north point is found at 0 degrees.
 
         """
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             x, y, z = self.read_magnetometer()
         except:
             x, y, z = 0,0,0
         finally:
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
 
         # using the x and z axis because the sensor is mounted vertically
         # the sensor's top face is oriented towards the front of the robot

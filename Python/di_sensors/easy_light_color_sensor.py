@@ -22,25 +22,7 @@ from math import sqrt
 '''
 MUTEX HANDLING
 '''
-mutex = I2C_mutex.Mutex(debug = False)
-overall_mutex = mutex.overall_mutex()
-
-def _ifMutexAcquire(mutex_enabled = False):
-    """
-    Acquires the I2C if the ``use_mutex`` parameter of the constructor was set to ``True``.
-    Always acquires if system-wide mutex has been set.
-    
-    """
-    if mutex_enabled or overall_mutex==True:
-        mutex.acquire()
-
-def _ifMutexRelease(mutex_enabled = False):
-    """
-    Releases the I2C if the ``use_mutex`` parameter of the constructor was set to ``True``.
-
-    """
-    if mutex_enabled or overall_mutex==True:
-        mutex.release()
+from di_sensors.easy_mutex import *
 
 ''' 
 PORT TRANSLATION
@@ -79,20 +61,20 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
         # in case there's a distance sensor that hasn't been instanciated yet
         # attempt to move it to another address
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             VL53L0X.VL53L0X(bus = bus)
         except:
             pass
-        _ifMutexRelease(self.use_mutex)
+        ifMutexRelease(self.use_mutex)
 
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             super(self.__class__, self).__init__(led_state = led_state, bus = bus)
         except Exception as e:
             raise
         finally:
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
 
         self.led_state = led_state
 
@@ -134,14 +116,14 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
 
     def get_safe_raw_colors(self, use_mutex=True):
-        _ifMutexAcquire(self.use_mutex)
+        ifMutexAcquire(self.use_mutex)
         try:
             self.set_led(self.led_state)
             r,g,b,c = self.get_raw_colors()
         except:
             pass
         finally:
-            _ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
         return (r,g,b,c)
 
     def get_rgb(self):
