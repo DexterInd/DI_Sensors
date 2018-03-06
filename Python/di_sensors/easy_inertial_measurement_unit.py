@@ -50,7 +50,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
 
         ifMutexAcquire(self.use_mutex)
         try:
-            print("INSTANTIATING ON PORT {} OR BUS {} WITH MUTEX {}".format(port, bus, use_mutex))
+            # print("INSTANTIATING ON PORT {} OR BUS {} WITH MUTEX {}".format(port, bus, use_mutex))
             super(self.__class__, self).__init__(bus = bus)
             # on GPG3 we ask that the IMU be at the back of the robot, facing outward
             # We do not support the IMU on GPG2  but leaving the if statement in case
@@ -69,7 +69,9 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             ifMutexRelease(self.use_mutex)
 
     def reconfig_bus(self):
+        ifMutexAcquire(self.use_mutex)
         self.BNO055.i2c_bus.reconfig_bus()
+        ifMutexRelease(self.use_mutex)
 
     def calibrate(self):
         print("calibrating")
