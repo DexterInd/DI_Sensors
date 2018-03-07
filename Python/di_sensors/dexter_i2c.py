@@ -109,6 +109,11 @@ class Dexter_I2C(object):
         inBytes (default 0) -- how many bytes to read
 
         Returns list of bytes read"""
+        
+        # Make sure all bytes are in the range of 0-255
+        for b in range(len(outArr)):
+            outArr[b] &= 0xFF
+        
         if self.bus_name == "RPI_1":
             if RPI_1_Module == "pigpio":
                 if(len(outArr) >= 2 and inBytes == 0):
@@ -133,18 +138,31 @@ class Dexter_I2C(object):
                 else:
                     raise IOError("I2C operation not supported")
             elif RPI_1_Module == "periphery":
-                msgs = []
-                offset = 0
+                # for repeated starts
+                # seems to fail regularly. RPi does not recognize clock stretching during repeated starts.
+                #msgs = []
+                #offset = 0
+                #if(len(outArr) > 0):
+                #    msgs.append(self.i2c_bus.Message(outArr))
+                #    offset = 1
+                #if(inBytes):
+                #    r = [0 for b in range(inBytes)]
+                #    msgs.append(self.i2c_bus.Message(r, read = True))
+                #if(len(msgs) >= 1):
+                #    self.i2c_bus.transfer(self.address, msgs)
+                #if(inBytes):
+                #    return msgs[offset].data
+
+                # for independent messages (no repeated starts)
+                # there is a small delay between messages, but it doesn't fail to recognize clock stretching between the messages
                 if(len(outArr) > 0):
-                    msgs.append(self.i2c_bus.Message(outArr))
-                    offset = 1
+                    msg = [self.i2c_bus.Message(outArr)]
+                    self.i2c_bus.transfer(self.address, msg)
                 if(inBytes):
                     r = [0 for b in range(inBytes)]
-                    msgs.append(self.i2c_bus.Message(r, read = True))
-                if(len(msgs) >= 1):
-                    self.i2c_bus.transfer(self.address, msgs)
-                if(inBytes):
-                    return msgs[offset].data
+                    msg = [self.i2c_bus.Message(r, read = True)]
+                    self.i2c_bus.transfer(self.address, msg)
+                    return msg[0].data
                 return
 
         elif self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
