@@ -151,7 +151,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'DI-Sensors.tex', u'DI-Sensors Documentation',
-     u'Robert Lucian Chiriac', 'manual'),
+     u'Dexter Industries', 'manual'),
 ]
 
 
@@ -161,7 +161,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'di-sensors', u'DI-Sensors Documentation',
-     [author], 1)
+     [u'Dexter Industries'], 1)
 ]
 
 
@@ -172,7 +172,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'DI-Sensors', u'DI-Sensors Documentation',
-     author, 'DI-Sensors', 'One line description of project.',
+     u'Dexter Industries', 'DI-Sensors', 'One line description of project.',
      'Miscellaneous'),
 ]
 
