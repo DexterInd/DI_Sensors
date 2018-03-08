@@ -20,7 +20,7 @@ thp = TempHumPress()
 
 while True:
     # Read the temperature
-    temp = thp.get_temperature_celcius()
+    temp = thp.get_temperature_celsius()
 
     # Read the relative humidity
     hum = thp.get_humidity()
