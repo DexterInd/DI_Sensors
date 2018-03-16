@@ -41,7 +41,7 @@ class Mock(MagicMock):
     def __getattr__(cls, name):
             return MagicMock()
 
-MOCK_MODULES = ['periphery']
+MOCK_MODULES = ['periphery', 'I2C_mutex', 'easy_sensors']
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 extensions = ['sphinx.ext.autodoc',

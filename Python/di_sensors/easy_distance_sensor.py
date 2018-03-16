@@ -5,27 +5,9 @@
 # For more information see https://github.com/DexterInd/DI_Sensors/blob/master/LICENSE.md
 #
 
-
-#######################################################################
-#
-# DistanceSensor
-#
-# under try/except in case the Distance Sensor is not installed
-#######################################################################
-try:
-    from di_sensors import distance_sensor
-
-except:
-    print("DI Sensors library not found")
-    # try:
-    #     from mock_package import distance_sensor
-    # print ("Loading library without distance sensor")
-    # except:
-    #     pass
-
-import time
-
 from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
+import time
+from di_sensors import distance_sensor
 
 
 class EasyDistanceSensor(distance_sensor.DistanceSensor):
@@ -157,4 +139,3 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         """
         cm = self.read()
         return round(cm / 2.54, 1)
-
