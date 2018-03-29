@@ -24,7 +24,7 @@ MUTEX HANDLING
 '''
 from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 
-''' 
+'''
 PORT TRANSLATION
 '''
 ports = {
@@ -33,6 +33,9 @@ ports = {
 }
 
 class EasyLightColorSensor(light_color_sensor.LightColorSensor):
+
+    #: The 6 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
+    #: method may return upon reading and interpreting a new set of color values.
     known_colors = {
         "red":(255,0,0),
         "green":(0,255,0),
@@ -52,6 +55,17 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     }
 
     def __init__(self, port="I2C-1", led_state = False, use_mutex=False):
+        """
+        Constructor for initializing a link to the `Light Color Sensor`_.
+
+        :param str bus = "I2C-1": The bus to which the distance sensor is connected to. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned on.
+        :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
+        :raises ~exceptions.OSError: When the `Light Color Sensor`_ is not reachable.
+        :raises ~exceptions.RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `Light Color Sensor`_.
+
+        """
+
         self.use_mutex = use_mutex
 
         try:
@@ -79,11 +93,14 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         self.led_state = led_state
 
     def translate_to_hsv(self, in_color):
-        '''
-        standard algorithm to switch from one system (rgb) to the other(hsv)
-        incoming are values that go from 0 to 1
-        Returned values are h (0-360), s (0-100), v(0-100)
-        '''
+        """
+        Standard algorithm to switch from one color system (**RGB**) to another (**HSV**).
+
+        :param tuple(float,float,float) in_color: The RGB tuple list that gets translated to HSV system. The values of each element of the tuple is between **0** and **1**.
+        :return: The translated HSV tuple list. Returned values are *H(0-360)*, *S(0-100)*, *V(0-100)*.
+        :rtype: tuple(int, int, int)
+
+        """
         r,g,b = in_color
 
         min_channel = min((r,g,b))
@@ -115,7 +132,14 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         return (h,s*100,v*100)
 
 
-    def get_safe_raw_colors(self, use_mutex=True):
+    def get_safe_raw_colors(self):
+        """
+        Returns the color read off of the `Light Color Sensor`_.
+
+        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear).
+        :rtype: tuple(float,float,float,float) where the range of each element is between **0** and **1**.
+
+        """
         ifMutexAcquire(self.use_mutex)
         try:
             self.set_led(self.led_state)
@@ -132,12 +156,18 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         return r,g,b
 
     def guess_color_hsv(self, in_color):
-        '''
-        tries to match an incoming color to a color name
-        in_color is the raw readings from the DI Light and Color sensor
-        it is a tuple of 4 elements: r, g, b, and light intensity
-        expressed in a 0-1 range
-        '''
+        """
+        Determine to which color `in_color` parameter is closest to in the :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
+
+        This method uses the euclidean algorithm for detecting the nearest center to it out of :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
+        It does work exactly the same as KNN (K-Nearest-Neighbors) algorithm, where `K = 1`.
+
+        :param tuple(float,float,float,float) in_color: A 4-element tuple list for the *Red*, *Green*, *Blue* and *Alpha* channels. The elements are all valued between **0** and **1**.
+        :returns: The detected color in string format and then a 3-element tuple describing the color in RGB format. The values of the RGB tuple are between **0** and **1**.
+        :rtype: tuple(str,(float,float,float))
+
+        """
+
         r,g,b,c = in_color
         # print("incoming: {} {} {} {}".format(r,g,b,c))
 
@@ -176,4 +206,3 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
                 candidate = color
 
         return (candidate, self.known_colors[candidate])
-

@@ -4,12 +4,12 @@
 Examples
 ########
 
-This chapter revolves around the following python modules:
+This chapter revolves around the following python classes:
 
-* :py:mod:`di_sensors.inertial_measurement_unit`
-* :py:mod:`di_sensors.light_color_sensor`
-* :py:mod:`di_sensors.temp_hum_press`
-* :py:mod:`di_sensors.distance_sensor`
+* :py:mod:`di_sensors.inertial_measurement_unit.InertialMeasurementUnit`
+* :py:mod:`di_sensors.light_color_sensor.LightColorSensor`
+* :py:mod:`di_sensors.temp_hum_press.TempHumPress`
+* :py:mod:`di_sensors.distance_sensor.DistanceSensor`
 
 Please make sure you have followed all the instructions found in :ref:`Getting Started <getting-started-chapter>` before jumping into these example programs.
 In all these examples, you will be required to use one of the 4 documented sensors and optionally, a `GoPiGo3`_.

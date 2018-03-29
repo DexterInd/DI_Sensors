@@ -66,8 +66,8 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
 
         .. note::
 
-             1. Sensor's range is **5-8,000** millimeters.
-             2. When the values are out of the range, it returns **8190**.
+             1. Sensor's range is **5-2300** millimeters.
+             2. When the values are out of the range, it returns **3000**.
 
         """
 
@@ -116,8 +116,8 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
 
         .. note::
 
-             1. Sensor's range is **0-800** centimeters.
-             2. When the values are out of the range, it returns **819**.
+             1. Sensor's range is **0-230** centimeters.
+             2. When the values are out of the range, it returns **300**.
 
         """
 
@@ -133,8 +133,8 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
 
         .. note::
 
-             1. Sensor's range is **0-314** inches.
-             2. Anything that's bigger than **314** inches is returned when the sensor can't detect any target/surface.
+             1. Sensor's range is **0-90** inches.
+             2. Anything that's bigger than **90** inches is returned when the sensor can't detect any target/surface.
 
         """
         cm = self.read()
