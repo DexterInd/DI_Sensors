@@ -20,6 +20,9 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+# When building the documentation on Windows with graphviz in mind, use
+# <<sphinx-build -b html -D graphviz_dot="C:\Program Files (x86)\Graphviz2.38\bin\dot.exe" source build/html>> command
+# That should be the path on Windows, but it can vary depending on your system's configuration
 
 # -- General configuration ------------------------------------------------
 
