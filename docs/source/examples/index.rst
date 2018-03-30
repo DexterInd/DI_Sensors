@@ -22,5 +22,6 @@ In all these examples, you will be required to use one of the 4 documented senso
    light_color
    temp_hum
    imu
+   mutexes
 
 .. _gopigo3: https://www.dexterindustries.com/shop/gopigo-advanced-starter-kit/

@@ -24,7 +24,7 @@ MUTEX HANDLING
 '''
 from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 
-''' 
+'''
 PORT TRANSLATION
 '''
 ports = {
@@ -34,13 +34,24 @@ ports = {
 
 class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
     '''
-    Thread-safe IMU
-    Orient the IMU for use with a sensor mount
-    IMU must be at the back of the GoPiGo, facing backwards
-    Supports headings as strings
+    Class for interfacing with the `InertialMeasurementUnit Sensor`_.
+
+    This class compared to :py:class:`~di_sensors.inertial_measurement_unit.InertialMeasurementUnit` uses mutexes that allows a given
+    object to be accessed simultaneously from multiple threads/processes.
+    Apart from this difference, there may
+    also be functions that are more user-friendly than the latter.
     '''
 
     def __init__(self, port="AD1", use_mutex=False):
+        """
+        Constructor for initializing link with the `InertialMeasurementUnit Sensor`_.
+
+        :param str port = "AD1": The port to which the IMU sensor gets connected to. By default, it's set to bus ``"AD1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
+        :raises RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `InertialMeasurementUnit Sensor`_.
+        :raises ~exceptions.OSError: When the `InertialMeasurementUnit Sensor`_ is not reachable.
+
+        """
         self.use_mutex = use_mutex
 
         try:
@@ -69,12 +80,19 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             ifMutexRelease(self.use_mutex)
 
     def reconfig_bus(self):
+        """
+        If the port configuration got reset, call this method to reconfigure it.
+
+        The idea is that in case the `InertialMeasurementUnit Sensor`_ gets pulled out of the plug or if there's an error on then
+        communication line or something else unexpected that puts this sensor to a halt, this method reconfigures
+        the connection to the sensor.
+        """
+
         ifMutexAcquire(self.use_mutex)
         self.BNO055.i2c_bus.reconfig_bus()
         ifMutexRelease(self.use_mutex)
 
     def calibrate(self):
-        print("calibrating")
         status = -1
         while status < 3:
             ifMutexAcquire(self.use_mutex)
@@ -89,12 +107,10 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
                 status = new_status
 
     def get_calibration_status(self):
-        print("get calibration status")
         ifMutexAcquire(self.use_mutex)
         try:
             status = self.BNO055.get_calibration_status()[3]
         except Exception as e:
-            print("get calibration status FAILED")
             print(e)
             status = -1
         finally:
@@ -118,7 +134,15 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         return(headings[heading_index])
 
     def safe_read_euler(self):
-        # print("safe_read_euler")
+        """
+        Read the absolute orientation.
+
+        :returns: Tuple of euler angles in degrees of *heading*, *roll* and *pitch*.
+        :rtype: (float,float,float)
+        :raises ~exceptions.OSError: When the sensor is not reachable.
+
+        """
+
         ifMutexAcquire(self.use_mutex)
         try:
             x, y, z = self.read_euler()
@@ -131,6 +155,17 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         return x,y,z
 
     def safe_read_magnetometer(self):
+        """
+        Read the magnetometer values.
+
+        :returns: Tuple containing X, Y, Z values in *micro-Teslas* units. You can check the X, Y, Z axes on the sensor itself.
+        :rtype: (float,float,float)
+
+        .. note::
+
+           In case of an exception occurring within this method, a tuple of 3 elements where all values are set to **0** is returned.
+
+        """
         ifMutexAcquire(self.use_mutex)
         try:
             x, y, z = self.read_magnetometer()
@@ -144,8 +179,13 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         """
         Determines the heading of the north point.
         This function doesn't take into account the declination.
-        :param imu: It's an InertialMeasurementUnit object.
-        :return: The heading of the north point measured in degrees. The north point is found at 0 degrees.
+
+        :return: The heading of the north point measured in degrees. The north point is found at **0** degrees.
+        :rtype: int
+
+        .. note::
+
+           In case of an exception occurring within this method, **0** is returned.
 
         """
         ifMutexAcquire(self.use_mutex)

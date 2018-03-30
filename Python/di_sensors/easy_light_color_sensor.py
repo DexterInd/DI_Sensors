@@ -33,7 +33,14 @@ ports = {
 }
 
 class EasyLightColorSensor(light_color_sensor.LightColorSensor):
+    """
+    Class for interfacing with the `Light Color Sensor`_.
 
+    This class compared to :py:class:`~di_sensors.light_color_sensor.LightColorSensor` uses mutexes that allows a given
+    object to be accessed simultaneously from multiple threads/processes.
+    Apart from this difference, there may
+    also be functions that are more user-friendly than the latter.
+    """
     #: The 6 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
     #: method may return upon reading and interpreting a new set of color values.
     known_colors = {
@@ -151,6 +158,12 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         return (r,g,b,c)
 
     def get_rgb(self):
+        """
+        Detect the RGB color off of the `Light Color Sensor`_.
+
+        :returns: The RGB color in 8-bit format.
+        :rtype: tuple(int,int,int)
+        """
         colors = self.get_safe_raw_colors()
         r,g,b,c = list(map(lambda c: int(c*255/colors[3]), colors))
         return r,g,b

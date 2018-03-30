@@ -14,32 +14,18 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
     """
     Class for the `Distance Sensor`_ device.
 
-    We can create this :py:class:`~easygopigo3.DistanceSensor` object similar to how we create it in the following template.
-
-    .. code-block:: python
-
-        # create an EasyGoPiGo3 object
-        gpg3_obj = EasyGoPiGo3()
-
-        # and now let's instantiate a DistanceSensor object through the gpg3_obj object
-        distance_sensor = gpg3_obj.init_distance_sensor()
-
-        # read values continuously and print them in the terminal
-        while True:
-            distance = distance_sensor.read()
-
-            print(distance)
+    This class compared to :py:class:`~di_sensors.distance_sensor.DistanceSensor` uses mutexes that allows a given
+    object to be accessed simultaneously from multiple threads/processes.
+    Apart from this difference, there may
+    also be functions that are more user-friendly than the latter.
 
     """
-    def __init__(self, port="I2C",gpg=None, use_mutex=False):
+    def __init__(self, use_mutex=False):
         """
         Creates a :py:class:`~easygopigo3.DistanceSensor` object which can be used for interfacing with a `distance sensor`_.
 
-        :param str port = "I2C": Port to which the distance sensor is connected.
-        :param easygopigo3.EasyGoPiGo3 gpg = None: Object that's required for instantianting a :py:class:`~easygopigo3.DistanceSensor` object.
-        :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
-        :raises IOError: If :py:class:`di_sensors.distance_sensor.DistanceSensor` can't be found. Probably the :py:mod:`di_sensors` module isn't installed.
-        :raises TypeError: If the ``gpg`` parameter is not a :py:class:`~easygopigo3.EasyGoPiGo3` object.
+        :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port, where in this case it must be ``"I2C"``. Most probably, this means the distance sensor is not connected at all.
 
         To see where the ports are located on the `GoPiGo3`_ robot, please take a look at the following diagram: :ref:`hardware-ports-section`.
 

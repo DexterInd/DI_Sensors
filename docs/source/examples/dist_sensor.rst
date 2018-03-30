@@ -4,6 +4,31 @@
 Using the Distance Sensor
 #########################
 
+*************
+Basic Example
+*************
+
+Before going to the more advanced example program of using the `Distance Sensor`_, we're going to give an example of the easiest way to read from the sensor.
+
+The following code snippet reads values off of the `Distance Sensor`_ and prints them iteratively in the console. As you'll see, this is far easier than the
+following examples, which are more complex to use, but have a more granular control over the device.
+
+.. code-block:: python
+
+   # import the modules
+   from di_sensors.easy_distance_sensor import EasyDistanceSensor
+   from time import sleep
+
+   # instantiate the distance object
+   sensor = EasyDistanceSensor()
+
+   # and read the sensor iteratively
+   while True:
+     cm_distance = sensor.read()
+     print("The distance to the detected robot is = {}".format(cm_distance))
+
+     sleep(0.1)
+
 ***************
 Continuous-mode
 ***************
