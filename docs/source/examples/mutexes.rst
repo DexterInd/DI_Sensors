@@ -12,46 +12,9 @@ Each of these 2 threads run for ``runtime`` seconds - we didn't make it so one c
 
 Without the mutex mechanism, accessing the same resource from multiple processes/threads would not be possible.
 
-.. code-block:: python
-
-   # do the import stuff
-   from di_sensors.easy_distance_sensor import EasyDistanceSensor
-   from time import time, sleep
-   from threading import Thread, Event, get_ident
-
-   # instantiate the distance object
-   sensor = EasyDistanceSensor(use_mutex = True)
-   start_time = time()
-   runtime = 2.0
-   # create an event object for triggering the "shutdown" of each thread
-   stop_event = Event()
-
-   # target function for each thread
-   def readingSensor():
-      while not stop_event.is_set():
-        thread_id = get_ident()
-        distance = sensor.read()
-        print("Thread ID = {} with distance value = {}".format(thread_id, distance))
-        sleep(0.001)
-
-   # create an object for each thread
-   thread1 = Thread(target = readingSensor)
-   thread2 = Thread(target = readingSensor)
-
-   # and then start them
-   thread1.start()
-   thread2.start()
-
-   # let it run for [runtime] seconds
-   while time() - start_time <= runtime:
-     sleep(0.1)
-
-   # and then set the stop event variable
-   stop_event.set()
-
-   # and wait both threads to end
-   thread1.join()
-   thread2.join()
+.. literalinclude:: ../../../Python/Examples/EasyDistanceSensorMutexes.py
+  :language: python
+  :lines: 14-
 
 .. important::
 
@@ -62,10 +25,21 @@ Without the mutex mechanism, accessing the same resource from multiple processes
    Still, the implementation we have with mutexes proves to be useful when one wants to launch multiple processes at a time - at that moment, we can talk of true concurrency.
    This can happen when multiple instances of Python scripts are launched and when each process tries to access the same resource as the other one.
 
-The output on the console should look like this.
+The output on the console should look like this - the thread IDs don't mean anything and they are merely just a number used to identify threads.
 
 .. code-block:: bash
 
-   bla bla
+  Thread ID = 1883501680 with distance value = 44
+  Thread ID = 1873802352 with distance value = 44
+  Thread ID = 1873802352 with distance value = 44
+  Thread ID = 1883501680 with distance value = 44
+  Thread ID = 1873802352 with distance value = 46
+  Thread ID = 1883501680 with distance value = 46
+  Thread ID = 1873802352 with distance value = 45
+  Thread ID = 1883501680 with distance value = 45
+  Thread ID = 1883501680 with distance value = 44
+  Thread ID = 1873802352 with distance value = 44
+  Thread ID = 1883501680 with distance value = 45
+  Thread ID = 1873802352 with distance value = 45
 
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
