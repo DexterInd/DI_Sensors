@@ -1,5 +1,7 @@
+.. _structure-chapter:
+
 ###########################################
-About Library & Hardware
+On Library & Hardware
 ###########################################
 
 ============
