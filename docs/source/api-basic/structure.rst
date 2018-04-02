@@ -33,7 +33,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
 
 .. important::
 
-   These notations for the ports (``"RPI_1"``, ``"GPG3_AD1"`` and ``"GPG3_AD2"``) is only required for classes that don't start with the **Easy** word,
+   These notations for ports (``"RPI_1"``, ``"GPG3_AD1"`` and ``"GPG3_AD2"``) is only required for classes that don't start with the **Easy** word,
    specifically for:
 
    * :py:class:`~di_sensors.distance_sensor.DistanceSensor`
@@ -41,12 +41,12 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
    * :py:class:`~di_sensors.light_color_sensor.LightColorSensor`
    * :py:class:`~di_sensors.temp_hum_press.TempHumPress`
 
-   For these sensors that start with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's `documentation <http://gopigo3.readthedocs.io>`__, such as:
+   For these sensors that start with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
 
    * ``"I2C"`` instead of ``"RPI_1"``.
    * ``"AD1/AD2"`` instead of ``"GPG3_AD1/GPG3_AD2"``.
 
-For seeing where the ``"AD1"``/``"AD2"`` are located on the GoPiGo3, please check the GoPiGo3's `documentation <http://gopigo3.readthedocs.io>`__.
+For seeing where the ``"AD1"``/``"AD2"`` are located on the GoPiGo3, please check the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`.
 
 ==================
 Library Structure

@@ -4,12 +4,12 @@
 Using the Light and Color Sensor
 ################################
 
-In order to run this example program, connect the `Light and Color Sensor`_ to an I2C port on whichever platform (`GoPiGo3`_, `GrovePi`_ or `BrickPi3`_)
-and then run the following script.
+In this short section, we get to see how one can read data off of the `Light and Color Sensor`_ without having to fine-tune the sensor or to deal with hard-to-understand concepts.
+Before anything else, connect the `Light and Color Sensor`_ to an I2C port on whichever platform (be it a `GoPiGo3`_, `GrovePi`_ or a `BrickPi3`_) and then run the following script.
 
-The source file for this example program can be found `here on github <https://github.com/DexterInd/DI_Sensors/blob/master/Python/Examples/LightColorSensor.py>`__.
+The source file for this example program can be found `here on github <https://github.com/DexterInd/DI_Sensors/blob/master/Python/Examples/EasyLightColorSensor.py>`__.
 
-.. literalinclude:: ../../../Python/Examples/LightColorSensor.py
+.. literalinclude:: ../../../Python/Examples/EasyLightColorSensor.py
    :language: python
    :lines: 14-
 
