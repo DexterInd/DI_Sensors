@@ -204,10 +204,6 @@ Non-Easy - IMU
    di_sensors.inertial_measurement_unit.InertialMeasurementUnit.read_quaternion
    di_sensors.inertial_measurement_unit.InertialMeasurementUnit.read_temperature
 
-^^^^^^^^^^^^^^^^^^^^
-Low-Level Sensors
-^^^^^^^^^^^^^^^^^^^^
-
 
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
 .. _imu sensor: https://www.dexterindustries.com/shop/imu-sensor/
