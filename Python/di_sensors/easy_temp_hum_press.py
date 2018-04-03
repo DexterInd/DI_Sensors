@@ -34,14 +34,14 @@ class EasyTHPSensor(temp_hum_press.TempHumPress):
     object to be accessed simultaneously from multiple threads/processes.
     Apart from this difference, there may
     also be functions that are more user-friendly than the latter.
-    
+
     """
 
-    def __init__(self, port="I2C-1", use_mutex=False):
+    def __init__(self, port="I2C", use_mutex=False):
         """
         Constructor for initializing link with the `Temperature Humidity Pressure Sensor`_.
 
-        :param str port = "I2C-1": The bus to which the THP sensor is connected to. By default, it's set to bus ``"I2C-1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str port = "I2C": The port to which the THP sensor is connected to. Can also be connected to ports ``"AD1"`` or ``"AD2"`` of the `GoPiGo3`_. If you're passing an **invalid port**, then the sensor resorts to an ``"I2C"`` connection. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
         :raises ~exceptions.OSError: When the sensor cannot be reached.
 

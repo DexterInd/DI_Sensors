@@ -17,7 +17,7 @@ from time import time, sleep
 from threading import Thread, Event, get_ident
 
 # instantiate the distance object
-sensor = EasyDistanceSensor(use_mutex = True)
+my_sensor = EasyDistanceSensor(use_mutex = True)
 start_time = time()
 runtime = 2.0
 # create an event object for triggering the "shutdown" of each thread
@@ -27,7 +27,7 @@ stop_event = Event()
 def readingSensor():
     while not stop_event.is_set():
       thread_id = get_ident()
-      distance = sensor.read()
+      distance = my_sensor.read()
       print("Thread ID = {} with distance value = {}".format(thread_id, distance))
       sleep(0.001)
 

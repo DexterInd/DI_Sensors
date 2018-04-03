@@ -38,8 +38,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
     This class compared to :py:class:`~di_sensors.light_color_sensor.LightColorSensor` uses mutexes that allows a given
     object to be accessed simultaneously from multiple threads/processes.
-    Apart from this difference, there may
-    also be functions that are more user-friendly than the latter.
+    Apart from this difference, there may also be functions that are more user-friendly than the latter.
 
     """
 
@@ -63,12 +62,12 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         "fuchsia":(300,100,100)
     }
 
-    def __init__(self, port="I2C-1", led_state = False, use_mutex=False):
+    def __init__(self, port="I2C", led_state = False, use_mutex=False):
         """
         Constructor for initializing a link to the `Light Color Sensor`_.
 
-        :param str bus = "I2C-1": The bus to which the distance sensor is connected to. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned on.
+        :param str port = "I2C": The port to which the distance sensor is connected to. Can also be connected to ports ``"AD1"`` or ``"AD2"`` of the `GoPiGo3`_. If you're passing an **invalid port**, then the sensor resorts to an ``"I2C"`` connection. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned off.
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
         :raises ~exceptions.OSError: When the `Light Color Sensor`_ is not reachable.
         :raises ~exceptions.RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `Light Color Sensor`_.
@@ -146,9 +145,11 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         return (h,s*100,v*100)
 
 
-    def get_safe_raw_colors(self):
+    def safe_raw_colors(self):
         """
         Returns the color read off of the `Light Color Sensor`_.
+
+        The colors detected vary depending on the lighting conditions of the nearby environment.
 
         :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**.
         :rtype: tuple(float,float,float,float)
@@ -164,14 +165,14 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
             ifMutexRelease(self.use_mutex)
         return (r,g,b,c)
 
-    def get_rgb(self):
+    def safe_rgb(self):
         """
         Detect the RGB color off of the `Light Color Sensor`_.
 
         :returns: The RGB color in 8-bit format.
         :rtype: tuple(int,int,int)
         """
-        colors = self.get_safe_raw_colors()
+        colors = self.safe_raw_colors()
         r,g,b,c = list(map(lambda c: int(c*255/colors[3]), colors))
         return r,g,b
 

@@ -46,7 +46,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         """
         Constructor for initializing link with the `InertialMeasurementUnit Sensor`_.
 
-        :param str port = "AD1": The port to which the IMU sensor gets connected to. By default, it's set to bus ``"AD1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str port = "AD1": The port to which the IMU sensor gets connected to. Can also be connected to port ``"AD2"`` of a `GoPiGo3`_ robot or to any ``"I2C"`` port of any of our platforms. If you're passing an **invalid port**, then the sensor resorts to an ``"I2C"`` connection. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
         :raises RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `InertialMeasurementUnit Sensor`_.
         :raises ~exceptions.OSError: When the `InertialMeasurementUnit Sensor`_ is not reachable.
@@ -81,18 +81,34 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
 
     def reconfig_bus(self):
         """
-        If the port configuration got reset, call this method to reconfigure it.
+        Use this method when the `InertialMeasurementUnit Sensor`_ becomes unresponsive but it's still plugged into the board.
+        There will be times when due to improper electrical contacts, the link between the sensor and the board gets disrupted - using this method restablishes the connection.
 
-        The idea is that in case the `InertialMeasurementUnit Sensor`_ gets pulled out of the plug or if there's an error on then
-        communication line or something else unexpected that puts this sensor to a halt, this method reconfigures
-        the connection to the sensor.
+        .. note::
+
+           Sometimes the sensor won't work just by calling this method - in this case, switching the port will do the job. This is something that happens
+           very rarely, so there's no need to worry much about this scenario.
+
+
         """
 
         ifMutexAcquire(self.use_mutex)
         self.BNO055.i2c_bus.reconfig_bus()
         ifMutexRelease(self.use_mutex)
 
-    def calibrate(self):
+    def safe_calibrate(self):
+        """
+        Once called, the method returns when the magnetometer of the `InertialMeasurementUnit Sensor`_ gets fully calibrated. Rotate the sensor in the air to help the sensor calibrate faster.
+
+        .. note::
+           Also, this method is not used to trigger the process of calibrating the sensor (the IMU does that automatically),
+           but its purpose is to block a given script until the sensor reports it has fully calibrated.
+
+           If you wish to block your code until the sensor calibrates and still have control over your script, use
+           :py:meth:`~di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibration_status` method along with a ``while`` loop to continuously check it.
+
+        """
+
         status = -1
         while status < 3:
             ifMutexAcquire(self.use_mutex)
@@ -103,21 +119,44 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             finally:
                 ifMutexRelease(self.use_mutex)
             if new_status != status:
-                print(new_status)
                 status = new_status
 
-    def get_calibration_status(self):
+    def safe_calibration_status(self):
+        """
+        Returns the calibration level of the magnetometer of the `InertialMeasurementUnit Sensor`_.
+
+        :returns: Calibration level of the magnetometer. Range is **0-3** and **-1** is returned when the sensor can't be accessed.
+        :rtype: int
+
+        """
         ifMutexAcquire(self.use_mutex)
         try:
             status = self.BNO055.get_calibration_status()[3]
         except Exception as e:
-            print(e)
             status = -1
         finally:
             ifMutexRelease(self.use_mutex)
         return status
 
-    def get_heading(self, in_heading):
+    def safe_heading(self):
+        """
+        Determines the heading of the sensor (robot).
+        This function doesn't take into account the declination.
+
+        :return: The heading of the sensor as a string.
+        :rtype: str
+
+        The possible strings that can be returned are: ``"North"``, ``"North East"``, ``"East"``,
+        ``"South East"``, ``"South"``, ``"South West"``, ``"West"``, ``"North West"``, ``"North"``.
+
+        .. note::
+
+           First use :py:meth:`~di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibrate` or :py:meth:`~di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibration_status`
+           methods to determine if the magnetometer sensor is fully calibrated.
+
+        """
+
+        in_heading = self.safe_north_point()
         headings = ["North", "North East",
                     "East", "South East",
                     "South", "South West",
@@ -175,7 +214,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             ifMutexRelease(self.use_mutex)
         return x,y,z
 
-    def get_north_point(self):
+    def safe_north_point(self):
         """
         Determines the heading of the north point.
         This function doesn't take into account the declination.

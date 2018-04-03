@@ -35,7 +35,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
 
 .. important::
 
-   These notations for ports (``"RPI_1"``, ``"GPG3_AD1"`` and ``"GPG3_AD2"``) is only required for classes that don't start with the **Easy** word,
+   These notations for ports (``"RPI_1"``, ``"GPG3_AD1"`` and ``"GPG3_AD2"``) are only required for classes that *don't start* with the **Easy** word,
    specifically for:
 
    * :py:class:`~di_sensors.distance_sensor.DistanceSensor`
@@ -43,7 +43,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
    * :py:class:`~di_sensors.light_color_sensor.LightColorSensor`
    * :py:class:`~di_sensors.temp_hum_press.TempHumPress`
 
-   For these sensors that start with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
+   For these sensors *that start* with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
 
    * ``"I2C"`` instead of ``"RPI_1"``.
    * ``"AD1/AD2"`` instead of ``"GPG3_AD1/GPG3_AD2"``.
@@ -117,8 +117,8 @@ Easy - Light
    di_sensors.easy_light_color_sensor.EasyLightColorSensor
    di_sensors.easy_light_color_sensor.EasyLightColorSensor.__init__
    di_sensors.easy_light_color_sensor.EasyLightColorSensor.translate_to_hsv
-   di_sensors.easy_light_color_sensor.EasyLightColorSensor.get_safe_raw_colors
-   di_sensors.easy_light_color_sensor.EasyLightColorSensor.get_rgb
+   di_sensors.easy_light_color_sensor.EasyLightColorSensor.safe_raw_colors
+   di_sensors.easy_light_color_sensor.EasyLightColorSensor.safe_rgb
    di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv
 
 ^^^^^^^^^^^^^^^^^^^^
@@ -142,12 +142,12 @@ Easy - IMU
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.__init__
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.reconfig_bus
-   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.calibrate
-   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.get_calibration_status
-   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.get_heading
+   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibrate
+   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibration_status
+   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_heading
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_read_euler
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_read_magnetometer
-   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.get_north_point
+   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_north_point
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Non-Easy - TempHumPress
@@ -207,5 +207,6 @@ Non-Easy - IMU
 
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
 .. _imu sensor: https://www.dexterindustries.com/shop/imu-sensor/
+.. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/

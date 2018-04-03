@@ -34,8 +34,6 @@ EasyIMUSensor
    :special-members:
    :exclude-members: __weakref__
 
-   .. automethod:: di_sensors.BNO055.BNO055.get_calibration_status
-
 ==============
 EasyTHPSsensor
 ==============

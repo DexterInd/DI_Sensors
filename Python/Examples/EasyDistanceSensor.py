@@ -16,11 +16,11 @@ from di_sensors.easy_distance_sensor import EasyDistanceSensor
 from time import sleep
 
 # instantiate the distance object
-sensor = EasyDistanceSensor()
+my_sensor = EasyDistanceSensor()
 
 # and read the sensor iteratively
 while True:
-  read_distance = sensor.read()
+  read_distance = my_sensor.read()
   print("distance from object: {} mm".format(read_distance))
 
   sleep(0.1)
