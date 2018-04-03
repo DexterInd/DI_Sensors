@@ -40,7 +40,9 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     object to be accessed simultaneously from multiple threads/processes.
     Apart from this difference, there may
     also be functions that are more user-friendly than the latter.
+
     """
+
     #: The 6 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
     #: method may return upon reading and interpreting a new set of color values.
     known_colors = {
@@ -107,6 +109,11 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         :return: The translated HSV tuple list. Returned values are *H(0-360)*, *S(0-100)*, *V(0-100)*.
         :rtype: tuple(int, int, int)
 
+        .. important::
+
+           For finding out the differences between **RGB** *(Red, Green, Blue)* color scheme and **HSV** *(Hue, Saturation, Value)*
+           please check out `this link <https://www.kirupa.com/design/little_about_color_hsv_rgb.htm>`__.
+
         """
         r,g,b = in_color
 
@@ -143,8 +150,8 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         """
         Returns the color read off of the `Light Color Sensor`_.
 
-        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear).
-        :rtype: tuple(float,float,float,float) where the range of each element is between **0** and **1**.
+        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**.
+        :rtype: tuple(float,float,float,float)
 
         """
         ifMutexAcquire(self.use_mutex)
@@ -178,6 +185,11 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         :param tuple(float,float,float,float) in_color: A 4-element tuple list for the *Red*, *Green*, *Blue* and *Alpha* channels. The elements are all valued between **0** and **1**.
         :returns: The detected color in string format and then a 3-element tuple describing the color in RGB format. The values of the RGB tuple are between **0** and **1**.
         :rtype: tuple(str,(float,float,float))
+
+        .. important::
+
+           For finding out the differences between **RGB** *(Red, Green, Blue)* color scheme and **HSV** *(Hue, Saturation, Value)*
+           please check out `this link <https://www.kirupa.com/design/little_about_color_hsv_rgb.htm>`__.
 
         """
 
