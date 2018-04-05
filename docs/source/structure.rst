@@ -43,7 +43,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
    * :py:class:`~di_sensors.light_color_sensor.LightColorSensor`
    * :py:class:`~di_sensors.temp_hum_press.TempHumPress`
 
-   If you choose to use a sensor library *that start* with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
+   If you choose to use a sensor library *that starts* with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
 
    * ``"I2C"`` instead of ``"RPI_1"``.
    * ``"AD1/AD2"`` instead of ``"GPG3_AD1/GPG3_AD2"``.
