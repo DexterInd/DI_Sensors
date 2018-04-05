@@ -43,7 +43,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
    * :py:class:`~di_sensors.light_color_sensor.LightColorSensor`
    * :py:class:`~di_sensors.temp_hum_press.TempHumPress`
 
-   For these sensors *that start* with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
+   If you choose to use a sensor library *that start* with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
 
    * ``"I2C"`` instead of ``"RPI_1"``.
    * ``"AD1/AD2"`` instead of ``"GPG3_AD1/GPG3_AD2"``.
@@ -58,13 +58,13 @@ Library Structure
 Classes Short-List
 ------------------
 
-The classes that are of interest for the user are graphically displayed shortly after this. In this graphic you can also notice inheritance links
-between different classes. In this graphic, we can notice 3 groups of classes:
+The classes that are more likely to be of interest are graphically displayed shortly after this. In this graphic you can also notice inheritance links
+between different classes. We can notice 3 groups of classes:
 
-* Those that start with the **Easy** word in them and are really simple to use.
+* Those that start with the **Easy** word in them and are easier to use and may provide some high-level functionalities.
 * Those that don't start with the **Easy** word and yet are related to those that are. These are generally intented for power users.
 * Those that look like they might represent a model number (that belong to modules such as :py:mod:`di_sensors.VL53L0X`, :py:mod:`di_sensors.BME280`, etc).
-  Intented for those who want to extend the functionalities of our library. These are not documented here.
+  These are intented for those who want to extend the functionalities of our library and are not documented here.
 
 .. inheritance-diagram::
    di_sensors.easy_distance_sensor
@@ -109,7 +109,7 @@ Easy - TempHumPress
 
 
 ^^^^^^^^^^^^^^^^^^^^
-Easy - Light
+Easy - Light & Color
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
@@ -150,7 +150,7 @@ Easy - IMU
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_north_point
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Non-Easy - TempHumPress
+TempHumPress
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
@@ -164,7 +164,7 @@ Non-Easy - TempHumPress
    di_sensors.temp_hum_press.TempHumPress.get_humidity
 
 ^^^^^^^^^^^^^^^^^^^^
-Non-Easy - Light
+Light & Color
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
@@ -175,7 +175,7 @@ Non-Easy - Light
    di_sensors.light_color_sensor.LightColorSensor.get_raw_colors
 
 ^^^^^^^^^^^^^^^^^^^^
-Non-Easy - Distance
+Distance
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
@@ -188,7 +188,7 @@ Non-Easy - Distance
    di_sensors.distance_sensor.DistanceSensor.timeout_occurred
 
 ^^^^^^^^^^^^^^^^^^^^
-Non-Easy - IMU
+IMU
 ^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
