@@ -147,7 +147,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
     def safe_raw_colors(self):
         """
-        Returns the color read off of the `Light Color Sensor`_.
+        Returns the color as read by the `Light Color Sensor`_.
 
         The colors detected vary depending on the lighting conditions of the nearby environment.
 
@@ -178,7 +178,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
     def guess_color_hsv(self, in_color):
         """
-        Determine to which color `in_color` parameter is closest to in the :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
+        Determines which color `in_color` parameter is closest to in the :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
 
         This method uses the euclidean algorithm for detecting the nearest center to it out of :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
         It does work exactly the same as KNN (K-Nearest-Neighbors) algorithm, where `K = 1`.
