@@ -8,7 +8,7 @@ On Library & Hardware
 Requirements
 ============
 
-Before you check the API for the DI-Sensors, please make sure you have the ``DI-Sensors`` package installed. You can do this by checking with ``pip`` by typing the following command.
+Before you check the API for the DI-Sensors, please make sure you have the ``DI_Sensors`` package installed. You can do this by checking with ``pip`` by typing the following command.
 
 .. code-block:: bash
 
