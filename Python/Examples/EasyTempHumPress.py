@@ -11,24 +11,24 @@
 from __future__ import print_function
 from __future__ import division
 
-import time
-from di_sensors.temp_hum_press import TempHumPress
+from time import sleep
+from di_sensors.easy_temp_hum_press import EasyTHPSensor
 
 print("Example program for reading a Dexter Industries Temperature Humidity Pressure Sensor on an I2C port.")
 
-thp = TempHumPress()
+my_thp = EasyTHPSensor()
 
 while True:
     # Read the temperature
-    temp = thp.get_temperature_celcius()
+    temp = my_thp.safe_celsius()
 
     # Read the relative humidity
-    hum = thp.get_humidity()
+    hum = my_thp.safe_humidity()
 
     # Read the pressure
-    press = thp.get_pressure()
+    press = my_thp.safe_pressure()
 
     # Print the values
     print("Temperature: {:5.3f} Humidity: {:5.3f} Pressure: {:5.3f}".format(temp, hum, press))
 
-    time.sleep(0.02)
+    sleep(0.02)

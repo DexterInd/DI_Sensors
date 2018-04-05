@@ -1,5 +1,4 @@
 import easy_sensors
-from I2C_mutex import Mutex
 import time
 from os import path
 # from numpy import mean, std

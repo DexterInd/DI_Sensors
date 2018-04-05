@@ -7,9 +7,9 @@ Temperature Humidity and Pressure Sensor
 In order to run this example program, connect the `Temperature Humidity and Pressure Sensor`_ to an I2C port on whichever platform (`GoPiGo3`_, `GrovePi`_ or `BrickPi3`_)
 and then run the following script.
 
-The source file for this example program can be found `here on github <https://github.com/DexterInd/DI_Sensors/blob/master/Python/Examples/TempHumPress.py>`__.
+The source file for this example program can be found `here on github <https://github.com/DexterInd/DI_Sensors/blob/master/Python/Examples/EasyTempHumPress.py>`__.
 
-.. literalinclude:: ../../../Python/Examples/TempHumPress.py
+.. literalinclude:: ../../../Python/Examples/EasyTempHumPress.py
    :language: python
    :lines: 14-
 

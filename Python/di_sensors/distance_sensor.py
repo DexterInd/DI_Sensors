@@ -27,7 +27,7 @@ class DistanceSensor(object):
         """
         self.VL53L0X = VL53L0X.VL53L0X(bus = bus)
 
-        # set to long range (about 2 meters)
+        # set to long range (about 2.3 meters)
         self.VL53L0X.set_signal_rate_limit(0.1)
         self.VL53L0X.set_vcsel_pulse_period(self.VL53L0X.VcselPeriodPreRange, 18)
         self.VL53L0X.set_vcsel_pulse_period(self.VL53L0X.VcselPeriodFinalRange, 14)
@@ -52,7 +52,7 @@ class DistanceSensor(object):
         """
         Read the detected range while the sensor is taking continuous measurements at the set rate.
 
-        :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
+        :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2.3 meters.
         :rtype: int
         :raises ~exceptions.OSError: When the distance sensor is not reachable or when the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous` hasn't been called before. This exception gets raised also when the user is trying to poll data faster than how it was initially set with the :py:meth:`~di_sensors.distance_sensor.DistanceSensor.start_continuous` method.
 
@@ -72,7 +72,7 @@ class DistanceSensor(object):
 
         :param boolean safe_infinity = True: As sometimes the distance sensor returns a small value when there's nothing in front of it, we need to poll again and again to confirm the presence of an obstacle. Setting ``safe_infinity`` to ``False`` will avoid that extra polling.
 
-        :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2 meters.
+        :returns: The detected range of the sensor as measured in millimeters. The range can go up to 2.3 meters.
         :rtype: int
         :raises ~exceptions.OSError: When the distance sensor is not reachable.
 
