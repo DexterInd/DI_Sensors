@@ -16,13 +16,12 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
 
     This class compared to :py:class:`~di_sensors.distance_sensor.DistanceSensor` uses mutexes that allows a given
     object to be accessed simultaneously from multiple threads/processes.
-    Apart from this difference, there may
-    also be functions that are more user-friendly than the latter.
+    Apart from this difference, there may also be functions that are more user-friendly than the latter.
 
     """
     def __init__(self, use_mutex=False):
         """
-        Creates a :py:class:`~easygopigo3.DistanceSensor` object which can be used for interfacing with a `distance sensor`_.
+        Creates a :py:class:`~easygopigo3.EasyDistanceSensor` object which can be used for interfacing with a `distance sensor`_.
 
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port, where in this case it must be ``"I2C"``. Most probably, this means the distance sensor is not connected at all.
