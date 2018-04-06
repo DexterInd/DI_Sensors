@@ -144,7 +144,7 @@ Easy - IMU
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.reconfig_bus
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibrate
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_calibration_status
-   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_heading
+   di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.convert_heading
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_read_euler
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_read_magnetometer
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_north_point

@@ -138,10 +138,10 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             ifMutexRelease(self.use_mutex)
         return status
 
-    def safe_heading(self):
+    def convert_heading(self, in_heading):
         """
-        Determines the heading of the sensor (robot).
-        This function doesn't take into account the declination.
+        This method takes in a heading in degrees and return the name of the corresponding heading.
+        :param float in_heading: the value in degree that needs to be converted to a string.
 
         :return: The heading of the sensor as a string.
         :rtype: str
@@ -156,7 +156,6 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
 
         """
 
-        in_heading = self.safe_north_point()
         headings = ["North", "North East",
                     "East", "South East",
                     "South", "South West",
