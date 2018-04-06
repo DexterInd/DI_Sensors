@@ -140,8 +140,8 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
 
     def convert_heading(self, in_heading):
         """
-        This method takes in a heading in degrees and return the name of the corresponding heading
-        :param float in_heading: the value in degree that needs to be converted to a string
+        This method takes in a heading in degrees and return the name of the corresponding heading.
+        :param float in_heading: the value in degree that needs to be converted to a string.
 
         :return: The heading of the sensor as a string.
         :rtype: str
