@@ -5,7 +5,8 @@ RASPBIAN=$PIHOME/di_update/Raspbian_For_Robots
 curl --silent https://raw.githubusercontent.com/DexterInd/script_tools/master/install_script_tools.sh | bash
 
 # needs to be sourced from here when we call this as a standalone
-source /home/pi/$DEXTER/lib/$DEXTER/script_tools/functions_library.sh
+source $DEXTER_PATH/script_tools/functions_library.sh
+source $DEXTER_PATH/DI_Sensors/Install/update_functions.sh
 
 ###############################################
 ## Install DI_Sensors
@@ -38,3 +39,6 @@ popd
 
 pip install python-periphery
 pip3 install python-periphery
+
+install_line_follower
+install_control_panel
