@@ -7,13 +7,13 @@ except ImportError:
 
 try:  #first look for libraries in the same folder
 	import sys
-	#sys.path.insert(0, '/home/pi/Dexter/GoPiGo/Software/Python/line_follower')
+	#sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/line_follower')
 
 	import line_sensor
 	import scratch_line
 except ImportError:
-	try:  # look in the standard Raspbian for Robots folder. 
-		sys.path.insert(0, '/home/pi/Dexter/GoPiGo/Software/Python/line_follower')
+	try:  # look in the standard Raspbian for Robots folder.
+		sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/line_follower')
 
 		import line_sensor
 		import scratch_line
@@ -31,12 +31,12 @@ class line_sensor_app(wx.Frame):
 		# Exit
 		exit_button = wx.Button(self, label="Exit", pos=(25,350))
 		exit_button.Bind(wx.EVT_BUTTON, self.onClose)
-		
-		robot = "/home/pi/Desktop/GoBox/Troubleshooting_GUI/dex.png"
+
+		robot = "/home/pi/Desktop/di_update/Raspbian_For_Robots/Troubleshooting_GUI/dex.png"
 		png = wx.Image(robot, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 		wx.StaticBitmap(self, -1, png, (395, 275), (png.GetWidth()-320, png.GetHeight()-10))
 		self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)		# Sets background picture
-	
+
 	#----------------------------------------------------------------------
 	def OnEraseBackground(self, evt):
 		"""
@@ -44,13 +44,13 @@ class line_sensor_app(wx.Frame):
 		"""
 		# yanked from ColourDB.py
 		dc = evt.GetDC()
- 
+
 		if not dc:
 			dc = wx.ClientDC(self)
 			rect = self.GetUpdateRegion().GetBox()
 			dc.SetClippingRect(rect)
-		dc.Clear()	
-		bmp = wx.Bitmap("/home/pi/Desktop/GoBox/Troubleshooting_GUI/dex.png")	# Draw the photograph.
+		dc.Clear()
+		bmp = wx.Bitmap("/home/pi/Desktop/di_update/Raspbian_For_Robots/Troubleshooting_GUI/dex.png")	# Draw the photograph.
 		dc.DrawBitmap(bmp, 0, 400)						# Absolute position of where to put the picture
 
 
