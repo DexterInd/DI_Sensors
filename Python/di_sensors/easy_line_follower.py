@@ -3,13 +3,9 @@ import time
 from os import path
 # from numpy import mean, std
 
-try:
-    from di_sensors import line_follower
-except:
-    # think about what we should do 
-    # goal is to support both line followers seamlessly
-    raise ImportError("Line Follower library not found")
-    exit()
+# import both both line followers
+from di_sensors import line_follower
+from di_sensors.line_follower import line_sensor as old_line_follower
 
 class EasyLineFollower(Sensor):
     """

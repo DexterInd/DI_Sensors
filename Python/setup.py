@@ -51,7 +51,6 @@ setup(
         "DHT Sensor",
     ],
     packages = find_packages()
-
 )
 
 #install_requires=open('requirements.txt').readlines(),
