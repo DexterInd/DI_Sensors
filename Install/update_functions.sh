@@ -19,25 +19,21 @@ install_line_follower(){
   then
     sudo mv $PIHOME/black_line.txt $PIHOME/Dexter/black_line.txt
   else
-    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/line_follower/black_line.txt $PIHOME/Dexter/black_line.txt
+    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/di_sensors/line_follower/black_line.txt $PIHOME/Dexter/black_line.txt
   fi
 
   if file_exists "$PIHOME/white_line.txt"
   then
     sudo mv $PIHOME/white_line.txt $PIHOME/Dexter/white_line.txt
   else
-    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/line_follower/white_line.txt $PIHOME/Dexter/white_line.txt
+    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/di_sensors/line_follower/white_line.txt $PIHOME/Dexter/white_line.txt
   fi
   if file_exists "$PIHOME/range_line.txt"
   then
     sudo mv $PIHOME/range_line.txt $PIHOME/Dexter/range_line.txt
   else
-    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/line_follower/range_line.txt $PIHOME/Dexter/range_line.txt
+    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/di_sensors/line_follower/range_line.txt $PIHOME/Dexter/range_line.txt
   fi
 
   sudo chmod 666 $PIHOME/Dexter/*line.txt
-}
-
-install_control_panel(){
-  sudo cp "$ROBOT_DIR/Software/Python/control_panel/gopigo_control_panel.desktop" $PIHOME/Desktop
 }
