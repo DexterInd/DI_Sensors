@@ -36,4 +36,4 @@ class PCA9570(object):
         """Get the output pin states
         
         Returns the bit values for the 4 outputs"""
-        return (self.i2c_bus.read_8u() & 0x0F)
+        return (self.i2c_bus.read_8() & 0x0F)

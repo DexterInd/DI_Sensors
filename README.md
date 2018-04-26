@@ -27,7 +27,7 @@ In order to quick install the `DI_Sensors` repository, open up a terminal and ty
 
 1. For installing the python packages of the `DI_Sensors` with root privileges (except any other settings that can come with), use the following command:
 ```
-sudo sh -c "curl -kL dexterindustries.com/update_sensors | bash"
+curl -kL dexterindustries.com/update_sensors | sudo bash"
 ```
 
 2. For installing the python packages of the `DI_Sensors` without root privileges (except any other settings that can come with), use the following command:

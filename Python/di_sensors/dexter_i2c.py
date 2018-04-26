@@ -215,100 +215,116 @@ class Dexter_I2C(object):
         arr = [reg]
         arr.extend(list)
         self.transfer(arr)
-
-    def read_8u(self):
-        """Read an 8-bit value
-
-        Returns the value"""
-        val = self.transfer([], 1)
-        return val
-
-    def read_reg_8u(self, reg):
-        """Read an 8-bit unsigned value from a register
-
+    
+    def read_8(self, reg = None, signed = False):
+        """Read a 8-bit value
+        
         Keyword arguments:
-        reg -- regester to read from
-
+        reg (default None) -- Register to read from or None
+        signed (default False) -- True (signed) or False (unsigned)
+        
         Returns the value
         """
-        val = self.transfer([reg], 1)
-        return val[0]
-
-    def read_reg_8s(self, reg):
-        """Read an 8-bit signed value from a register
-
+        # write the register to read from?
+        if reg != None:
+            outArr = [reg]
+        else:
+            outArr = []
+        
+        val = self.transfer(outArr, 1)
+        
+        value = val[0]
+        
+        # signed value?
+        if signed:
+            # negative value?
+            if value & 0x80:
+                value = value - 0x100
+        
+        return value
+    
+    def read_16(self, reg = None, signed = False, big_endian = None):
+        """Read a 16-bit value
+        
         Keyword arguments:
-        reg -- regester to read from
-
-        Returns the value
-        """
-        val = self.read_reg_8u(reg)
-        if val & 0x80:
-            return val - 0x100
-        return val
-
-    def read_reg_16u(self, reg, big_endian = None):
-        """Read a 16-bit unsigned value from a register
-
-        Keyword arguments:
-        reg -- regester to read from
+        reg (default None) -- Register to read from or None
+        signed (default False) -- True (signed) or False (unsigned)
         big_endian (default None) -- True (big endian), False (little endian), or None (use the pre-defined endianness for the object)
-
+        
         Returns the value
         """
-        val = self.transfer([reg], 2)
+        # write the register to read from?
+        if reg != None:
+            outArr = [reg]
+        else:
+            outArr = []
+        
+        val = self.transfer(outArr, 2)
+        
         if big_endian == None:
             big_endian = self.big_endian
+        
+        # big endian?
         if big_endian:
-            return (val[0] << 8) | val[1]
+            value = (val[0] << 8) | val[1]
         else:
-            return (val[1] << 8) | val[0]
+            value = (val[1] << 8) | val[0]
+        
+        # signed value?
+        if signed:
+            # negative value?
+            if value & 0x8000:
+                value = value - 0x10000
+        
+        return value
 
-    def read_reg_16s(self, reg, big_endian = None):
-        """Read a 16-bit signed value from a register
-
+    def read_32(self, reg = None, signed = False, big_endian = None):
+        """Read a 32-bit value
+        
         Keyword arguments:
-        reg -- regester to read from
+        reg (default None) -- Register to read from or None
+        signed (default False) -- True (signed) or False (unsigned)
         big_endian (default None) -- True (big endian), False (little endian), or None (use the pre-defined endianness for the object)
-
+        
         Returns the value
         """
-        val = self.read_reg_16u(reg, big_endian)
-        if val & 0x8000:
-            return val - 0x10000
-        return val
-
-    def read_32u(self, big_endian = None):
-        """Read a 32-bit unsigned value
-
-        Keyword arguments:
-        big_endian (default None) -- True (big endian), False (little endian), or None (use the pre-defined endianness for the object)
-
-        Returns the value
-        """
-        val = self.transfer([], 4)
+        # write the register to read from?
+        if reg != None:
+            outArr = [reg]
+        else:
+            outArr = []
+        
+        val = self.transfer(outArr, 4)
+        
         if big_endian == None:
             big_endian = self.big_endian
+        
+        # big endian?
         if big_endian:
-            return (val[0] << 24) | (val[1] << 16) | (val[2] << 8) | val[3]
+            value = (val[0] << 24) | (val[1] << 16) | (val[2] << 8) | val[3]
         else:
-            return (val[3] << 24) | (val[2] << 16) | (val[1] << 8) | val[0]
+            value = (val[3] << 24) | (val[2] << 16) | (val[1] << 8) | val[0]
+        
+        # signed value?
+        if signed:
+            # negative value?
+            if value & 0x80000000:
+                value = value - 0x100000000
+        
+        return value
 
-    def read_list(self, len):
-        """Read a list of bytes
-
-        Keyword arguments:
-        len -- the number of bytes to read
-
-        Returns a list of the bytes read"""
-        return self.transfer([], len)
-
-    def read_reg_list(self, reg, len):
+    def read_list(self, reg, len):
         """Read a list of bytes from a register
-
+        
         Keyword arguments:
-        reg -- the regester to read from
-        len -- the number of bytes to read
-
+        reg -- Register to read from or None
+        len -- Number of bytes to read
+        
         Returns a list of the bytes read"""
-        return self.transfer([reg], len)
+        
+        # write the register to read from?
+        if reg != None:
+            outArr = [reg]
+        else:
+            outArr = []
+        return self.transfer(outArr, len)
