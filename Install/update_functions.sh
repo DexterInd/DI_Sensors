@@ -1,8 +1,9 @@
 PIHOME=/home/pi
 DEXTER=Dexter
 DEXTER_PATH=$PIHOME/$DEXTER
+SCRIPT_TOOLS=$DEXTER_PATH/lib/Dexter/script_tools
 
-source $DEXTER_PATH/script_tools/functions_library.sh
+source $SCRIPT_TOOLS/functions_library.sh
 
 install_line_follower(){
   feedback "--> Installing Line Follower Calibration"
