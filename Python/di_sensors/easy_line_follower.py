@@ -5,7 +5,7 @@ from os import path
 
 # import both both line followers
 from di_sensors import line_follower
-from di_sensors.line_follower import line_sensor as old_line_follower
+from line_follower import line_sensor as old_line_follower
 
 class EasyLineFollower(Sensor):
     """
