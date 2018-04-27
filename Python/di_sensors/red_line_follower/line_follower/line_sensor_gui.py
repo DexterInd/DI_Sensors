@@ -7,13 +7,13 @@ except ImportError:
 
 try:  #first look for libraries in the same folder
 	import sys
-	#sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/red_line_follower/line_follower')
+	#sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower')
 
 	import line_sensor
 	import scratch_line
 except ImportError:
 	try:  # look in the standard Raspbian for Robots folder.
-		sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/red_line_follower/line_follower')
+		sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower')
 
 		import line_sensor
 		import scratch_line
