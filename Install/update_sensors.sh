@@ -37,6 +37,11 @@ python setup.py install
 python3 setup.py install
 popd
 
+pushd $SENSOR_DIR/Python/di_sensors/red_line_follower
+python setup.py install
+python3 setup.py install
+popd
+
 pip install python-periphery
 pip3 install python-periphery
 

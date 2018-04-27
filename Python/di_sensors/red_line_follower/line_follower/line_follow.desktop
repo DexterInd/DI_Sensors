@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Line Follower Calibration
+Comment=Line Follower Calibration
+Icon=/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/red_line_follower/line_follower/obconf.xpm
+Exec=lxterminal  --title "Line Follower Calibration - Do not close this window!" --command "gksu python /home/pi/Dexter/DI_Sensors/Software/Python/red_line_follower/line_follower/line_sensor_gui.py"
+NoDisplay=true

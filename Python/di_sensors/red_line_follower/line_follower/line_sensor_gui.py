@@ -7,13 +7,13 @@ except ImportError:
 
 try:  #first look for libraries in the same folder
 	import sys
-	#sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/line_follower')
+	#sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/red_line_follower/line_follower')
 
 	import line_sensor
 	import scratch_line
 except ImportError:
 	try:  # look in the standard Raspbian for Robots folder.
-		sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/line_follower')
+		sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Software/Python/di_sensors/red_line_follower/line_follower')
 
 		import line_sensor
 		import scratch_line
@@ -22,7 +22,7 @@ except ImportError:
 		raise ImportError,"Line sensor libraries not found"
 		sys.exit(0)
 
-y=200 
+y=200
 class line_sensor_app(wx.Frame):
 	def __init__(self,parent,id,title):
 		wx.Frame.__init__(self,parent,id,title,size=(500,400))
@@ -69,10 +69,10 @@ class line_sensor_app(wx.Frame):
 		line_position_set_button = wx.Button(self,-1,label="Read Line Position", pos=(350,y))
 		sizer.Add(line_position_set_button, (0,1))
 		self.Bind(wx.EVT_BUTTON, self.line_position_set_button_OnButtonClick, line_position_set_button)
-		
+
 		# Set up labels: This is where the output of sensor readings will be printed.
 		self.label = wx.StaticText(self,-1,label=u'  ',pos=(150,y+150))	# Prints line sensor information out.
-		
+
 		self.label_top = wx.StaticText(self,-1,label=u'Instructions:\n 1.\tPlace the line sensor so that all of the black sensors are over \n\tyour black line.  Then press the button "Black Line Sensor Set".\n\n 2.\tNext, place the line sensor so that all of the black sensors are \n\tNOT over your black line and on the white background surface.\n\tThen press "White Line Sensor Set".\n\n 3.\tFinally, test the sensor by pressing "Read Line Position"',pos=(25,0))
 
 		sizer.Add( self.label, (1,0),(1,2), wx.EXPAND )
@@ -86,15 +86,15 @@ class line_sensor_app(wx.Frame):
 		line_sensor.set_black_line()
 		line_val=line_sensor.get_black_line()
 		self.label.SetLabel("Black Line : "+str(line_val))
-		
-	
+
+
 	def white_line_set_button_OnButtonClick(self,event):
 		for i in range(2):
 			line_sensor.get_sensorval()
 		line_sensor.set_white_line()
 		line_val=line_sensor.get_white_line()
 		self.label.SetLabel("White Line : "+str(line_val))
-		
+
 	def line_position_set_button_OnButtonClick(self,event):
 		line_val=scratch_line.absolute_line_pos()
 		self.label.SetLabel("Line Position : "+str(line_val))
