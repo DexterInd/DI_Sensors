@@ -8,9 +8,9 @@ install_line_follower(){
   feedback "--> Installing Line Follower Calibration"
   # Install GoPiGo Line Follower Calibration
   delete_file /home/pi/Desktop/line_follow.desktop
-  sudo cp /home/pi/Dexter/GoPiGo/Software/Python/line_follower/line_follow.desktop /home/pi/Desktop/
+  sudo cp /home/pi/Dexter/DI_Sensors/Python/di_sensors/line_follower/line_follow.desktop /home/pi/Desktop/
   sudo chmod +x /home/pi/Desktop/line_follow.desktop
-  sudo chmod +x /home/pi/Dexter/GoPiGo/Software/Python/line_follower/line_sensor_gui.py
+  sudo chmod +x /home/pi/Dexter/DI_Sensors/Python/di_sensors/line_follower/line_sensor_gui.py
 
   # if the configuration files exist in the home directory
   # then move them to their new place
@@ -19,20 +19,20 @@ install_line_follower(){
   then
     sudo mv $PIHOME/black_line.txt $PIHOME/Dexter/black_line.txt
   else
-    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/di_sensors/line_follower/black_line.txt $PIHOME/Dexter/black_line.txt
+    sudo cp $PIHOME/Dexter/DI_Sensors/Python/di_sensors/line_follower/black_line.txt $PIHOME/Dexter/black_line.txt
   fi
 
   if file_exists "$PIHOME/white_line.txt"
   then
     sudo mv $PIHOME/white_line.txt $PIHOME/Dexter/white_line.txt
   else
-    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/di_sensors/line_follower/white_line.txt $PIHOME/Dexter/white_line.txt
+    sudo cp $PIHOME/Dexter/DI_Sensors/Python/di_sensors/line_follower/white_line.txt $PIHOME/Dexter/white_line.txt
   fi
   if file_exists "$PIHOME/range_line.txt"
   then
     sudo mv $PIHOME/range_line.txt $PIHOME/Dexter/range_line.txt
   else
-    sudo cp $PIHOME/Dexter/GoPiGo/Software/Python/di_sensors/line_follower/range_line.txt $PIHOME/Dexter/range_line.txt
+    sudo cp $PIHOME/Dexter/DI_Sensors/Python/di_sensors/line_follower/range_line.txt $PIHOME/Dexter/range_line.txt
   fi
 
   sudo chmod 666 $PIHOME/Dexter/*line.txt
