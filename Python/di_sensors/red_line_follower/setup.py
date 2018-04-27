@@ -26,4 +26,5 @@ setuptools.setup(
     author="Dexter Industries",
     url="http://www.dexterindustries.com/GoPiGo/",
     py_modules=['line_follower.line_sensor', 'line_follower.scratch_line'],
+    install_requires = ['python-periphery']
 )
