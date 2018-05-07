@@ -15,7 +15,7 @@ SENSOR_DIR=$DEXTER_PATH/DI_Sensors
 
 # the top-level module name for python package
 # used for identifying present packages
-REPO_PACKAGE=di-sensors
+REPO_PACKAGE=di_sensors
 
 # called way down bellow
 check_if_run_with_pi() {
