@@ -16,6 +16,7 @@ SENSOR_DIR=$DEXTER_PATH/DI_Sensors
 # the top-level module name for python package
 # used for identifying present packages
 REPO_PACKAGE=di_sensors
+LINEFOLLOWER_PACKAGE=line_follower
 
 # called way down bellow
 check_if_run_with_pi() {
@@ -246,13 +247,18 @@ remove_python_packages() {
 # called way down bellow
 install_python_pkgs_and_dependencies() {
 
-  # feedback "Removing \"$REPO_PACKAGE\" and \"$DHT_PACKAGE\" to make space for new ones"
+  feedback "Removing \"$REPO_PACKAGE\" and \"$LINEFOLLOWER_PACKAGE\" to make space for new ones"
   feedback "Removing \"$REPO_PACKAGE\" to make space for the new one"
   remove_python_packages "$REPO_PACKAGE"
-  # remove_python_packages "$DHT_PACKAGE"
+  remove_python_packages "$LINEFOLLOWER_PACKAGE"
 
-  # installing the package itself
+  # installing the di_sensors package
   pushd $SENSOR_DIR/Python > /dev/null
+  install_python_packages
+  popd > /dev/null
+
+  # installing the red line follower package
+  pushd $SENSOR_DIR/Python/di_sensors/red_line_follower > /dev/null
   install_python_packages
   popd > /dev/null
 }
