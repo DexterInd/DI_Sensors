@@ -261,6 +261,9 @@ install_python_pkgs_and_dependencies() {
   pushd $SENSOR_DIR/Python/di_sensors/red_line_follower > /dev/null
   install_python_packages
   popd > /dev/null
+
+  source $SENSOR_DIR/Install/update_functions.sh
+  configure_line_follower
 }
 
 ################################################
