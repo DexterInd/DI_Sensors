@@ -13,7 +13,7 @@ Who we are and what we do.
 .. image:: https://i.imgur.com/V1LUKyq.jpg
    :scale: 100
    :width: 1695
-   :height: 532
+   :height: 300
 
 `Dexter Industries`_ is an American educational robotics company that develops robot kits that make programming accessible for everyone.
 
