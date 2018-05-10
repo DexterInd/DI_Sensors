@@ -5,8 +5,7 @@ SCRIPT_TOOLS=$DEXTER_PATH/lib/Dexter/script_tools
 
 source $SCRIPT_TOOLS/functions_library.sh
 
-install_line_follower(){
-  feedback "--> Installing Line Follower Calibration"
+configure_line_follower(){
   # Install GoPiGo Line Follower Calibration
   if [ -d /home/pi/Desktop ]; then
     delete_file $PIHOME/Desktop/line_follow.desktop

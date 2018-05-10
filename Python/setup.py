@@ -50,7 +50,8 @@ setup(
         "RGB LCD",
         "DHT Sensor",
     ],
-    packages = find_packages()
+    packages = find_packages(),
+	install_requires = ["python-periphery"]
 )
 
 #install_requires=open('requirements.txt').readlines(),
