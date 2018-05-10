@@ -248,7 +248,6 @@ remove_python_packages() {
 install_python_pkgs_and_dependencies() {
 
   feedback "Removing \"$REPO_PACKAGE\" and \"$LINEFOLLOWER_PACKAGE\" to make space for new ones"
-  feedback "Removing \"$REPO_PACKAGE\" to make space for the new one"
   remove_python_packages "$REPO_PACKAGE"
   remove_python_packages "$LINEFOLLOWER_PACKAGE"
 
@@ -262,8 +261,10 @@ install_python_pkgs_and_dependencies() {
   install_python_packages
   popd > /dev/null
 
+  feedback "Configuring the red line follower in DI_Sensors installation"
   source $SENSOR_DIR/Install/update_functions.sh
   configure_line_follower
+  feedback "Done configuring the red line follower in DI_Sensors installation"
 }
 
 ################################################
