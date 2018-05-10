@@ -7,7 +7,7 @@ The quickest way for installing the DI_Sensors is to enter the following command
 curl -kL dexterindustries.com/update_sensors | bash
 ```
 
-By default, the DI_Sensors package is installed system-wide and [script_tools](https://github.com/DexterInd/script_tools) is completely updated each time the script is ran.
+By default, the DI_Sensors package is installed system-wide and [script_tools](https://github.com/DexterInd/script_tools) and [RFR_Tools](https://github.com/DexterInd/RFR_Tools) are updated each time the script is ran.
 
 An example using options appended to the command can be:
 ```
@@ -20,7 +20,8 @@ The options that can be appended to this command are:
 
 * `--no-dependencies` - skip installing any dependencies for the DI_Sensors. It's supposed to be used on each consecutive update after the initial install has gone through.
 * `--no-update-aptget` - to skip using `sudo apt-get update` before installing dependencies. For this to be useful, `--no-dependencies` has to be not used.
-* `--bypass-pkg-scriptools` - skips installing/updating the python package for  [script_tools](https://github.com/DexterInd/script_tools).
+* `--bypass-rfrtools` - bypass the installation of RFR_Tools completely.
+* `--bypass-python-rfrtools` - skips installing/updating the python package for  [script_tools](https://github.com/DexterInd/script_tools).
 * `--user-local` - install the python package for the DI_Sensors in the home directory of the user. This doesn't require any special read/write permissions: the actual command used is (`python setup.py install --force --user`).
 * `--env-local` - install the python package for the DI_Sensors within the given environment without elevated privileges: the actual command used is (`python setup.py install --force`).
 * `--system-wide` - install the python package for the DI_Sensors within the sytem-wide environment with `sudo`: the actual command used is (`sudo python setup.py install --force`).
