@@ -1,108 +1,141 @@
 #!/usr/bin/python
 
 try:
-	import wx
+    import wx
 except ImportError:
-	raise ImportError,"The wxPython module is required to run this program"
+    raise ImportError,"The wxPython module is required to run this program"
 
 try:  #first look for libraries in the same folder
-	import sys
-	#sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower')
+    import sys
+    #sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower')
 
-	import line_sensor
-	import scratch_line
+    import line_sensor
+    import scratch_line
 except ImportError:
-	try:  # look in the standard Raspbian for Robots folder.
-		sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower')
+    try:  # look in the standard Raspbian for Robots folder.
+        sys.path.insert(0, '/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower')
 
-		import line_sensor
-		import scratch_line
+        import line_sensor
+        import scratch_line
 
-	except ImportError:
-		raise ImportError,"Line sensor libraries not found"
-		sys.exit(0)
+    except ImportError:
+        raise ImportError,"Line sensor libraries not found"
+        sys.exit(0)
 
-y=200
-class line_sensor_app(wx.Frame):
-	def __init__(self,parent,id,title):
-		wx.Frame.__init__(self,parent,id,title,size=(500,400))
-		self.parent = parent
-		self.initialize()
-		# Exit
-		exit_button = wx.Button(self, label="Exit", pos=(25,350))
-		exit_button.Bind(wx.EVT_BUTTON, self.onClose)
+PIHOME="/home/pi"
+DEXTER="Dexter"
+SCRATCH="Scratch_GUI"
+RFR_TOOLS="RFR_Tools"
+ICON_PATH = "/".join( (PIHOME, DEXTER,"lib",DEXTER, RFR_TOOLS, "icons")  )+"/"
 
-		robot = "/home/pi/Desktop/di_update/Raspbian_For_Robots/Troubleshooting_GUI/dex.png"
-		png = wx.Image(robot, wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-		wx.StaticBitmap(self, -1, png, (395, 275), (png.GetWidth()-320, png.GetHeight()-10))
-		self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)		# Sets background picture
+class MainPanel(wx.Panel):
+    def __init__(self,parent):
+        wx.Panel.__init__(self,parent)
+        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+        self.SetBackgroundColour(wx.WHITE)
+        self.frame = parent
 
-	#----------------------------------------------------------------------
-	def OnEraseBackground(self, evt):
-		"""
-		Add a picture to the background
-		"""
-		# yanked from ColourDB.py
-		dc = evt.GetDC()
+        font = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, u'Helvetica')
+        self.SetFont(font)
 
-		if not dc:
-			dc = wx.ClientDC(self)
-			rect = self.GetUpdateRegion().GetBox()
-			dc.SetClippingRect(rect)
-		dc.Clear()
-		bmp = wx.Bitmap("/home/pi/Desktop/di_update/Raspbian_For_Robots/Troubleshooting_GUI/dex.png")	# Draw the photograph.
-		dc.DrawBitmap(bmp, 0, 400)						# Absolute position of where to put the picture
+        hSizer = wx.BoxSizer(wx.HORIZONTAL)
+        vSizer = wx.BoxSizer(wx.VERTICAL)
+
+        logo_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        bmp = wx.Bitmap(ICON_PATH+"dexter_industries_logo.png",type=wx.BITMAP_TYPE_PNG)
+        bitmap = wx.StaticBitmap(self, bitmap=bmp)
+        bmpW,bmpH = bitmap.GetSize()
+        logo_sizer.Add(bitmap,0,wx.RIGHT|wx.LEFT|wx.EXPAND)
+        vSizer.Add(logo_sizer,0,wx.SHAPED|wx.EXPAND)
+
+        instructions = u'Instructions:\n\n' + \
+                       u' 1.\tPlace the line sensor so that all of the black sensors are \n\tover your black line.  Then press the button "Set Black Line Values".\n\n' + \
+                       u' 2.\tNext, place the line sensor so that all of the black sensors are \n\tNOT over your black line and on the white background surface.\n\tThen press "Set White Line Values".\n\n' + \
+                       u' 3.\tFinally, test the sensor by pressing "Read Line Position"'
+        self.label_top = wx.StaticText(self,-1,label=instructions)
+        vSizer.Add(self.label_top,1,wx.EXPAND)
+
+        buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        # Set up buttons
+        self.black_line_set_button = wx.Button(self,-1,label="Set Black Line Values")
+        self.Bind(wx.EVT_BUTTON, self.black_line_set_OnButtonClick, self.black_line_set_button)
+        buttonSizer.AddSpacer(10)
+        buttonSizer.Add(self.black_line_set_button,0)
+        buttonSizer.AddSpacer(10)
+
+        self.white_line_set_button = wx.Button(self,-1,label="Set White Line Values")
+        self.Bind(wx.EVT_BUTTON, self.white_line_set_button_OnButtonClick, self.white_line_set_button)
+        buttonSizer.Add(self.white_line_set_button,0)
+        buttonSizer.AddSpacer(10)
+        
+        self.line_position_set_button = wx.Button(self,-1,label="Read Line Position")
+        self.Bind(wx.EVT_BUTTON, self.line_position_set_button_OnButtonClick, self.line_position_set_button)
+        buttonSizer.Add(self.line_position_set_button,0)
+        buttonSizer.AddSpacer(10)
+
+        vSizer.AddSpacer(20)
+        vSizer.Add(buttonSizer)
+        vSizer.AddSpacer(10)
+
+        # Set up labels: This is where the output of sensor readings will be printed.
+        self.label = wx.StaticText(self,-1,label=u'  ')	# Prints line sensor information out.
+        vSizer.Add( self.label )
+        
+                # Exit
+        self.exit_button = wx.Button(self, label="Exit")
+        self.exit_button.Bind(wx.EVT_BUTTON, self.onClose)
+        vSizer.AddSpacer(20)
+        vSizer.Add(self.exit_button, 0, wx.ALIGN_RIGHT)
+        hSizer.AddSpacer(5)
+        hSizer.Add(vSizer)
+        hSizer.AddSpacer(5)
+        self.SetSizerAndFit(hSizer)
+
+        self.Show(True)
+
+    def black_line_set_OnButtonClick(self,event):
+        for i in range(2):
+            line_sensor.get_sensorval()
+        line_sensor.set_black_line()
+        line_val=line_sensor.get_black_line()
+        self.label.SetLabel("Black Line : "+str(line_val))
 
 
-	def initialize(self):
-		sizer = wx.GridBagSizer()
+    def white_line_set_button_OnButtonClick(self,event):
+        for i in range(2):
+            line_sensor.get_sensorval()
+        line_sensor.set_white_line()
+        line_val=line_sensor.get_white_line()
+        self.label.SetLabel("White Line : "+str(line_val))
 
-		# Set up buttons
-		black_line_set_button = wx.Button(self,-1,label="Set Black Line Values", pos=(10,y))
-		sizer.Add(black_line_set_button, (0,1))
-		self.Bind(wx.EVT_BUTTON, self.black_line_set_OnButtonClick, black_line_set_button)
+    def line_position_set_button_OnButtonClick(self, event):
+        # There's an issue with the line follower being "behind"
+        for i in range(3):
+            line_val=scratch_line.absolute_line_pos()
+        self.label.SetLabel("Line Position : "+str(line_val))
 
-		white_line_set_button = wx.Button(self,-1,label="Set White Line Values", pos=(180,y))
-		sizer.Add(white_line_set_button, (0,1))
-		self.Bind(wx.EVT_BUTTON, self.white_line_set_button_OnButtonClick, white_line_set_button)
+    def onClose(self, event):	# Close the entire program.
+        self.frame.Close()
 
-		line_position_set_button = wx.Button(self,-1,label="Read Line Position", pos=(350,y))
-		sizer.Add(line_position_set_button, (0,1))
-		self.Bind(wx.EVT_BUTTON, self.line_position_set_button_OnButtonClick, line_position_set_button)
+class MainFrame(wx.Frame):
+    def __init__(self):
+        """Constructor"""
+        # wx.ComboBox
 
-		# Set up labels: This is where the output of sensor readings will be printed.
-		self.label = wx.StaticText(self,-1,label=u'  ',pos=(150,y+150))	# Prints line sensor information out.
+        wx.Icon(ICON_PATH+'favicon.ico', wx.BITMAP_TYPE_ICO)
+        wx.Log.SetVerbose(False)
+        wx.Frame.__init__(self, None, title="Line Follower Calibration", size=(530,600))		# Set the fram size
+        panel = MainPanel(self)
+        self.Center()
 
-		self.label_top = wx.StaticText(self,-1,label=u'Instructions:\n 1.\tPlace the line sensor so that all of the black sensors are over \n\tyour black line.  Then press the button "Black Line Sensor Set".\n\n 2.\tNext, place the line sensor so that all of the black sensors are \n\tNOT over your black line and on the white background surface.\n\tThen press "White Line Sensor Set".\n\n 3.\tFinally, test the sensor by pressing "Read Line Position"',pos=(25,0))
+class Main(wx.App):
+    def __init__(self, redirect=False, filename=None):
+        wx.App.__init__(self, redirect, filename)
+        dlg = MainFrame()
+        dlg.Show()
 
-		sizer.Add( self.label, (1,0),(1,2), wx.EXPAND )
-		sizer.Add( self.label_top, (1,0),(1,2), wx.EXPAND )
-
-		self.Show(True)
-
-	def black_line_set_OnButtonClick(self,event):
-		for i in range(2):
-			line_sensor.get_sensorval()
-		line_sensor.set_black_line()
-		line_val=line_sensor.get_black_line()
-		self.label.SetLabel("Black Line : "+str(line_val))
-
-
-	def white_line_set_button_OnButtonClick(self,event):
-		for i in range(2):
-			line_sensor.get_sensorval()
-		line_sensor.set_white_line()
-		line_val=line_sensor.get_white_line()
-		self.label.SetLabel("White Line : "+str(line_val))
-
-	def line_position_set_button_OnButtonClick(self,event):
-		line_val=scratch_line.absolute_line_pos()
-		self.label.SetLabel("Line Position : "+str(line_val))
-
-	def onClose(self, event):	# Close the entire program.
-		self.Close()
 
 if __name__ == "__main__":
-	app = wx.App()
-	frame = line_sensor_app(None,-1,'Line Follower Calibration')
-	app.MainLoop()
+    app = Main()
+    app.MainLoop()
