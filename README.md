@@ -24,7 +24,6 @@ Installation
 ------------
 
 In order to quick install the `DI_Sensors` repository, open up a terminal and type following command:
-
 ```
 curl -kL dexterindustries.com/update_sensors | bash
 ```
