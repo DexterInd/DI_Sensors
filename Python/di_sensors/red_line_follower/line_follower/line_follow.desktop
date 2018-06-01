@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Line Follower Calibration
+Comment=Line Follower Calibration
+Icon=/home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower/obconf.xpm
+Exec=python /home/pi/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower/line_sensor_gui.py
+NoDisplay=true
