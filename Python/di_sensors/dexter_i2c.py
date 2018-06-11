@@ -109,6 +109,10 @@ class Dexter_I2C(object):
         inBytes (default 0) -- how many bytes to read
 
         Returns list of bytes read"""
+
+        for b in range(len(outArr)):
+            outArr[b] &= 0xFF
+        
         if self.bus_name == "RPI_1":
             if RPI_1_Module == "pigpio":
                 if(len(outArr) >= 2 and inBytes == 0):
@@ -215,14 +219,14 @@ class Dexter_I2C(object):
         arr = [reg]
         arr.extend(list)
         self.transfer(arr)
-    
+
     def read_8(self, reg = None, signed = False):
         """Read a 8-bit value
-        
+
         Keyword arguments:
         reg (default None) -- Register to read from or None
         signed (default False) -- True (signed) or False (unsigned)
-        
+
         Returns the value
         """
         # write the register to read from?
@@ -230,27 +234,27 @@ class Dexter_I2C(object):
             outArr = [reg]
         else:
             outArr = []
-        
+
         val = self.transfer(outArr, 1)
-        
+
         value = val[0]
-        
+
         # signed value?
         if signed:
             # negative value?
             if value & 0x80:
                 value = value - 0x100
-        
+
         return value
-    
+
     def read_16(self, reg = None, signed = False, big_endian = None):
         """Read a 16-bit value
-        
+
         Keyword arguments:
         reg (default None) -- Register to read from or None
         signed (default False) -- True (signed) or False (unsigned)
         big_endian (default None) -- True (big endian), False (little endian), or None (use the pre-defined endianness for the object)
-        
+
         Returns the value
         """
         # write the register to read from?
@@ -258,34 +262,34 @@ class Dexter_I2C(object):
             outArr = [reg]
         else:
             outArr = []
-        
+
         val = self.transfer(outArr, 2)
-        
+
         if big_endian == None:
             big_endian = self.big_endian
-        
+
         # big endian?
         if big_endian:
             value = (val[0] << 8) | val[1]
         else:
             value = (val[1] << 8) | val[0]
-        
+
         # signed value?
         if signed:
             # negative value?
             if value & 0x8000:
                 value = value - 0x10000
-        
+
         return value
 
     def read_32(self, reg = None, signed = False, big_endian = None):
         """Read a 32-bit value
-        
+
         Keyword arguments:
         reg (default None) -- Register to read from or None
         signed (default False) -- True (signed) or False (unsigned)
         big_endian (default None) -- True (big endian), False (little endian), or None (use the pre-defined endianness for the object)
-        
+
         Returns the value
         """
         # write the register to read from?
@@ -293,35 +297,35 @@ class Dexter_I2C(object):
             outArr = [reg]
         else:
             outArr = []
-        
+
         val = self.transfer(outArr, 4)
-        
+
         if big_endian == None:
             big_endian = self.big_endian
-        
+
         # big endian?
         if big_endian:
             value = (val[0] << 24) | (val[1] << 16) | (val[2] << 8) | val[3]
         else:
             value = (val[3] << 24) | (val[2] << 16) | (val[1] << 8) | val[0]
-        
+
         # signed value?
         if signed:
             # negative value?
             if value & 0x80000000:
                 value = value - 0x100000000
-        
+
         return value
 
     def read_list(self, reg, len):
         """Read a list of bytes from a register
-        
+
         Keyword arguments:
         reg -- Register to read from or None
         len -- Number of bytes to read
-        
+
         Returns a list of the bytes read"""
-        
+
         # write the register to read from?
         if reg != None:
             outArr = [reg]
