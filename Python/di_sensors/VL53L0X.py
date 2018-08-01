@@ -399,7 +399,7 @@ class VL53L0X(object):
 
         self.i2c_bus.write_reg_8(0x81, 0x00)
         self.i2c_bus.write_reg_8(0xFF, 0x06)
-        self.i2c_bus.write_reg_8(0x83, self.i2c_bus.read_8(0x83  & ~0x04))
+        self.i2c_bus.write_reg_8(0x83, self.i2c_bus.read_8(0x83) & ~0x04)
         self.i2c_bus.write_reg_8(0xFF, 0x01)
         self.i2c_bus.write_reg_8(0x00, 0x01)
 
