@@ -35,7 +35,7 @@ else:
 import RPi.GPIO as GPIO
 
 
-class Dexter_RPI_1SW_I2C(object):
+class Dexter_I2C_RPI_1SW(object):
     """Dexter Industries I2C bit-bang drivers for the Raspberry Pi"""
 
     '''
@@ -252,7 +252,7 @@ class Dexter_I2C(object):
                 self.i2c_bus = I2C("/dev/i2c-1")
         elif bus == "RPI_1SW":
             self.bus_name = bus
-            self.i2c_bus = Dexter_RPI_1SW_I2C()
+            self.i2c_bus = Dexter_I2C_RPI_1SW()
         elif bus == "GPG3_AD1" or bus == "GPG3_AD2":
             self.bus_name = bus
 
