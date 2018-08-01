@@ -29,6 +29,206 @@ else:
     raise IOError("RPI_1 module not supported")
 
 
+# for RPI bus 1 SW I2C
+## pip install wiringpi
+#import wiringpi
+import RPi.GPIO as GPIO
+
+
+class Dexter_RPI_1SW_I2C(object):
+    """Dexter Industries I2C bit-bang drivers for the Raspberry Pi"""
+
+    '''
+    Currently the bus runs at about 100kbps. Tested with an RPi 3B+ with minimal CPU load.
+
+
+    RPi.GPIO
+        # setup
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(2, GPIO.IN)
+        GPIO.setup(3, GPIO.IN)
+
+        GPIO.setup(3, GPIO.IN) # SCL High
+        GPIO.setup(3, GPIO.OUT) # SCL Low
+        GPIO.setup(2, GPIO.IN) # SDA High
+        GPIO.setup(2, GPIO.OUT) # SDA Low
+        GPIO.input(3) # SCL Read
+        GPIO.input(2) # SDA Read
+
+    wiringpi
+        # setup
+        wiringpi.wiringPiSetup()
+        wiringpi.pinMode(8, 0) # SDA
+        wiringpi.pinMode(9, 0) # SCL
+        wiringpi.digitalWrite(8, 0)
+        wiringpi.digitalWrite(9, 0)
+
+        wiringpi.pinMode(9, 0) # SCL High
+        wiringpi.pinMode(9, 1) # SCL Low
+        wiringpi.pinMode(8, 0) # SDA High
+        wiringpi.pinMode(8, 1) # SDA Low
+        wiringpi.digitalRead(9) # SCL Read
+        wiringpi.digitalRead(8) # SDA Read
+
+
+    '''
+
+    def __init__(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(2, GPIO.IN)
+        GPIO.setup(3, GPIO.IN)
+
+    def transfer(self, addr, outArr, inBytes):
+        if(len(outArr) > 0):
+            if self.__write__(addr, outArr, inBytes):
+                raise IOError("[Errno 5] Input/output error")
+        if(inBytes > 0):
+            result, value = self.__read__(addr, inBytes)
+            if result:
+                raise IOError("[Errno 5] Input/output error")
+            return value
+
+    def __delay__(self):
+        #time_start = time.time()
+        #while (time.time() - time_start) < 0.000005:
+        #    pass
+
+        #time.sleep(0.000005)
+
+        pass # Already enough time overhead. Return ASAP.
+
+    def __scl_high_check__(self):
+        GPIO.setup(3, GPIO.IN) # SCL High
+        result = 0
+        time_start = time.time()
+        while not GPIO.input(3): # SCL Read
+            if (time.time() - time_start) > 0.005:
+                result = 1
+        self.__delay__() # SCL is already high, just make sure it's high enough
+        return result
+
+    def __sda_high_check__(self):
+        GPIO.setup(2, GPIO.IN) # SDA High
+        result = 0
+        time_start = time.time()
+        while not GPIO.input(2): # SDA Read
+            if time.time() - time_start > 0.005:
+                result = 1
+        self.__delay__() # SDA is already high, just make sure it's high enough
+        return result
+
+    def __write__(self, addr, outArr, restart = False):
+        outBuffer = [(addr << 1)]
+        outBuffer.extend(outArr)
+        self.__start__()
+        for b in range(len(outBuffer)):
+            result = self.__write_byte__(outBuffer[b])
+            if result:
+                if result == 1:
+                    self.__stop__()
+                else:
+                    GPIO.setup(3, GPIO.IN) # SCL High
+                    GPIO.setup(2, GPIO.IN) # SDA High
+                return result
+        if restart:
+            if self.__sda_high_check__():
+                return 6
+            if self.__scl_high_check__():
+                return 2
+            self.__start__()
+            return 0
+        else:
+            return self.__stop__()
+
+    def __read__(self, addr, inBytes):
+        addr = (addr << 1) | 0x01 # set the read bit
+        inBuffer = []
+
+        self.__start__()
+        result = self.__write_byte__(addr)
+        if result:
+            self.__stop__()
+            return result, inBuffer
+
+        for b in range(inBytes):
+            result, value = self.__read_byte__((inBytes - 1) - b)
+            if result > 1:
+                GPIO.setup(3, GPIO.IN) # SCL High
+                GPIO.setup(2, GPIO.IN) # SDA High
+                return result, inBuffer
+            inBuffer.append(value)
+
+        result = self.__stop__()
+        return result, inBuffer
+
+    def __start__(self):
+        GPIO.setup(2, GPIO.OUT) # SDA Low
+        self.__delay__()
+
+    def __stop__(self):
+        GPIO.setup(2, GPIO.OUT) # SDA Low
+        self.__delay__()
+        if self.__scl_high_check__():
+            if self.__sda_high_check__():
+                return 6
+            return 2
+
+        if self.__sda_high_check__():
+            return 4
+
+        return 0
+
+    def __write_byte__(self, val):
+        result = 0
+        for b in range(8):
+            GPIO.setup(3, GPIO.OUT) # SCL Low
+            if (0x80 >> b) & val:
+                GPIO.setup(2, GPIO.IN) # SDA High
+            else:
+                GPIO.setup(2, GPIO.OUT) # SDA Low
+            self.__delay__()
+            if b == 0:
+                if self.__scl_high_check__():
+                    return 2
+            else:
+                GPIO.setup(3, GPIO.IN) # SCL High
+                self.__delay__()
+        GPIO.setup(3, GPIO.OUT) # SCL Low
+        GPIO.setup(2, GPIO.IN) # SDA High
+        self.__delay__()
+        if self.__scl_high_check__():
+            return 2
+        if GPIO.input(2): # SDA Read
+            result = 1
+        GPIO.setup(3, GPIO.OUT) # SCL Low
+        return result
+
+    def __read_byte__(self, ack):
+        GPIO.setup(2, GPIO.IN) # SDA High
+        data = 0
+        GPIO.setup(3, GPIO.OUT) # SCL Low
+        self.__delay__()
+        for b in range(8):
+            if b == 0:
+                if self.__scl_high_check__():
+                    return 2, 0
+            else:
+                GPIO.setup(3, GPIO.IN) # SCL High
+                self.__delay__()
+            if GPIO.input(2): # SDA Read
+                data |= (0x80 >> b)
+            GPIO.setup(3, GPIO.OUT) # SCL Low
+            if b < 7:
+                self.__delay__()
+        if ack != 0:
+            GPIO.setup(2, GPIO.OUT) # SDA Low
+        self.__delay__()
+        if self.__scl_high_check__():
+            return 2, 0
+        GPIO.setup(3, GPIO.OUT) # SCL Low
+        return 0, data
+
+
 class Dexter_I2C(object):
     """Dexter Industries I2C drivers for hardware and software I2C busses"""
 
@@ -50,6 +250,9 @@ class Dexter_I2C(object):
             elif RPI_1_Module == "periphery":
                 self.bus_name = bus
                 self.i2c_bus = I2C("/dev/i2c-1")
+        elif bus == "RPI_1SW":
+            self.bus_name = bus
+            self.i2c_bus = Dexter_RPI_1SW_I2C()
         elif bus == "GPG3_AD1" or bus == "GPG3_AD2":
             self.bus_name = bus
 
@@ -109,11 +312,11 @@ class Dexter_I2C(object):
         inBytes (default 0) -- how many bytes to read
 
         Returns list of bytes read"""
-        
+
         # Make sure all bytes are in the range of 0-255
         for b in range(len(outArr)):
             outArr[b] &= 0xFF
-        
+
         if self.bus_name == "RPI_1":
             if RPI_1_Module == "pigpio":
                 if(len(outArr) >= 2 and inBytes == 0):
@@ -164,6 +367,9 @@ class Dexter_I2C(object):
                     self.i2c_bus.transfer(self.address, msg)
                     return msg[0].data
                 return
+
+        elif self.bus_name == "RPI_1SW":
+            return self.i2c_bus.transfer(self.address, outArr, inBytes)
 
         elif self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
             try:
