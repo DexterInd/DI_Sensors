@@ -33,6 +33,7 @@ else:
 ## pip install wiringpi
 #import wiringpi
 import RPi.GPIO as GPIO
+import atexit
 
 
 class Dexter_I2C_RPI_1SW(object):
@@ -83,7 +84,16 @@ class Dexter_I2C_RPI_1SW(object):
     StretchTimeout = 0.001
 
     def __init__(self):
+        """ Set up the GPIO pins, and register the exit method """
+
         GPIO.setmode(GPIO.BCM) # set up the GPIO with BCM numbering
+        GPIO.setup(2, GPIO.IN) # set SDA pin as input
+        GPIO.setup(3, GPIO.IN) # set SCL pin as input
+        atexit.register(self.__exit_cleanup__) # register the exit method
+
+    def __exit_cleanup__(self):
+        """ Called at exit to set the pins as inputs """
+
         GPIO.setup(2, GPIO.IN) # set SDA pin as input
         GPIO.setup(3, GPIO.IN) # set SCL pin as input
 
