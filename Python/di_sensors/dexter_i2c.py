@@ -42,11 +42,11 @@ class Dexter_I2C_RPI_1SW(object):
     Currently the bus runs at about 100kbps. Tested with an RPi 3B+ with minimal CPU load.
 
 
-    RPi.GPIO
+    Code for using RPi.GPIO for GPIO control
         # setup
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(2, GPIO.IN)
-        GPIO.setup(3, GPIO.IN)
+        GPIO.setmode(GPIO.BCM) # set up the GPIO with BCM numbering
+        GPIO.setup(2, GPIO.IN) # set SDA pin as input
+        GPIO.setup(3, GPIO.IN) # set SCL pin as input
 
         GPIO.setup(3, GPIO.IN) # SCL High
         GPIO.setup(3, GPIO.OUT) # SCL Low
@@ -55,11 +55,11 @@ class Dexter_I2C_RPI_1SW(object):
         GPIO.input(3) # SCL Read
         GPIO.input(2) # SDA Read
 
-    wiringpi
+    Code for using wiringpi for GPIO control
         # setup
         wiringpi.wiringPiSetup()
-        wiringpi.pinMode(8, 0) # SDA
-        wiringpi.pinMode(9, 0) # SCL
+        wiringpi.pinMode(8, 0) # set SDA pin as input
+        wiringpi.pinMode(9, 0) # set SCL pin as input
         wiringpi.digitalWrite(8, 0)
         wiringpi.digitalWrite(9, 0)
 
@@ -73,22 +73,36 @@ class Dexter_I2C_RPI_1SW(object):
 
     '''
 
+    SUCCESS = 0
+    ERROR_NACK = 1
+    ERROR_CLOCK_STRETCH_TIMEOUT = 2
+    ERROR_DATA_STRETCH_TIMEOUT  = 3
+    ERROR_DATA_AND_CLOCK_STRETCH_TIMEOUT  = 4
+
+    # timeout if stretched for more than this long (in seconds)
+    StretchTimeout = 0.001
+
     def __init__(self):
-        GPIO.setmode(GPIO.BCM)
-        GPIO.setup(2, GPIO.IN)
-        GPIO.setup(3, GPIO.IN)
+        GPIO.setmode(GPIO.BCM) # set up the GPIO with BCM numbering
+        GPIO.setup(2, GPIO.IN) # set SDA pin as input
+        GPIO.setup(3, GPIO.IN) # set SCL pin as input
 
     def transfer(self, addr, outArr, inBytes):
-        if(len(outArr) > 0):
-            if self.__write__(addr, outArr, inBytes):
+        """ Write and/or read I2C """
+
+        if(len(outArr) > 0): # bytes to write?
+            if self.__write__(addr, outArr, inBytes) != self.SUCCESS:
                 raise IOError("[Errno 5] Input/output error")
-        if(inBytes > 0):
+
+        if(inBytes > 0): # read bytes?
             result, value = self.__read__(addr, inBytes)
-            if result:
+            if result != self.SUCCESS:
                 raise IOError("[Errno 5] Input/output error")
             return value
 
     def __delay__(self):
+        """ Delay called for slowing down the I2C clock to around 100kbps """
+
         #time_start = time.time()
         #while (time.time() - time_start) < 0.000005:
         #    pass
@@ -98,135 +112,159 @@ class Dexter_I2C_RPI_1SW(object):
         pass # Already enough time overhead. Return ASAP.
 
     def __scl_high_check__(self):
+        """ Allow SCL to go high, and wait until it's high. Timeout. """
+
         GPIO.setup(3, GPIO.IN) # SCL High
-        result = 0
+        if not GPIO.input(3): # SCL Read
+            return self.__scl_check_timeout__()
+        return self.SUCCESS
+
+    def __scl_check_timeout__(self):
+        """ Wait until SCL is high, and timeout if it takes too long """
         time_start = time.time()
         while not GPIO.input(3): # SCL Read
-            if (time.time() - time_start) > 0.005:
-                result = 1
-        self.__delay__() # SCL is already high, just make sure it's high enough
-        return result
+            if (time.time() - time_start) > self.StretchTimeout:
+                return self.ERROR_CLOCK_STRETCH_TIMEOUT # timeout waiting for SCL to go high
+        #self.__delay__() # SCL is already high, just make sure it's high enough
+        return self.SUCCESS
 
     def __sda_high_check__(self):
+        """ Allow SDA to go high, and wait until it's high """
+
         GPIO.setup(2, GPIO.IN) # SDA High
         result = 0
         time_start = time.time()
         while not GPIO.input(2): # SDA Read
-            if time.time() - time_start > 0.005:
-                result = 1
-        self.__delay__() # SDA is already high, just make sure it's high enough
-        return result
+            if time.time() - time_start > self.StretchTimeout:
+                return self.ERROR_DATA_STRETCH_TIMEOUT # timeout waiting for SDA to go high
+        #self.__delay__() # SDA is already high, just make sure it's high enough
+        return self.SUCCESS
 
     def __write__(self, addr, outArr, restart = False):
-        outBuffer = [(addr << 1)]
-        outBuffer.extend(outArr)
-        self.__start__()
-        for b in range(len(outBuffer)):
-            result = self.__write_byte__(outBuffer[b])
-            if result:
-                if result == 1:
+        """ Write bytes """
+
+        outBuffer = [(addr << 1)] # left-shift I2C address and clear read bit
+        outBuffer.extend(outArr) # outBuffer now contains the address and outArr
+        self.__start__() # issue bus start
+        for b in range(len(outBuffer)): # for each byte
+            result = self.__write_byte__(outBuffer[b]) # write the byte
+            if result != self.SUCCESS: # if an error
+                if result == self.ERROR_NACK: # if NACK
                     self.__stop__()
-                else:
+                else: # other error. Probably ERROR_CLOCK_STRETCH_TIMEOUT
                     GPIO.setup(3, GPIO.IN) # SCL High
                     GPIO.setup(2, GPIO.IN) # SDA High
-                return result
-        if restart:
+                return result # return error
+        if restart: # if a read is immediately following, issue a restart
+            # SDA high then SCL high, with provisions for timeout
             if self.__sda_high_check__():
-                return 6
+                if self.__scl_high_check__():
+                    return self.ERROR_DATA_AND_CLOCK_STRETCH_TIMEOUT
+                return self.ERROR_DATA_STRETCH_TIMEOUT
             if self.__scl_high_check__():
-                return 2
-            self.__start__()
-            return 0
+                return self.ERROR_CLOCK_STRETCH_TIMEOUT
+
+            #self.__start__() # This doesn't seem to be necessary # issue bus start
+            return self.SUCCESS
         else:
-            return self.__stop__()
+            return self.__stop__() # issue bus stop
 
     def __read__(self, addr, inBytes):
-        addr = (addr << 1) | 0x01 # set the read bit
+        """ Read bytes """
+
+        addr = (addr << 1) | 0x01 # left-shift I2C address and set read bit
         inBuffer = []
 
-        self.__start__()
-        result = self.__write_byte__(addr)
-        if result:
-            self.__stop__()
+        self.__start__() # issue bus start
+        result = self.__write_byte__(addr) # write the address and read bit
+        if result != self.SUCCESS: # check for error
+            self.__stop__() # there was an error, so issue bus stop
             return result, inBuffer
 
-        for b in range(inBytes):
-            result, value = self.__read_byte__((inBytes - 1) - b)
-            if result > 1:
+        for b in range(inBytes): # for each byte to read
+            result, value = self.__read_byte__((inBytes - 1) - b) # read a byte, and ack all except the last
+            if result != self.SUCCESS: # check for error
                 GPIO.setup(3, GPIO.IN) # SCL High
                 GPIO.setup(2, GPIO.IN) # SDA High
-                return result, inBuffer
-            inBuffer.append(value)
+                return result, inBuffer # return error
+            inBuffer.append(value) # append the read byte to inBuffer
 
-        result = self.__stop__()
-        return result, inBuffer
+        result = self.__stop__() # issue bus stop
+        return result, inBuffer # return the read byte array
 
     def __start__(self):
+        """ Issue bus start sequence """
+
         GPIO.setup(2, GPIO.OUT) # SDA Low
         self.__delay__()
 
     def __stop__(self):
+        """ Issue bus stop sequence """
+
         GPIO.setup(2, GPIO.OUT) # SDA Low
         self.__delay__()
+
+        # SCL high then SDA high, with provisions for timeout
         if self.__scl_high_check__():
             if self.__sda_high_check__():
-                return 6
-            return 2
-
+                return self.ERROR_DATA_AND_CLOCK_STRETCH_TIMEOUT
+            return self.ERROR_CLOCK_STRETCH_TIMEOUT
         if self.__sda_high_check__():
-            return 4
+            return self.ERROR_DATA_STRETCH_TIMEOUT
 
-        return 0
+        return self.SUCCESS
 
     def __write_byte__(self, val):
-        result = 0
+        """ Write a byte """
+
         for b in range(8):
             GPIO.setup(3, GPIO.OUT) # SCL Low
             if (0x80 >> b) & val:
                 GPIO.setup(2, GPIO.IN) # SDA High
             else:
                 GPIO.setup(2, GPIO.OUT) # SDA Low
-            self.__delay__()
-            if b == 0:
-                if self.__scl_high_check__():
-                    return 2
-            else:
-                GPIO.setup(3, GPIO.IN) # SCL High
-                self.__delay__()
+            #self.__delay__()
+            GPIO.setup(3, GPIO.IN) # SCL High
+            if not GPIO.input(3): # SCL Read
+                if self.__scl_check_timeout__():
+                    return self.ERROR_CLOCK_STRETCH_TIMEOUT
+            #self.__delay__()
         GPIO.setup(3, GPIO.OUT) # SCL Low
         GPIO.setup(2, GPIO.IN) # SDA High
         self.__delay__()
         if self.__scl_high_check__():
-            return 2
-        if GPIO.input(2): # SDA Read
-            result = 1
+            return self.ERROR_CLOCK_STRETCH_TIMEOUT
+
+        result = self.SUCCESS
+        if GPIO.input(2): # SDA Read. check for ACK
+            result = self.ERROR_NACK
         GPIO.setup(3, GPIO.OUT) # SCL Low
         return result
 
     def __read_byte__(self, ack):
+        """ Read a byte """
+
         GPIO.setup(2, GPIO.IN) # SDA High
         data = 0
         GPIO.setup(3, GPIO.OUT) # SCL Low
-        self.__delay__()
         for b in range(8):
-            if b == 0:
-                if self.__scl_high_check__():
-                    return 2, 0
-            else:
-                GPIO.setup(3, GPIO.IN) # SCL High
-                self.__delay__()
+            self.__delay__()
+            GPIO.setup(3, GPIO.IN) # SCL High
+            if not GPIO.input(3): # SCL Read
+                if self.__scl_check_timeout__():
+                    return self.ERROR_CLOCK_STRETCH_TIMEOUT
             if GPIO.input(2): # SDA Read
                 data |= (0x80 >> b)
+            #self.__delay__()
             GPIO.setup(3, GPIO.OUT) # SCL Low
-            if b < 7:
-                self.__delay__()
-        if ack != 0:
+        if ack != 0: # send ack?
             GPIO.setup(2, GPIO.OUT) # SDA Low
-        self.__delay__()
+        else:
+            self.__delay__()
         if self.__scl_high_check__():
-            return 2, 0
+            return self.ERROR_CLOCK_STRETCH_TIMEOUT, 0
         GPIO.setup(3, GPIO.OUT) # SCL Low
-        return 0, data
+        return self.SUCCESS, data
 
 
 class Dexter_I2C(object):
