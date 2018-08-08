@@ -29,10 +29,65 @@ else:
     raise IOError("RPI_1 module not supported")
 
 
+import time
+import fcntl
+import os
+import atexit
+
+
+class Dexter_Mutex(object):
+    """ Dexter Industries mutex """
+
+    def __init__(self, name, loop_time = 0.0001):
+        """ Initialize """
+
+        self.Filename = "/run/lock/Dexter_Mutex_" + name
+        self.LoopTime = loop_time
+        self.Handle = None
+
+        try:
+            open(self.Filename, 'w')
+            if os.path.isfile(self.Filename):
+                os.chmod(self.Filename, 0o777)
+        except Exception as e:
+            pass
+
+        # Register the exit method
+        atexit.register(self.__exit_cleanup__) # register the exit method
+
+    def __exit_cleanup__(self):
+        """ Called at exit to clean up """
+
+        self.release()
+
+    def acquire(self):
+        """ Acquire the mutex """
+
+        while True:
+            try:
+                self.Handle = open(self.Filename, 'w')
+                # lock
+                fcntl.lockf(self.Handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                return
+            except IOError: # already locked by a different process
+                time.sleep(self.LoopTime)
+            except Exception as e:
+                print(e)
+
+    def release(self):
+        """ Release the mutex """
+
+        if self.Handle is not None and self.Handle is not True:
+            self.Handle.close()
+            self.Handle = None
+            time.sleep(self.LoopTime)
+
+
 # for RPI bus 1 SW I2C
 ## pip install wiringpi
 #import wiringpi
 import RPi.GPIO as GPIO
+import time
 import atexit
 
 
@@ -81,34 +136,49 @@ class Dexter_I2C_RPI_1SW(object):
     ERROR_DATA_AND_CLOCK_STRETCH_TIMEOUT  = 4
 
     # timeout if stretched for more than this long (in seconds)
-    StretchTimeout = 0.001
+    STRETCH_TIMEOUT = 0.001
 
     def __init__(self):
-        """ Set up the GPIO pins, and register the exit method """
+        """ Initialize """
 
+        # Set up the GPIO pins
         GPIO.setmode(GPIO.BCM) # set up the GPIO with BCM numbering
-        GPIO.setup(2, GPIO.IN) # set SDA pin as input
         GPIO.setup(3, GPIO.IN) # set SCL pin as input
+        GPIO.setup(2, GPIO.IN) # set SDA pin as input
+
+        self.BusActive = False
+
+        # Register the exit method
         atexit.register(self.__exit_cleanup__) # register the exit method
 
     def __exit_cleanup__(self):
-        """ Called at exit to set the pins as inputs """
+        """ Called at exit to clean up """
 
-        GPIO.setup(2, GPIO.IN) # set SDA pin as input
-        GPIO.setup(3, GPIO.IN) # set SCL pin as input
+        if self.BusActive:
+            # Set GPIOs as inputs
+            GPIO.setup(3, GPIO.IN) # set SCL pin as input
+            GPIO.setup(2, GPIO.IN) # set SDA pin as input
+
+        self.BusActive = False
 
     def transfer(self, addr, outArr, inBytes):
         """ Write and/or read I2C """
 
         if(len(outArr) > 0): # bytes to write?
+            self.BusActive = True
             if self.__write__(addr, outArr, inBytes) != self.SUCCESS:
+                self.BusActive = False
                 raise IOError("[Errno 5] Input/output error")
 
         if(inBytes > 0): # read bytes?
+            self.BusActive = True
             result, value = self.__read__(addr, inBytes)
+            self.BusActive = False
             if result != self.SUCCESS:
                 raise IOError("[Errno 5] Input/output error")
             return value
+        else:
+            self.BusActive = False
 
     def __delay__(self):
         """ Delay called for slowing down the I2C clock to around 100kbps """
@@ -131,9 +201,10 @@ class Dexter_I2C_RPI_1SW(object):
 
     def __scl_check_timeout__(self):
         """ Wait until SCL is high, and timeout if it takes too long """
+
         time_start = time.time()
         while not GPIO.input(3): # SCL Read
-            if (time.time() - time_start) > self.StretchTimeout:
+            if (time.time() - time_start) > self.STRETCH_TIMEOUT:
                 return self.ERROR_CLOCK_STRETCH_TIMEOUT # timeout waiting for SCL to go high
         #self.__delay__() # SCL is already high, just make sure it's high enough
         return self.SUCCESS
@@ -145,7 +216,7 @@ class Dexter_I2C_RPI_1SW(object):
         result = 0
         time_start = time.time()
         while not GPIO.input(2): # SDA Read
-            if time.time() - time_start > self.StretchTimeout:
+            if time.time() - time_start > self.STRETCH_TIMEOUT:
                 return self.ERROR_DATA_STRETCH_TIMEOUT # timeout waiting for SDA to go high
         #self.__delay__() # SDA is already high, just make sure it's high enough
         return self.SUCCESS
@@ -188,7 +259,11 @@ class Dexter_I2C_RPI_1SW(object):
         self.__start__() # issue bus start
         result = self.__write_byte__(addr) # write the address and read bit
         if result != self.SUCCESS: # check for error
-            self.__stop__() # there was an error, so issue bus stop
+            if result == self.ERROR_NACK: # if NACK
+                self.__stop__()
+            else: # other error. Probably ERROR_CLOCK_STRETCH_TIMEOUT
+                GPIO.setup(3, GPIO.IN) # SCL High
+                GPIO.setup(2, GPIO.IN) # SDA High
             return result, inBuffer
 
         for b in range(inBytes): # for each byte to read
@@ -330,6 +405,8 @@ class Dexter_I2C(object):
         else:
             raise IOError("I2C bus not supported")
 
+        self.mutex = Dexter_Mutex(name = ("I2C_Bus_" + bus))
+
         self.set_address(address)
 
         self.big_endian = big_endian
@@ -365,71 +442,79 @@ class Dexter_I2C(object):
         for b in range(len(outArr)):
             outArr[b] &= 0xFF
 
-        if self.bus_name == "RPI_1":
-            if RPI_1_Module == "pigpio":
-                if(len(outArr) >= 2 and inBytes == 0):
-                    self.i2c_bus.i2c_write_i2c_block_data(self.i2c_bus_handle, outArr[0], outArr[1:])
-                elif(len(outArr) == 1 and inBytes == 0):
-                    self.i2c_bus.i2c_write_byte(self.i2c_bus_handle, outArr[0])
-                elif(len(outArr) == 1 and inBytes >= 1):
-                    return self.i2c_bus.i2c_read_i2c_block_data(self.i2c_bus_handle, outArr[0], inBytes)
-                elif(len(outArr) == 0 and inBytes >= 1):
-                    return self.i2c_bus.i2c_read_byte(self.i2c_bus_handle)
-                else:
-                    raise IOError("I2C operation not supported")
-            elif RPI_1_Module == "smbus":
-                if(len(outArr) >= 2 and inBytes == 0):
-                    self.i2c_bus.write_i2c_block_data(self.address, outArr[0], outArr[1:])
-                elif(len(outArr) == 1 and inBytes == 0):
-                    self.i2c_bus.write_byte(self.address, outArr[0])
-                elif(len(outArr) == 1 and inBytes >= 1):
-                    return self.i2c_bus.read_i2c_block_data(self.address, outArr[0], inBytes)
-                elif(len(outArr) == 0 and inBytes == 1):
-                    return self.i2c_bus.read_byte(self.address)
-                else:
-                    raise IOError("I2C operation not supported")
-            elif RPI_1_Module == "periphery":
-                # for repeated starts
-                # seems to fail regularly. RPi does not recognize clock stretching during repeated starts.
-                #msgs = []
-                #offset = 0
-                #if(len(outArr) > 0):
-                #    msgs.append(self.i2c_bus.Message(outArr))
-                #    offset = 1
-                #if(inBytes):
-                #    r = [0 for b in range(inBytes)]
-                #    msgs.append(self.i2c_bus.Message(r, read = True))
-                #if(len(msgs) >= 1):
-                #    self.i2c_bus.transfer(self.address, msgs)
-                #if(inBytes):
-                #    return msgs[offset].data
+        self.mutex.acquire() # acquire the bus mutex
 
-                # for independent messages (no repeated starts)
-                # there is a small delay between messages, but it doesn't fail to recognize clock stretching between the messages
-                if(len(outArr) > 0):
-                    msg = [self.i2c_bus.Message(outArr)]
-                    self.i2c_bus.transfer(self.address, msg)
-                if(inBytes):
-                    r = [0 for b in range(inBytes)]
-                    msg = [self.i2c_bus.Message(r, read = True)]
-                    self.i2c_bus.transfer(self.address, msg)
-                    return msg[0].data
-                return
+        try:
+            if self.bus_name == "RPI_1":
+                if RPI_1_Module == "pigpio":
+                    if(len(outArr) >= 2 and inBytes == 0):
+                        self.i2c_bus.i2c_write_i2c_block_data(self.i2c_bus_handle, outArr[0], outArr[1:])
+                    elif(len(outArr) == 1 and inBytes == 0):
+                        self.i2c_bus.i2c_write_byte(self.i2c_bus_handle, outArr[0])
+                    elif(len(outArr) == 1 and inBytes >= 1):
+                        return self.i2c_bus.i2c_read_i2c_block_data(self.i2c_bus_handle, outArr[0], inBytes)
+                    elif(len(outArr) == 0 and inBytes >= 1):
+                        return self.i2c_bus.i2c_read_byte(self.i2c_bus_handle)
+                    else:
+                        raise IOError("I2C operation not supported")
+                elif RPI_1_Module == "smbus":
+                    if(len(outArr) >= 2 and inBytes == 0):
+                        self.i2c_bus.write_i2c_block_data(self.address, outArr[0], outArr[1:])
+                    elif(len(outArr) == 1 and inBytes == 0):
+                        self.i2c_bus.write_byte(self.address, outArr[0])
+                    elif(len(outArr) == 1 and inBytes >= 1):
+                        return self.i2c_bus.read_i2c_block_data(self.address, outArr[0], inBytes)
+                    elif(len(outArr) == 0 and inBytes == 1):
+                        return self.i2c_bus.read_byte(self.address)
+                    else:
+                        raise IOError("I2C operation not supported")
+                elif RPI_1_Module == "periphery":
+                    # for repeated starts
+                    # seems to fail regularly. RPi does not recognize clock stretching during repeated starts.
+                    #msgs = []
+                    #offset = 0
+                    #if(len(outArr) > 0):
+                    #    msgs.append(self.i2c_bus.Message(outArr))
+                    #    offset = 1
+                    #if(inBytes):
+                    #    r = [0 for b in range(inBytes)]
+                    #    msgs.append(self.i2c_bus.Message(r, read = True))
+                    #if(len(msgs) >= 1):
+                    #    self.i2c_bus.transfer(self.address, msgs)
+                    #if(inBytes):
+                    #    return msgs[offset].data
 
-        elif self.bus_name == "RPI_1SW":
-            return self.i2c_bus.transfer(self.address, outArr, inBytes)
+                    # for independent messages (no repeated starts)
+                    # there is a small delay between messages, but it doesn't fail to recognize clock stretching between the messages
+                    if(len(outArr) > 0):
+                        msg = [self.i2c_bus.Message(outArr)]
+                        self.i2c_bus.transfer(self.address, msg)
+                    if(inBytes):
+                        r = [0 for b in range(inBytes)]
+                        msg = [self.i2c_bus.Message(r, read = True)]
+                        self.i2c_bus.transfer(self.address, msg)
+                        return msg[0].data
+                    return
 
-        elif self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
-            try:
-                return self.gpg3.grove_i2c_transfer(self.port, self.address, outArr, inBytes)
-            except self.gopigo3_module.I2CError:
-                raise IOError("[Errno 5] Input/output error")
+            elif self.bus_name == "RPI_1SW":
+                return self.i2c_bus.transfer(self.address, outArr, inBytes)
 
-        elif self.bus_name == "BP3_1" or self.bus_name == "BP3_2" or self.bus_name == "BP3_3" or self.bus_name == "BP3_4":
-            try:
-                return self.bp3.i2c_transfer(self.port, self.address, outArr, inBytes)
-            except self.brickpi3_module.I2CError:
-                raise IOError("[Errno 5] Input/output error")
+            elif self.bus_name == "GPG3_AD1" or self.bus_name == "GPG3_AD2":
+                try:
+                    return self.gpg3.grove_i2c_transfer(self.port, self.address, outArr, inBytes)
+                except self.gopigo3_module.I2CError:
+                    raise IOError("[Errno 5] Input/output error")
+
+            elif self.bus_name == "BP3_1" or self.bus_name == "BP3_2" or self.bus_name == "BP3_3" or self.bus_name == "BP3_4":
+                try:
+                    return self.bp3.i2c_transfer(self.port, self.address, outArr, inBytes)
+                except self.brickpi3_module.I2CError:
+                    raise IOError("[Errno 5] Input/output error")
+        except:
+            self.mutex.release() # release before raising the exception
+            raise # still raise the exception for user-code to deal with
+
+        self.mutex.release() # release the bus mutex
 
     def write_8(self, val):
         """Write an 8-bit value
