@@ -133,7 +133,7 @@ parse_cmdline_arguments() {
   [[ $install_rfrtools_gui = "true" ]] && rfrtools_options+=("--install-gui")
 
   echo "Using \"$selectedbranch\" branch"
-  echo "Options used for script_tools script: \"${scriptools_options[@]}\""
+  echo "Options used for RFR_Tools script: \"${rfrtools_options[@]}\""
 }
 
 #################################################
