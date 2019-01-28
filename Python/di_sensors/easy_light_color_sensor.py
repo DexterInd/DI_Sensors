@@ -151,16 +151,17 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
         The colors detected vary depending on the lighting conditions of the nearby environment.
 
-        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**.
+        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**. -1 means an error occured.
         :rtype: tuple(float,float,float,float)
 
         """
         ifMutexAcquire(self.use_mutex)
         try:
-            self.set_led(self.led_state)
+            self.set_led(True, True) # turn light on to take color readings
             r,g,b,c = self.get_raw_colors()
+            self.set_led(self.led_state, True) # return to default setting
         except:
-            pass
+            r,g,b,c = [-1]*4
         finally:
             ifMutexRelease(self.use_mutex)
         return (r,g,b,c)
@@ -173,7 +174,10 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         :rtype: tuple(int,int,int)
         """
         colors = self.safe_raw_colors()
-        r,g,b,c = list(map(lambda c: int(c*255/colors[3]), colors))
+        if colors != (-1,-1,-1,-1):
+            r,g,b,c = list(map(lambda c: int(c*255/colors[3]), colors))
+        else:
+            r,g,b,c = colors
         return r,g,b
 
     def guess_color_hsv(self, in_color):
