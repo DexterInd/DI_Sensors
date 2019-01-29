@@ -151,7 +151,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
         The colors detected vary depending on the lighting conditions of the nearby environment.
 
-        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**. -1 means an error occured.
+        :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**. **-1** means an error occured.
         :rtype: tuple(float,float,float,float)
 
         """
