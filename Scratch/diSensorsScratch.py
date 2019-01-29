@@ -63,7 +63,7 @@ def handleDiSensors(msg):
     if en_debug:
         print ("handleDiSensors Rx: {}".format(msg))
     
-    retdict={}
+    retdict = {}
     
     regObj = compiled_disensors.match(msg)
     if regObj == None:
