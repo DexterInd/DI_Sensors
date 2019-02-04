@@ -59,7 +59,10 @@ class LineFollower(object):
                 if mode == self.BOTH or not (g == 2 or (g == 1 and s > 1)):
                     temp = (array[(g * 4) + s] << 2) | ((array[LSB_Offset + g] >> (2 * s)) & 0x03)
                     array[(g * 4) + s] = (1023 - temp) / 1023.0
-        return array[:LSB_Offset]
+
+        array = array[:LSB_Offset]
+        array = array[::-1]
+        return array
     
     def get_manufacturer(self):
         #self.i2c_bus.write_8(0x11)
