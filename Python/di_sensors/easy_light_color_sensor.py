@@ -15,7 +15,6 @@
 
 from di_sensors import light_color_sensor
 from di_sensors import VL53L0X
-import I2C_mutex
 from time import sleep
 from math import sqrt
 
