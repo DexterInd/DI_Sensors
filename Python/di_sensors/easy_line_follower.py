@@ -1,7 +1,9 @@
+from __future__ import print_function
+from __future__ import division
+
 # from di_sensors import line_follower
-import nlf as line_follower
+import line_follower
 import pickle
-import operator
 
 '''
 MUTEX HANDLING
@@ -12,7 +14,6 @@ class EasyLineFollower(line_follower.LineFollower):
 
     file_white_calibration = '/home/pi/Dexter/white_line.txt'
     file_black_calibration = '/home/pi/Dexter/black_line.txt'
-    file_range_calibration = '/home/pi/Dexter/range_line.txt'
 
     def __init__(self):
         super(EasyLineFollower, self).__init__()
@@ -27,16 +28,16 @@ class EasyLineFollower(line_follower.LineFollower):
         self._calculate_threshold()
 
     def _calculate_threshold(self):
-        self._range_sensor = list(map(operator.sub, self._white_calibration, self._black_calibration))
-        self._threshold = [a + b / 2.0 for a,b in zip(self._black_calibration, self._range_sensor)]
+        self._threshold = [(a + b) / 2.0 for a,b in zip(self._black_calibration, self._white_calibration)]
+
 
     def read(self, representation="raw"):
         """
         representation - float, position, string
         """
-        if representation == "raw":
+        if representation == 'raw':
             return self.read_sensors()
-        elif representation == "bivariate":
+        elif representation == 'bivariate':
             raw_vals = self.read_sensors()
             six_vals = [0] * 6
             for i in range(6):
@@ -45,9 +46,9 @@ class EasyLineFollower(line_follower.LineFollower):
                 else:
                     six_vals[i] = 0
             return six_vals
-        elif representation == "position":
+        elif representation == 'position':
             pass
-        elif representation == "string":
+        elif representation == 'string':
             pass
         else:
             pass
@@ -56,7 +57,18 @@ class EasyLineFollower(line_follower.LineFollower):
         """
         color - white or black
         """
-        pass
+        vals = self.read()
+        
+        if color == 'white':
+            fname = self.file_white_calibration
+        elif color == 'black':
+            fname = self.file_black_calibration
+        else:
+            fname = ''
+        
+        if fname != '':
+            with open(fname, 'wb') as f:
+                pickle.dump(vals, f)
 
     
     def get_calibration(self, color):
