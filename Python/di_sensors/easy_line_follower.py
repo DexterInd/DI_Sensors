@@ -30,6 +30,36 @@ class EasyLineFollower(line_follower.LineFollower):
     def _calculate_threshold(self):
         self._threshold = [(a + b) / 2.0 for a,b in zip(self._black_calibration, self._white_calibration)]
 
+    
+    def detect_line_follower(self):
+        """
+        returns
+        0 - for no line follower detected
+        1 - for detecting the old line follower
+        2 - for detecting the new line follower
+        """
+        # see if the device is up and running
+        device_on = False
+        try:
+            self.i2c_bus.read_8()
+            device_on = True
+        except:
+            pass
+        
+        if device_on is True:
+            # then it means we have a line follower connected
+            # we still don't know whether it is the new one or the old one
+            counter = 0
+            board = 1
+            try:
+                self.get_board()
+                board = 2
+            except:
+                pass
+            return board
+        else:
+            return 0
+
 
     def read(self, representation="raw"):
         """
