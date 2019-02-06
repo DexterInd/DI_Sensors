@@ -2,7 +2,7 @@
 #
 # https://www.dexterindustries.com
 #
-# Copyright (c) 2017 Dexter Industries
+# Copyright (c) 2019 Dexter Industries
 # Released under the MIT license (http://choosealicense.com/licenses/mit/).
 # For more information see https://github.com/DexterInd/DI_Sensors/blob/master/LICENSE.md
 #
@@ -37,11 +37,5 @@ while True:
     for v in range(len(values)):
         str += "%.3f " % values[v]
     print(str)
-    
-    values = lf.read_sensors(lf.BOTH)
-    str = ""
-    for v in range(len(values)):
-        str += "%.3f " % values[v]
-    print(str)
-    
+
     time.sleep(0.1)
