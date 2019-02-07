@@ -79,7 +79,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         try:
             bus = ports[port]
         except KeyError:
-            bus = "RPI_1"
+            bus = "RPI_1SW"
 
         # in case there's a distance sensor that hasn't been instanciated yet
         # attempt to move it to another address
