@@ -115,8 +115,6 @@ class EasyLineFollower(object):
                 raw_vals[i] = 1.0 - raw_vals[i]
             norm_vals = raw_vals
 
-            print(norm_vals)
-
             numerator = sum([i * norm_vals[i] for i in range(self._no_vals)])
             denominator = float(sum(norm_vals))
             try:
