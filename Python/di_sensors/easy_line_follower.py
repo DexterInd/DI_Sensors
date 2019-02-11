@@ -1,8 +1,7 @@
 from __future__ import print_function
 from __future__ import division
 
-# from di_sensors import line_follower
-import line_follower
+from di_sensors import line_follower
 import pickle
 
 '''
@@ -93,7 +92,7 @@ class EasyLineFollower(object):
 
     def read(self, representation="raw"):
         """
-        representation - raw, bivariate, weighted-avg, string
+        representation - raw, bivariate, bivariate-str, weighted-avg
         """
         if representation == 'raw':
             return self.sensor.read_sensors()
@@ -106,6 +105,10 @@ class EasyLineFollower(object):
                 else:
                     six_vals[i] = 0
             return six_vals
+        elif representation == 'bivariate-str':
+            raw_vals = self.read('bivariate')
+            string_vals = ''.join(['b' if sensor_val == 0 else 'w' for sensor_val in raw_vals])
+            return string_vals
         elif representation == 'weighted-avg':
             raw_vals = self.sensor.read_sensors()
             for i in range(self._no_vals):
@@ -121,15 +124,15 @@ class EasyLineFollower(object):
                 position = numerator / (denominator * (self._no_vals - 1))
             except ZeroDivisionError:
                 position = 0.5
+            
+            hits = 0
+            lost_line = False
+            for i in range(self._no_vals):
+                hits += 1 if raw_vals[i] > self._threshold[i] else 0
+            if hits == self._no_vals or hits == 0:
+                lost_line = True
 
-            # returns a value in [-1, 1] range with negative values
-            # indicating the left of the robot and the positive
-            # values the right
-            return position
-        elif representation == 'position-based':
-            pass
-        elif representation == 'string':
-            pass
+            return position, lost_line
         else:
             pass
 
