@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from di_sensors import dexter_i2c
+import di_i2c
 import time
 
 # Constants
@@ -112,8 +112,8 @@ class VL53L0X(object):
     # __init__ changes the address (default to 0x54 >> 1 = 0x2A) to prevent conflicts.
     ADDRESS = ADDRESS_DEFAULT
 
-    def __init__(self, address = 0x2A, timeout = 0.5, bus = "RPI_1"):
-        self.i2c_bus = dexter_i2c.Dexter_I2C(bus = bus, address = address)
+    def __init__(self, address = 0x2A, timeout = 0.5, bus = "RPI_1SW"):
+        self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = address)
 
         try:
             self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00) # try resetting from 0x2A

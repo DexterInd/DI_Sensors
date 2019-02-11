@@ -56,7 +56,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         try:
             bus = ports[port]
         except KeyError:
-            bus = "RPI_1"
+            bus = "RPI_1SW"
 
         ifMutexAcquire(self.use_mutex)
         try:
@@ -64,7 +64,7 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             super(self.__class__, self).__init__(bus = bus)
             # on GPG3 we ask that the IMU be at the back of the robot, facing outward
             # We do not support the IMU on GPG2  but leaving the if statement in case
-            if bus != "RPI_1":
+            if bus != "RPI_1SW":
                 self.BNO055.set_axis_remap( BNO055.AXIS_REMAP_X,
                                         BNO055.AXIS_REMAP_Z,
                                         BNO055.AXIS_REMAP_Y,

@@ -51,7 +51,7 @@ class EasyTHPSensor(temp_hum_press.TempHumPress):
         try:
             bus = ports[port]
         except KeyError:
-            bus = "RPI_1"
+            bus = "RPI_1SW"
 
         ifMutexAcquire(self.use_mutex)
         try:

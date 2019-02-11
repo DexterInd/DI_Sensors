@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from di_sensors import dexter_i2c
+import di_i2c
 import time
 
 # Constants
@@ -203,17 +203,17 @@ OPERATION_MODE_NDOF         = 0x0C
 
 class BNO055(object):
 
-    def __init__(self, bus = "RPI_1", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
+    def __init__(self, bus = "RPI_1SW", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
         """Initialize the sensor
 
         Keyword arguments:
-        bus (default "RPI_1") -- The I2C bus
+        bus (default "RPI_1SW") -- The I2C bus
         address (default ADDRESS_A) -- The BNO055 I2C address
         mode (default OPERATION_MODE_NDOF) -- The operation mode
         units (default 0) -- The value unit selection bits"""
 
         # create an I2C bus object and set the address
-        self.i2c_bus = dexter_i2c.Dexter_I2C(bus = bus, address = address)
+        self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = address)
 
         self._mode = mode
 
@@ -258,10 +258,10 @@ class BNO055(object):
 
         # set the unit selection bits
         self.i2c_bus.write_reg_8(REG_UNIT_SEL, units)
-        
+
         # set temperature source to gyroscope, as it seems to be more accurate.
         self.i2c_bus.write_reg_8(REG_TEMP_SOURCE, 0x01)
-        
+
         # switch to normal operation mode
         self._operation_mode()
 
