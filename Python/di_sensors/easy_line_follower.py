@@ -4,11 +4,6 @@ from __future__ import division
 from di_sensors import line_follower
 import pickle
 
-'''
-MUTEX HANDLING
-'''
-# from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
-
 class EasyLineFollower(object):
 
     def __init__(self, 
