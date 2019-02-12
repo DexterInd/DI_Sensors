@@ -22,14 +22,14 @@ class LightColorSensor(object):
     Class for interfacing with the `Light Color Sensor`_.
     """
 
-    def __init__(self, sensor_integration_time = 0.0048, sensor_gain = TCS34725.GAIN_16X, led_state = False, bus = "RPI_1"):
+    def __init__(self, sensor_integration_time = 0.0048, sensor_gain = TCS34725.GAIN_16X, led_state = False, bus = "RPI_1SW"):
         """
         Constructor for initializing a link to the `Light Color Sensor`_.
 
         :param float sensor_integration_time = 0.0048: Time in seconds for each sample (aka the time needed to take a sample). Range is between 0.0024 and 0.6144 seconds. Use increments of 2.4 ms.
         :param int sensor_gain = di_sensors.TCS34725.GAIN_16X: The gain constant of the sensor. Valid values are :py:const:`di_sensors.TCS34725.GAIN_1X`, :py:const:`di_sensors.TCS34725.GAIN_4X`, :py:const:`di_sensors.TCS34725.GAIN_16X` or :py:const:`di_sensors.TCS34725.GAIN_60X`.
         :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned on.
-        :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str bus = "RPI_1SW": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :raises ~exceptions.OSError: When the `Light Color Sensor`_ is not reachable.
         :raises ~exceptions.RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `Light Color Sensor`_.
 

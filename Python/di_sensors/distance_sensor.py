@@ -17,11 +17,11 @@ class DistanceSensor(object):
     Class for interfacing with the `Distance Sensor`_.
     """
 
-    def __init__(self, bus = "RPI_1"):
+    def __init__(self, bus = "RPI_1SW"):
         """
         Constructor for initializing a :py:class:`~di_sensors.distance_sensor.DistanceSensor` class.
 
-        :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str bus = "RPI_1SW": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port. Most probably, this means the distance sensor is not connected at all.
 
         """

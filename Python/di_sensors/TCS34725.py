@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from di_sensors import dexter_i2c
+import di_i2c
 import time
 
 # Constants
@@ -71,45 +71,45 @@ GAIN_60X         = 0x03 # 60x gain
 
 class TCS34725(object):
     """Drivers for TCS34725 light color sensor"""
-    
-    def __init__(self, integration_time = 0.0024, gain = GAIN_16X, bus = "RPI_1"):
+
+    def __init__(self, integration_time = 0.0024, gain = GAIN_16X, bus = "RPI_1SW"):
         """Initialize the sensor
-        
+
         Keyword arguments:
         integration_time (default 0.0024 seconds) -- Time in seconds for each sample. 0.0024 second (2.4ms) increments. Clipped to the range of 0.0024 to 0.6144 seconds.
         gain (default GAIN_16X) -- The gain constant. Valid values are GAIN_1X, GAIN_4X, GAIN_16X, and GAIN_60X
-        bus (default "RPI_1") -- The I2C bus"""
-        self.i2c_bus = dexter_i2c.Dexter_I2C(bus = bus, address = ADDRESS, big_endian = False)
-        
+        bus (default "RPI_1SW") -- The I2C bus"""
+        self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = ADDRESS, big_endian = False)
+
         # Make sure we're connected to the right sensor.
         chip_id = self.i2c_bus.read_8((COMMAND_BIT | ID))
         if chip_id != 0x44:
             raise RuntimeError('Incorrect chip ID.')
-        
+
         # Set default integration time and gain.
         self.set_integration_time(integration_time)
         self.set_gain(gain)
-        
+
         # Enable the device (by default, the device is in power down mode on bootup).
         self.enable()
-    
+
     def enable(self):
         """Enable the sensor"""
         # Set the power and enable bits.
         self.i2c_bus.write_reg_8((COMMAND_BIT | ENABLE), ENABLE_PON)
         time.sleep(0.01)
         self.i2c_bus.write_reg_8((COMMAND_BIT | ENABLE), (ENABLE_PON | ENABLE_AEN))
-    
+
     def disable(self):
         """Disable the sensor"""
         # Clear the power and enable bits.
         reg = self.i2c_bus.read_8((COMMAND_BIT | ENABLE))
         reg &= ~(ENABLE_PON | ENABLE_AEN)
         self.i2c_bus.write_reg_8((COMMAND_BIT | ENABLE), reg)
-    
+
     def set_integration_time(self, time):
         """Set the integration (sampling) time for the sensor
-        
+
         Keyword arguments:
         time -- Time in seconds for each sample. 0.0024 second (2.4ms) increments. Clipped to the range of 0.0024 to 0.6144 seconds."""
         val = int(0x100 - (time / 0.0024))
@@ -119,14 +119,14 @@ class TCS34725(object):
             val = 0
         self.i2c_bus.write_reg_8((COMMAND_BIT | ATIME), val)
         self.integration_time_val = val
-    
+
     def set_gain(self, gain):
         """Set the sensor gain (light sensitivity)
-        
+
         Keyword arguments:
         gain -- The gain constant. Valid values are GAIN_1X, GAIN_4X, GAIN_16X, and GAIN_60X"""
         self.i2c_bus.write_reg_8((COMMAND_BIT | CONTROL), gain)
-    
+
     def set_interrupt(self, state):
         self.i2c_bus.write_reg_8((COMMAND_BIT | PERS), PERS_NONE)
         enable = self.i2c_bus.read_8((COMMAND_BIT | ENABLE))
@@ -135,20 +135,20 @@ class TCS34725(object):
         else:
             enable &= ~ENABLE_AIEN
         self.i2c_bus.write_reg_8((COMMAND_BIT | ENABLE), enable)
-    
+
     def get_raw_data(self, delay = True):
         """Read the Red Green Blue and Clear values from the sensor
-        
+
         Keyword arguments:
         delay (default True) -- Delay for the time it takes to sample. This allows immediately consecutive readings that aren't redundant.
-        
+
         Returns the values as a 4-tuple on a scale of 0-1. Red Green Blue Clear."""
         if delay:
             # Delay for the integration time to allow reading immediately after the previous read.
             time.sleep(((256 - self.integration_time_val) * 0.0024))
-        
+
         div = ((256 - self.integration_time_val) * 1024)
-        
+
         # Read each color register.
         r = self.i2c_bus.read_16((COMMAND_BIT | RDATAL)) / div
         g = self.i2c_bus.read_16((COMMAND_BIT | GDATAL)) / div
