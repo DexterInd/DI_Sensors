@@ -145,7 +145,7 @@ class EasyLineFollower(object):
             Returns a 2-element tuple. The first element is an estimated position of the line. 
             
             The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used), 
-            so that if the line follower is on the left of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the right, 
+            so that if the black line is on the right of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the left, 
             it's in the **0.5-1.0** range, thus making **0.5** the center point of the black line. If the line follower sensor ends up on a surface with an homogeneous color  (or shade of grey), the returned value will circle around **0.5**.
             
             The 2nd element is an integer taking 3 values: **1** if the line follower only detects black, **2** if it only detects white and **0** for the rest of cases.
@@ -189,9 +189,9 @@ class EasyLineFollower(object):
                 for i in range(self._no_vals):
                     hits += 1 if raw_vals[i] > self._threshold[i] else 0
                 if hits == self._no_vals:
-                    lost_line_type = 2
-                if hits == 0:
                     lost_line_type = 1
+                if hits == 0:
+                    lost_line_type = 2
 
                 return position, lost_line_type
             else:
