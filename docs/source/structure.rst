@@ -77,11 +77,13 @@ between different classes. We can notice 3 groups of classes:
    di_sensors.distance_sensor
    di_sensors.easy_inertial_measurement_unit
    di_sensors.easy_temp_hum_press
+   di_sensors.easy_line_follower
    di_sensors.inertial_measurement_unit
    di_sensors.easy_light_color_sensor
    di_sensors.light_color_sensor
-   di_sensors.easy_mutex
+   di_sensors.line_follower
    di_sensors.temp_hum_press
+   di_sensors.easy_mutex
    di_sensors.VL53L0X
    di_sensors.BME280
    di_sensors.BNO055
@@ -155,6 +157,18 @@ Easy - IMU
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_read_magnetometer
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_north_point
 
+^^^^^^^^^^^^^^^^^^^^
+Easy - Line Follower
+^^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+   di_sensors.easy_line_follower.EasyLineFollower
+   di_sensors.easy_line_follower.EasyLineFollower.__init__
+   di_sensors.easy_line_follower.EasyLineFollower.read
+   di_sensors.easy_line_follower.EasyLineFollower.set_calibration
+   di_sensors.easy_line_follower.EasyLineFollower.get_calibration
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TempHumPress
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -211,8 +225,31 @@ IMU
    di_sensors.inertial_measurement_unit.InertialMeasurementUnit.read_temperature
 
 
+^^^^^^^^^^^^^^^^^^^^^
+Line Follower Old/New
+^^^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+   di_sensors.line_follower.LineFollower
+   di_sensors.line_follower.LineFollower.__init__
+   di_sensors.line_follower.LineFollower.read_sensors
+   di_sensors.line_follower.LineFollower.get_manufacturer
+   di_sensors.line_follower.LineFollower.get_board
+   di_sensors.line_follower.LineFollower.get_version_firmware
+
+
+.. autosummary::
+
+   di_sensors.line_follower.OldLineFollower
+   di_sensors.line_follower.OldLineFollower.__init__
+   di_sensors.line_follower.OldLineFollower.read_sensors
+
+
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
 .. _imu sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
+.. _line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor
+.. _old line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/

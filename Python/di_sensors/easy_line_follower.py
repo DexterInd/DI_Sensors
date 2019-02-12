@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import division
 
 from di_sensors import line_follower
+from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 import pickle
 
 class EasyLineFollower(object):
@@ -10,19 +11,21 @@ class EasyLineFollower(object):
     """
 
     def __init__(self, 
-        bus = 'RPI_1SW', 
+        port = 'I2C', 
         module_id = -1, 
         calib_dir = '/home/pi/Dexter/',
         white_file = 'white_line.txt',
-        black_file = 'black_line.txt'):
+        black_file = 'black_line.txt',
+        use_mutex = True):
         """
         Initialize a class to interface with either the :py:class:`~di_sensors.line_follower.LineFollower` or the :py:class:`~di_sensors.line_follower.OldLineFollower`.
 
-        :param str bus = "RPI_1SW": The bus to which either line follower is connected. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :param int module_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the old line follower (:py:class:`~di_sensors.line_follower.OldLineFollower`) or to **2** for the new line follower (:py:class:`~di_sensors.line_follower.LineFollower`)
+        :param str port = "I2C": The port to which the line follower is connected. The ``"I2C"`` port corresponds to ``"RPI_1SW"`` bus. Can also choose port ``"AD1"``/``"AD2"`` only if it's connected to the GoPiGo3 and the ``module_id`` is specifically set to **2**. To find out more, check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param int module_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the old line follower (:py:class:`~di_sensors.line_follower.OldLineFollower`) or to **2** for the new line follower (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
         :param str calib_dir = "/home/pi/Dexter/": Directory where the calibration files are saved. It already has a default value set.
         :param str white_file = "white_line.txt": The name of the calibration file for the white line.
         :param str black_file = "black_line.txt": The name of the calibration file for the black line.
+        :param bool use_mutex = True: Whether to use a mutex on the sensor or not. Recommended when the same sensor is called from multiple threads/processes. It's meant for the I2C line and does not protect the file I/O in multi-threaded applications.
 
         Upon instantiating an object of this class, after detecting the line follower, the calibration values are read and if they are not compatible with those required for the given line follower,
         default/generic calibration values will be set for both colors computed by taking the average of the 2 extremes. 
@@ -30,24 +33,43 @@ class EasyLineFollower(object):
         Important to keep in mind is that both line followers' 
         calibration files are incompatible, because one uses 5 sensors and the other one 6 - there are also, more factors to consider, such as the kind of sensors used in the
         line follower, but for the most part, the incompatibility comes from the different number of sensors.
+
+        .. [#] To see what module has been detected, check :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.module_id` attribute. If it's set to 0, then no line follower has been detected.
+
         """
 
         self.file_white_calibration = calib_dir + white_file
         self.file_black_calibration = calib_dir + black_file
-        self._test_dev = line_follower.LineFollower(bus)
+        self.use_mutex = use_mutex
 
-        if module_id == 1:
-            self.module_id = module_id
-            self.sensor = line_follower.OldLineFollower(bus)
-        elif module_id == 2:
-            self.module_id = module_id
-            self.sensor = line_follower.LineFollower(bus)
-        elif module_id == -1:
-            self.module_id = self._detect_line_follower()
-            if self.module_id == 1:
+        if port == "I2C":
+            bus = "RPI_1SW"
+        elif port == "AD1" and module_id == 2:
+            bus = "GPG3_AD1"
+        elif port == "AD2" and module_id == 2:
+            bus = "GPG3_AD2"
+        else:
+            raise ValueError("selected port is not valid")
+
+        ifMutexAcquire(self.use_mutex)
+        try:
+            self._test_dev = line_follower.LineFollower(bus)
+            if module_id == 1:
+                self.module_id = module_id
                 self.sensor = line_follower.OldLineFollower(bus)
-            else: # sensor_module can only be 2, because otherwise an exception is raised
+            elif module_id == 2:
+                self.module_id = module_id
                 self.sensor = line_follower.LineFollower(bus)
+            elif module_id == -1:
+                self.module_id = self._detect_line_follower()
+                if self.module_id == 1:
+                    self.sensor = line_follower.OldLineFollower(bus)
+                else: # sensor_module can only be 2, because otherwise an exception is raised
+                    self.sensor = line_follower.LineFollower(bus)
+        except Exception as e:
+            raise
+        finally:
+            ifMutexRelease(self.use_mutex)
 
         if self.module_id == 1:
             self._no_vals = 5
@@ -129,49 +151,55 @@ class EasyLineFollower(object):
             The 2nd element is an integer taking 3 values: **1** if the line follower only detects black, **2** if it only detects white and **0** for the rest of cases.
 
         """
-        if representation == 'raw':
-            return self.sensor.read_sensors()
-        elif representation == 'bivariate':
-            raw_vals = self.sensor.read_sensors()
-            six_vals = [0] * self._no_vals
-            for i in range(self._no_vals):
-                if raw_vals[i] > self._threshold[i]:
-                    six_vals[i] = 1
-                else:
-                    six_vals[i] = 0
-            return six_vals
-        elif representation == 'bivariate-str':
-            raw_vals = self.read('bivariate')
-            string_vals = ''.join(['b' if sensor_val == 0 else 'w' for sensor_val in raw_vals])
-            return string_vals
-        elif representation == 'weighted-avg':
-            raw_vals = self.sensor.read_sensors()
-            for i in range(self._no_vals):
-                raw_vals[i] = (raw_vals[i] - self.black_calibration[i]) / (self.white_calibration[i] - self.black_calibration[i])
-                if raw_vals[i] < 0: raw_vals[i] = 0.0
-                if raw_vals[i] > 1: raw_vals[i] = 1.0
-                raw_vals[i] = 1.0 - raw_vals[i]
-            norm_vals = raw_vals
+        ifMutexAcquire(self.use_mutex)
+        try:
+            if representation == 'raw':
+                return self.sensor.read_sensors()
+            elif representation == 'bivariate':
+                raw_vals = self.sensor.read_sensors()
+                six_vals = [0] * self._no_vals
+                for i in range(self._no_vals):
+                    if raw_vals[i] > self._threshold[i]:
+                        six_vals[i] = 1
+                    else:
+                        six_vals[i] = 0
+                return six_vals
+            elif representation == 'bivariate-str':
+                raw_vals = self.read('bivariate')
+                string_vals = ''.join(['b' if sensor_val == 0 else 'w' for sensor_val in raw_vals])
+                return string_vals
+            elif representation == 'weighted-avg':
+                raw_vals = self.sensor.read_sensors()
+                for i in range(self._no_vals):
+                    raw_vals[i] = (raw_vals[i] - self.black_calibration[i]) / (self.white_calibration[i] - self.black_calibration[i])
+                    if raw_vals[i] < 0: raw_vals[i] = 0.0
+                    if raw_vals[i] > 1: raw_vals[i] = 1.0
+                    raw_vals[i] = 1.0 - raw_vals[i]
+                norm_vals = raw_vals
 
-            numerator = sum([i * norm_vals[i] for i in range(self._no_vals)])
-            denominator = float(sum(norm_vals))
-            try:
-                position = numerator / (denominator * (self._no_vals - 1))
-            except ZeroDivisionError:
-                position = 0.5
-            
-            hits = 0
-            lost_line_type = 0
-            for i in range(self._no_vals):
-                hits += 1 if raw_vals[i] > self._threshold[i] else 0
-            if hits == self._no_vals:
-                lost_line_type = 2
-            if hits == 0:
-                lost_line_type = 1
+                numerator = sum([i * norm_vals[i] for i in range(self._no_vals)])
+                denominator = float(sum(norm_vals))
+                try:
+                    position = numerator / (denominator * (self._no_vals - 1))
+                except ZeroDivisionError:
+                    position = 0.5
+                
+                hits = 0
+                lost_line_type = 0
+                for i in range(self._no_vals):
+                    hits += 1 if raw_vals[i] > self._threshold[i] else 0
+                if hits == self._no_vals:
+                    lost_line_type = 2
+                if hits == 0:
+                    lost_line_type = 1
 
-            return position, lost_line_type
-        else:
-            pass
+                return position, lost_line_type
+            else:
+                pass
+        except Exception as e:
+            raise
+        finally:
+            ifMutexRelease(self.use_mutex)
 
     def set_calibration(self, color, inplace = True):
         """
