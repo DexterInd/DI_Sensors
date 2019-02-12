@@ -44,6 +44,16 @@ EasyTHPSsensor
   :special-members:
   :exclude-members: __weakref__
 
+================
+EasyLineFollower
+================
+
+.. autoclass:: di_sensors.easy_line_follower.EasyLineFollower
+  :members:
+  :show-inheritance:
+  :special-members:
+  :exclude-members: __weakref__
+
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/

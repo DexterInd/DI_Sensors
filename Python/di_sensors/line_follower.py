@@ -22,7 +22,7 @@ class LineFollower(object):
         This sensor is the replacement for the old one :py:class:`~di_sensors.line_follower.OldLineFollower`, which is getting retired, 
         but we'll still support it. The improvements of this one over the old one are:
 
-        1. Much faster poll rate - **~500** times a second vs the old one at **~60Hz**.
+        1. Much faster poll rate - **~130** times a second vs the old one at **~60Hz**.
         2. More energy efficient - this one uses a **minimum** amount of power compared to the previous generation which tended to get hot to touch.
         3. Sensors are much more **accurate and consistent** over the old ones.
         4. **Reduced overhead** on the I2C line.
@@ -45,7 +45,7 @@ class LineFollower(object):
 
         :returns: A 6-element tuple with the 1st element starting at index 1 and going up to 6 **(check the line follower's markings)** with values between **0** (for black) and **1** (for white).
         :rtype: tuple
-        :raises ~exceptions.IOError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
         """
 
         array = self.i2c_bus.read_list(0x01, 8)
@@ -61,7 +61,7 @@ class LineFollower(object):
 
         :returns: The name of the manufacturer.
         :rtype: str
-        :raises ~exceptions.IOError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
         """
 
         array = self.i2c_bus.read_list(0x11, 20)
@@ -80,7 +80,7 @@ class LineFollower(object):
 
         :returns: The name of the board.
         :rtype: str
-        :raises ~exceptions.IOError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
         """
 
         array = self.i2c_bus.read_list(0x12, 20)
@@ -99,7 +99,7 @@ class LineFollower(object):
 
         :returns: The version of the firmware.
         :rtype: str
-        :raises ~exceptions.IOError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
         """
         self.i2c_bus.write_8(0x13)
         return self.i2c_bus.read_32()
@@ -123,9 +123,9 @@ class OldLineFollower(object):
         """
         Read the line follower's values.
 
-        :returns: A 5-element tuple with the 1st element starting from the left of the sensor going to the right of it **(check the markings on the sensor)** with values between **0** (for black) and **1** (for white).
+        :returns: A 5-element tuple with the 1st element starting from the right of the sensor going to the left of it **(check the markings on the sensor)** with values between **0** (for black) and **1** (for white).
         :rtype: tuple
-        :raises ~exceptions.IOError: When the `Old Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Old Line Follower Sensor`_ is not reachable.
         """
 
         self.i2c_bus.write_reg_list(0x01, [0x03] + 3 * [0x00])
@@ -137,5 +137,6 @@ class OldLineFollower(object):
         for step in range(5):
             temp = array[2 * step] * 256 + array[2 * step + 1]
             output.append((1023 - temp) / 1023.0)
+        output = output[::-1]
 
         return output

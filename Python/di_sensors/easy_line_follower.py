@@ -5,17 +5,31 @@ from di_sensors import line_follower
 import pickle
 
 class EasyLineFollower(object):
+    """
+    Higher-level of abstraction class for either the :py:class:`~di_sensors.line_follower.LineFollower` or :py:class:`~di_sensors.line_follower.OldLineFollower`.
+    """
 
     def __init__(self, 
-        bus = "RPI_1SW", 
+        bus = 'RPI_1SW', 
         module_id = -1, 
         calib_dir = '/home/pi/Dexter/',
         white_file = 'white_line.txt',
         black_file = 'black_line.txt'):
         """
-        keyword params:
-        bus (default "RPI_1SW") -- The I2C bus
-        module_id (default -1) -- Which module to use (1 for old, 2 for new) and -1 to automatically detect
+        Initialize a class to interface with either the :py:class:`~di_sensors.line_follower.LineFollower` or the :py:class:`~di_sensors.line_follower.OldLineFollower`.
+
+        :param str bus = "RPI_1SW": The bus to which either line follower is connected. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param int module_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the old line follower (:py:class:`~di_sensors.line_follower.OldLineFollower`) or to **2** for the new line follower (:py:class:`~di_sensors.line_follower.LineFollower`)
+        :param str calib_dir = "/home/pi/Dexter/": Directory where the calibration files are saved. It already has a default value set.
+        :param str white_file = "white_line.txt": The name of the calibration file for the white line.
+        :param str black_file = "black_line.txt": The name of the calibration file for the black line.
+
+        Upon instantiating an object of this class, after detecting the line follower, the calibration values are read and if they are not compatible with those required for the given line follower,
+        default/generic calibration values will be set for both colors computed by taking the average of the 2 extremes. 
+        
+        Important to keep in mind is that both line followers' 
+        calibration files are incompatible, because one uses 5 sensors and the other one 6 - there are also, more factors to consider, such as the kind of sensors used in the
+        line follower, but for the most part, the incompatibility comes from the different number of sensors.
         """
 
         self.file_white_calibration = calib_dir + white_file
@@ -87,7 +101,33 @@ class EasyLineFollower(object):
 
     def read(self, representation="raw"):
         """
-        representation - raw, bivariate, bivariate-str, weighted-avg
+        Read the sensors' values from either line follower.
+
+        :param str representation="raw": It's set by-default to ``"raw"`` , but it can also be ``"bivariate"``, ``"bivariate-str"`` or ``"weighted-avg"``.
+        :raises ~exceptions.OSError: If the line follower sensor is not reachable.
+
+        Each of the line followers' order of the sensors is the same as the one in each read method of them both: :py:meth:`di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`di_sensors.line_follower.OldLineFollower.read_sensors`.
+        
+
+        For ``representation="raw"``
+            For this, raw values are returned from the line follower sensor. Values range between **0** and **1023** and there can be 5 or 6 values returned depending on what line follower sensor is used.
+        
+        For ``representation="bivariate"``
+            In this case, a list with the length equal to the number of sensors present on the given line follower is returned. Values are either **0** (for black) or **1** (for white). 
+            In order to get good results, make sure the line follower is properly calibrated.
+
+        For ``representation="bivariate-str"``
+            Same as ``"bivariate"`` except that **0** is replaced with letter `b` (for black) and **1** with `w` (for white).
+
+        For ``representation="weighted-avg"``
+            Returns a 2-element tuple. The first element is an estimated position of the line. 
+            
+            The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used), 
+            so that if the line follower is on the left of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the right, 
+            it's in the **0.5-1.0** range, thus making **0.5** the center point of the black line. If the line follower sensor ends up on a surface with an homogeneous color  (or shade of grey), the returned value will circle around **0.5**.
+            
+            The 2nd element is an integer taking 3 values: **1** if the line follower only detects black, **2** if it only detects white and **0** for the rest of cases.
+
         """
         if representation == 'raw':
             return self.sensor.read_sensors()
@@ -121,19 +161,25 @@ class EasyLineFollower(object):
                 position = 0.5
             
             hits = 0
-            lost_line = False
+            lost_line_type = 0
             for i in range(self._no_vals):
                 hits += 1 if raw_vals[i] > self._threshold[i] else 0
-            if hits == self._no_vals or hits == 0:
-                lost_line = True
+            if hits == self._no_vals:
+                lost_line_type = 2
+            if hits == 0:
+                lost_line_type = 1
 
-            return position, lost_line
+            return position, lost_line_type
         else:
             pass
 
     def set_calibration(self, color, inplace = True):
         """
-        color - white or black
+        Calibrate the sensor for the given ``color`` and save the values to file.
+
+        :param str color: Either ``"white"`` for calibrating white or ``"black"`` for black.
+        :param bool inplace = True: Apply the calibration values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` to access the calibration values.
+
         """
         vals = self.read()
         
@@ -156,7 +202,14 @@ class EasyLineFollower(object):
     
     def get_calibration(self, color, inplace = True):
         """
-        color - white or black
+        Read the calibration values from the disk for the given ``color``.
+
+        :param str color: Either ``"white"`` for reading the calibration values for white or ``"black"`` for black.
+        :param bool inplace = True: Apply the read values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` to access the calibration values.
+        :rtype: 5/6-element list depending on which line follower is used.
+        :returns: The calibrated values for the given color.
+        :raises ~exception.ValueError: When the read file is incompatible with what the line follower expects. This can happen if a line follower has been calibrated and then switched with another one of a different type (like going from the old -> new or vice-versa).
+
         """
         line = []
         try:
