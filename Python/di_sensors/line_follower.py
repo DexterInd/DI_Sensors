@@ -137,6 +137,5 @@ class OldLineFollower(object):
         for step in range(5):
             temp = array[2 * step] * 256 + array[2 * step + 1]
             output.append((1023 - temp) / 1023.0)
-        output = output[::-1]
 
         return output
