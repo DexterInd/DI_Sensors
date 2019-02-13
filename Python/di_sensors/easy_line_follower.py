@@ -146,7 +146,12 @@ class EasyLineFollower(object):
             
             The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used), 
             so that if the black line is on the right of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the left, 
-            it's in the **0.5-1.0** range, thus making **0.5** the center point of the black line. If the line follower sensor ends up on a surface with an homogeneous color  (or shade of grey), the returned value will circle around **0.5**.
+            it's in the **0.5-1.0** range, thus making **0.5** the center point of the black line. Keep in mind that the sensor's orientation is determined by the order
+            of the returned sensor values and not by how the sensor is positioned on the robot. 
+            Check :py:meth:`~di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`~di_sensors.line_follower.OldLineFollower.read_sensors` methods to see
+            how the values are returned. 
+            
+            If the line follower sensor ends up on a surface with an homogeneous color  (or shade of grey), the returned value will circle around **0.5**.
             
             The 2nd element is an integer taking 3 values: **1** if the line follower only detects black, **2** if it only detects white and **0** for the rest of cases.
 
