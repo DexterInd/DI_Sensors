@@ -870,7 +870,7 @@ class VL53L0X(object):
         self.start_timeout()
         while (self.i2c_bus.read_8(SYSRANGE_START) & 0x01):
             if self.check_timeout_expired():
-                self.did_timeout = true
+                self.did_timeout = True
                 raise IOError("read_range_single_millimeters timeout")
         return self.read_range_continuous_millimeters()
 
