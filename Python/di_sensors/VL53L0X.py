@@ -531,7 +531,7 @@ class VL53L0X(object):
     #always stored in a uint16_t.
     def decode_timeout(self, reg_val):
         # format: "(LSByte * 2^MSByte) + 1"
-        return ((reg_val & 0x00FF) << ((reg_val & 0xFF00) >> 8)) + 1;
+        return ((reg_val & 0x00FF) << ((reg_val & 0xFF00) >> 8)) + 1
 
     # Set the measurement timing budget in microseconds, which is the time allowed
     # for one measurement the ST API and this library take care of splitting the
@@ -856,15 +856,15 @@ class VL53L0X(object):
     # millimeters
     # based on VL53L0X_PerformSingleRangingMeasurement()
     def read_range_single_millimeters(self):
-        self.i2c_bus.write_reg_8(0x80, 0x01);
-        self.i2c_bus.write_reg_8(0xFF, 0x01);
-        self.i2c_bus.write_reg_8(0x00, 0x00);
-        self.i2c_bus.write_reg_8(0x91, self.stop_variable);
-        self.i2c_bus.write_reg_8(0x00, 0x01);
-        self.i2c_bus.write_reg_8(0xFF, 0x00);
-        self.i2c_bus.write_reg_8(0x80, 0x00);
+        self.i2c_bus.write_reg_8(0x80, 0x01)
+        self.i2c_bus.write_reg_8(0xFF, 0x01)
+        self.i2c_bus.write_reg_8(0x00, 0x00)
+        self.i2c_bus.write_reg_8(0x91, self.stop_variable)
+        self.i2c_bus.write_reg_8(0x00, 0x01)
+        self.i2c_bus.write_reg_8(0xFF, 0x00)
+        self.i2c_bus.write_reg_8(0x80, 0x00)
 
-        self.i2c_bus.write_reg_8(SYSRANGE_START, 0x01);
+        self.i2c_bus.write_reg_8(SYSRANGE_START, 0x01)
 
         # "Wait until start bit has been cleared"
         self.start_timeout()
