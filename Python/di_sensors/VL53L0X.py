@@ -361,13 +361,14 @@ class VL53L0X(object):
 
         return True
 
-    def set_signal_rate_limit(self, limit_Mcps):
-        if (limit_Mcps < 0 or limit_Mcps > 511.99):
-            return False
+# duplicate method
+    # def set_signal_rate_limit(self, limit_Mcps):
+    #     if (limit_Mcps < 0 or limit_Mcps > 511.99):
+    #         return False
 
-        # Q9.7 fixed point format (9 integer bits, 7 fractional bits)
-        self.i2c_bus.write_reg_16(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, int(limit_Mcps * (1 << 7)))
-        return True
+    #     # Q9.7 fixed point format (9 integer bits, 7 fractional bits)
+    #     self.i2c_bus.write_reg_16(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, int(limit_Mcps * (1 << 7)))
+    #     return True
 
     # Get reference SPAD (single photon avalanche diode) count and type
     # based on VL53L0X_get_info_from_device(),
