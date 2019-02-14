@@ -39,6 +39,8 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
                             "AD1" : "GPG3_AD1",
                             "AD2" : "GPG3_AD2",
                             "RPI_1SW": "RPI_1SW",
+                            "RPI_1" : "RPI_1",
+                            "RPI_1HW" : "RPI_1",   # doesn't really exist but can be a reflex for some users as we do have RPI_1SW
                             "GPG3_AD1": "GPG3_AD1",
                             "GPG3_AD2": "GPG3_AD2"}
 
