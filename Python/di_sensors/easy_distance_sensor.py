@@ -19,10 +19,11 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
     Apart from this difference, there may also be functions that are more user-friendly than the latter.
 
     """
-    def __init__(self, use_mutex=False):
+    def __init__(self, port="I2C", use_mutex=False):
         """
         Creates a :py:class:`~easygopigo3.EasyDistanceSensor` object which can be used for interfacing with a `distance sensor`_.
 
+        :param string bus = ``"I2C"``: the bus for the sensor. For the GoPiGo3, options also include ``"GPG3_AD1"`` and ``"GPG3_AD2"``.
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port, where in this case it must be ``"I2C"``. Most probably, this means the distance sensor is not connected at all.
 
@@ -32,9 +33,27 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         self.descriptor = "Distance Sensor"
         self.use_mutex = use_mutex
 
+        # let's be kind to the user who may get confused between ports and buses 
+        # let's allow for all of them
+        possible_ports = { "I2C" : "RPI_1SW",
+                            "AD1" : "GPG3_AD1",
+                            "AD2" : "GPG3_AD2",
+                            "RPI_1SW": "RPI_1SW",
+                            "RPI_1" : "RPI_1",
+                            "RPI_1HW" : "RPI_1",   # doesn't really exist but can be a reflex for some users as we do have RPI_1SW
+                            "GPG3_AD1": "GPG3_AD1",
+                            "GPG3_AD2": "GPG3_AD2"}
+
+        port = port.upper() # force to uppercase
+        # switch quietly to default value if we receive gibberish
+        if port in possible_ports.keys():
+            bus = possible_ports[port]
+        else:
+            bus = "RPI_1SW"
+
         ifMutexAcquire(self.use_mutex)
         try:
-            distance_sensor.DistanceSensor.__init__(self)
+            distance_sensor.DistanceSensor.__init__(self, bus=bus)
         except Exception as e:
             print("Distance Sensor init: {}".format(e))
             raise
