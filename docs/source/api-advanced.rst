@@ -54,7 +54,7 @@ LineFollower
    :special-members:
    :exclude-members: __weakref__
 
-.. autoclass:: di_sensors.line_follower.OldLineFollower
+.. autoclass:: di_sensors.line_follower.RedLineFollower
    :members:
    :show-inheritance:
    :special-members:
@@ -80,5 +80,5 @@ All these submodules that are being referenced in this section were used for cre
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
 .. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor
-.. _old line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/
+.. _red line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/
 .. _github repo: https://github.com/DexterInd/DI_Sensors

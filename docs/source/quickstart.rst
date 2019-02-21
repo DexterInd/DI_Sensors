@@ -14,11 +14,11 @@ In order to run code found in this documentation, you need to head over to our o
    * The DI `Light and Color Sensor`_.
    * The DI `Temperature Humidity Pressure Sensor`_.
    * The DI `Distance Sensor`_.
-   * The DI `Line Follower Sensor`_, aka the *new one*.
+   * The DI `Line Follower Sensor`_, aka the *black line follower*.
 
 .. image:: https://i.imgur.com/A4ugOi2.png
 
-Also, apart from these sensors, the old line follower is also supported. It is the predecessor to the `Line Follower Sensor`_. This is what it looks like:
+Also, apart from these sensors, the red line follower is also supported. It is the predecessor to the `Line Follower Sensor`_. This is what it looks like:
 
 .. image:: https://i.imgur.com/E81rNgP.jpg
 

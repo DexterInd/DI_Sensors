@@ -225,9 +225,9 @@ IMU
    di_sensors.inertial_measurement_unit.InertialMeasurementUnit.read_temperature
 
 
-^^^^^^^^^^^^^^^^^^^^^
-Line Follower Old/New
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+Line Follower Black/Red
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
 
@@ -241,9 +241,9 @@ Line Follower Old/New
 
 .. autosummary::
 
-   di_sensors.line_follower.OldLineFollower
-   di_sensors.line_follower.OldLineFollower.__init__
-   di_sensors.line_follower.OldLineFollower.read_sensors
+   di_sensors.line_follower.RedLineFollower
+   di_sensors.line_follower.RedLineFollower.__init__
+   di_sensors.line_follower.RedLineFollower.read_sensors
 
 
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
@@ -252,4 +252,4 @@ Line Follower Old/New
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
 .. _line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor
-.. _old line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/
+.. _red line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/
