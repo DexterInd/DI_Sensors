@@ -12,7 +12,7 @@ class EasyLineFollower(object):
 
     def __init__(self, 
         port = 'I2C', 
-        module_id = -1, 
+        sensor_id = -1, 
         calib_dir = '/home/pi/Dexter/',
         white_file = 'white_line.txt',
         black_file = 'black_line.txt',
@@ -20,8 +20,8 @@ class EasyLineFollower(object):
         """
         Initialize a class to interface with either the :py:class:`~di_sensors.line_follower.LineFollower` or the :py:class:`~di_sensors.line_follower.OldLineFollower`.
 
-        :param str port = "I2C": The port to which the line follower is connected. The ``"I2C"`` port corresponds to ``"RPI_1SW"`` bus. Can also choose port ``"AD1"``/``"AD2"`` only if it's connected to the GoPiGo3 and the ``module_id`` is specifically set to **2**. To find out more, check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :param int module_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the old line follower (:py:class:`~di_sensors.line_follower.OldLineFollower`) or to **2** for the new line follower (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
+        :param str port = "I2C": The port to which the line follower is connected. The ``"I2C"`` port corresponds to ``"RPI_1SW"`` bus. Can also choose port ``"AD1"``/``"AD2"`` only if it's connected to the GoPiGo3 and the black line follower sensor is used. To find out more, check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param int sensor_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the old line follower (:py:class:`~di_sensors.line_follower.OldLineFollower`) or to **2** for the new line follower (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
         :param str calib_dir = "/home/pi/Dexter/": Directory where the calibration files are saved. It already has a default value set.
         :param str white_file = "white_line.txt": The name of the calibration file for the white line.
         :param str black_file = "black_line.txt": The name of the calibration file for the black line.
@@ -34,7 +34,7 @@ class EasyLineFollower(object):
         calibration files are incompatible, because one uses 5 sensors and the other one 6 - there are also, more factors to consider, such as the kind of sensors used in the
         line follower, but for the most part, the incompatibility comes from the different number of sensors.
 
-        .. [#] To see what module has been detected, check :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.module_id` attribute. If it's set to 0, then no line follower has been detected.
+        .. [#] To see what module has been detected, check :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower._sensor_id` attribute. If it's set to 0, then no line follower has been detected.
 
         """
 
@@ -44,9 +44,9 @@ class EasyLineFollower(object):
 
         if port == "I2C":
             bus = "RPI_1SW"
-        elif port == "AD1" and module_id == 2:
+        elif port == "AD1":
             bus = "GPG3_AD1"
-        elif port == "AD2" and module_id == 2:
+        elif port == "AD2":
             bus = "GPG3_AD2"
         else:
             raise ValueError("selected port is not valid")
@@ -54,15 +54,15 @@ class EasyLineFollower(object):
         ifMutexAcquire(self.use_mutex)
         try:
             self._test_dev = line_follower.LineFollower(bus)
-            if module_id == 1:
-                self.module_id = module_id
+            if sensor_id == 1:
+                self._sensor_id = sensor_id
                 self.sensor = line_follower.OldLineFollower(bus)
-            elif module_id == 2:
-                self.module_id = module_id
+            elif sensor_id == 2:
+                self._sensor_id = sensor_id
                 self.sensor = line_follower.LineFollower(bus)
-            elif module_id == -1:
-                self.module_id = self._detect_line_follower()
-                if self.module_id == 1:
+            elif sensor_id == -1:
+                self._sensor_id = self._detect_line_follower()
+                if self._sensor_id == 1:
                     self.sensor = line_follower.OldLineFollower(bus)
                 else: # sensor_module can only be 2, because otherwise an exception is raised
                     self.sensor = line_follower.LineFollower(bus)
@@ -71,7 +71,7 @@ class EasyLineFollower(object):
         finally:
             ifMutexRelease(self.use_mutex)
 
-        if self.module_id == 1:
+        if self._sensor_id == 1:
             self._no_vals = 5
         else:
             self._no_vals = 6
