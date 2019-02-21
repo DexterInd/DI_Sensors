@@ -251,5 +251,5 @@ Line Follower Black/Red
 .. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
-.. _line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor
+.. _black line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor/
 .. _red line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/

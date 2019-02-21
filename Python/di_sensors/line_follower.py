@@ -15,7 +15,7 @@ import time
 
 class LineFollower(object):
     """
-    Class for interfacing with the `Line Follower Sensor`_.
+    Class for interfacing with the `Black Line Follower Sensor`_.
 
     .. important::
 
@@ -31,9 +31,9 @@ class LineFollower(object):
 
     def __init__(self, bus = "RPI_1SW"):
         """
-        Constructor for initializing an object to interface with the `Line Follower Sensor`_.
+        Constructor for initializing an object to interface with the `Black Line Follower Sensor`_.
 
-        :param str bus = "RPI_1SW": The bus to which the `Line Follower Sensor`_ is connected to. By default, it's set to ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str bus = "RPI_1SW": The bus to which the `Black Line Follower Sensor`_ is connected to. By default, it's set to ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         """
 
         # create an I2C bus object and set the address
@@ -45,7 +45,7 @@ class LineFollower(object):
 
         :returns: A 6-element tuple with the 1st element starting at index 1 and going up to 6 **(check the line follower's markings)** with values between **0** (for black) and **1** (for white).
         :rtype: tuple
-        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Black Line Follower Sensor`_ is not reachable.
         """
 
         array = self.i2c_bus.read_list(0x01, 8)
@@ -57,11 +57,11 @@ class LineFollower(object):
 
     def get_manufacturer(self):
         """
-        Read the manufacturer of the `Line Follower Sensor`_'s.
+        Read the manufacturer of the `Black Line Follower Sensor`_'s.
 
         :returns: The name of the manufacturer.
         :rtype: str
-        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Black Line Follower Sensor`_ is not reachable.
         """
 
         array = self.i2c_bus.read_list(0x11, 20)
@@ -76,11 +76,11 @@ class LineFollower(object):
 
     def get_board(self):
         """
-        Read the board name of the `Line Follower Sensor`_.
+        Read the board name of the `Black Line Follower Sensor`_.
 
         :returns: The name of the board.
         :rtype: str
-        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Black Line Follower Sensor`_ is not reachable.
         """
 
         array = self.i2c_bus.read_list(0x12, 20)
@@ -95,11 +95,11 @@ class LineFollower(object):
 
     def get_version_firmware(self):
         """
-        Get the firmware version currently residing on the `Line Follower Sensor`_.
+        Get the firmware version currently residing on the `Black Line Follower Sensor`_.
 
         :returns: The version of the firmware.
         :rtype: str
-        :raises ~exceptions.OSError: When the `Line Follower Sensor`_ is not reachable.
+        :raises ~exceptions.OSError: When the `Black Line Follower Sensor`_ is not reachable.
         """
         self.i2c_bus.write_8(0x13)
         return self.i2c_bus.read_32()
