@@ -206,6 +206,36 @@ class EasyLineFollower(object):
         finally:
             ifMutexRelease(self.use_mutex)
 
+    def read_bivariate(self):
+        """
+        Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("bivariate")``.
+
+        :rtype: list(int)
+        :returns: A list of 0s and 1s for each sensor of the line follower.
+        :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
+        """
+        return self.read(representation="bivariate")
+    
+    def read_bivariate_str(self):
+        """
+        Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("bivariate-str")``.
+
+        :rtype: str
+        :returns: A string with a bunch of ``"w"`` (for white) and ``"b"`` (for black) representing the detected color on each sensor.
+        :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
+        """
+        return self.read(representation="bivariate-str")
+
+    def read_weighted_avg(self):
+        """
+        Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("weighted-avg")``.
+
+        :rtype: float
+        :returns: Range is between **0.0** and **1.0**. For **<0.5**, the black line is on the right of the line follower, otherwise it's on the left. **0.5** suggests the black line is in the middle.
+        :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
+        """
+        return self.read(representation="weighted-avg")
+
     def set_calibration(self, color, inplace = True):
         """
         Calibrate the sensor for the given ``color`` and save the values to file.
