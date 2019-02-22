@@ -230,8 +230,9 @@ class EasyLineFollower(object):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("weighted-avg")``.
 
-        :rtype: float
-        :returns: Range is between **0.0** and **1.0**. For **<0.5**, the black line is on the right of the line follower, otherwise it's on the left. **0.5** suggests the black line is in the middle.
+        :rtype: float, int
+        :returns: Range is between **0.0** and **1.0**. For **<0.5**, the black line is on the right of the line follower, otherwise it's on the left. **0.5** suggests the black line is in the middle. The 2nd returned value is **0** if it detects both black
+         and white, **1** if it's all black, or **2** for only white.
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         return self.read(representation="weighted-avg")
@@ -241,7 +242,8 @@ class EasyLineFollower(object):
         Calibrate the sensor for the given ``color`` and save the values to file.
 
         :param str color: Either ``"white"`` for calibrating white or ``"black"`` for black.
-        :param bool inplace = True: Apply the calibration values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` to access the calibration values.
+        :param bool inplace = True: Apply the calibration values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` and :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` attributes
+         to access the calibration values.
 
         """
         vals = self.read()
