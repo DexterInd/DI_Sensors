@@ -325,9 +325,9 @@ class EasyLineFollower(object):
             if estimated_position >= 0.4 and estimated_position <= 0.6:
                 return "center"
             if estimated_position >= 0.0 and estimated_position < 0.4:
-                return "left"
-            if estimated_position > 0.6 and estimated_position <= 1.0:
                 return "right"
+            if estimated_position > 0.6 and estimated_position <= 1.0:
+                return "left"
         
         return "unknown"
 
