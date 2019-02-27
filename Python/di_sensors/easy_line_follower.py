@@ -20,8 +20,8 @@ class EasyLineFollower(object):
         """
         Initialize a class to interface with either the :py:class:`~di_sensors.line_follower.LineFollower` or the :py:class:`~di_sensors.line_follower.RedLineFollower`.
 
-        :param str port = "I2C": The port to which the line follower is connected. The ``"I2C"`` port corresponds to ``"RPI_1SW"`` bus. Can also choose port ``"AD1"``/``"AD2"`` only if it's connected to the GoPiGo3 and the black line follower sensor is used. To find out more, check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :param int sensor_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the red line follower (:py:class:`~di_sensors.line_follower.RedLineFollower`) or to **2** for the black line follower (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
+        :param str port = "I2C": The port to which the line follower is connected. The ``"I2C"`` port corresponds to ``"RPI_1SW"`` bus. Can also choose port ``"AD1"``/``"AD2"`` only if it's connected to the GoPiGo3 and the line follower sensor (black board) is used. To find out more, check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param int sensor_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the line follower (red board) (:py:class:`~di_sensors.line_follower.RedLineFollower`) or to **2** for the line follower (black board) (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
         :param str calib_dir = "/home/pi/Dexter/": Directory where the calibration files are saved. It already has a default value set.
         :param str white_file = "white_line.txt": The name of the calibration file for the white line.
         :param str black_file = "black_line.txt": The name of the calibration file for the black line.
@@ -96,8 +96,8 @@ class EasyLineFollower(object):
         """
         returns
         0 - for no line follower detected
-        1 - for detecting the red line follower
-        2 - for detecting the black line follower
+        1 - for detecting the line follower (red board)
+        2 - for detecting the line follower (black board)
         """
         # see if the device is up and running
         device_on = False
@@ -119,6 +119,72 @@ class EasyLineFollower(object):
             return board
         else:
             return 0
+
+    def set_calibration(self, color, inplace = True):
+        """
+        Calibrate the sensor for the given ``color`` and save the values to file.
+
+        :param str color: Either ``"white"`` for calibrating white or ``"black"`` for black.
+        :param bool inplace = True: Apply the calibration values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` and :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` attributes
+         to access the calibration values.
+
+        """
+        vals = self.read()
+        
+        if color == 'white':
+            fname = self.file_white_calibration
+        elif color == 'black':
+            fname = self.file_black_calibration
+        else:
+            fname = ''
+        
+        if fname != '':
+            with open(fname, 'wb') as f:
+                pickle.dump(vals, f)
+                if inplace is True:
+                    if color == 'white':
+                        self.white_calibration = vals
+                    if color == 'black':
+                        self.black_calibration = vals
+                    self._calculate_threshold()
+    
+    def get_calibration(self, color, inplace = True):
+        """
+        Read the calibration values from the disk for the given ``color``.
+
+        :param str color: Either ``"white"`` for reading the calibration values for white or ``"black"`` for black.
+        :param bool inplace = True: Apply the read values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` to access the calibration values.
+        :rtype: 5/6-element list depending on which line follower is used.
+        :returns: The calibrated values for the given color.
+        :raises ~exception.ValueError: When the read file is incompatible with what the line follower expects. This can happen if a line follower has been calibrated and then switched with another one of a different type (like going from the black -> red board or vice-versa).
+
+        """
+        line = []
+        try:
+            if color == 'white':
+                fname = self.file_white_calibration
+            elif color == 'black':
+                fname = self.file_black_calibration
+            if color == 'white' or color == 'black':
+                with open(fname, 'rb') as f:
+                    line = pickle.load(f)
+        except:
+            if color == 'white':
+                line = [1.0] * self._no_vals
+            elif color == 'black':
+                line = [0.0] * self._no_vals
+
+        if len(line) != self._no_vals:
+            raise ValueError('incompatible calibration file')
+        else:
+            if inplace is True:
+                if color == 'white':
+                    self.white_calibration = line
+                if color == 'black':
+                    self.black_calibration = line
+                self._calculate_threshold()
+            return line
+
 
 
     def read(self, representation="raw"):
@@ -206,7 +272,7 @@ class EasyLineFollower(object):
         finally:
             ifMutexRelease(self.use_mutex)
 
-    def read_bivariate(self):
+    def position_01(self):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("bivariate")``.
 
@@ -216,7 +282,7 @@ class EasyLineFollower(object):
         """
         return self.read(representation="bivariate")
     
-    def read_bivariate_str(self):
+    def position_bw(self):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("bivariate-str")``.
 
@@ -226,79 +292,53 @@ class EasyLineFollower(object):
         """
         return self.read(representation="bivariate-str")
 
-    def read_weighted_avg(self):
+    def position(self):
+        """
+        Returns a string telling to which side the black line that we're following is located.
+
+        :returns: String that's indicating the location of the black line.
+        :rtype: str
+        :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
+
+        .. important::
+
+            It is assumed that with this method, the line follower is properly oriented on the GoPiGo.
+            For the red line follower, when looking forward, the **left** marking on the board is on the left
+            and vice-versa for the **right** marking.
+            As for the black line follower, the wiggly white arrow on the board is pointed forward.
+
+        The strings this method can return are the following:
+            * ``"center"`` - when the line is found in the middle.
+            * ``"black"`` - when the line follower sensor only detects black surfaces.
+            * ``"white"`` - when the line follower sensor only detects white surfaces.
+            * ``"left"`` - when the black line is located on the left of the sensor.
+            * ``"right"`` - when the black line is located on the right of the sensor.
+
+        """
+        estimated_position, lost_line = self.read('weighted-avg')
+
+        if lost_line == 1:
+            return "black"
+        elif lost_line == 2:
+            return "white"
+        else:
+            if estimated_position >= 0.4 and estimated_position <= 0.6:
+                return "center"
+            if estimated_position >= 0.0 and estimated_position < 0.4:
+                return "left"
+            if estimated_position > 0.6 and estimated_position <= 1.0:
+                return "right"
+        
+        return "unknown"
+
+    def position_val(self):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("weighted-avg")``.
 
         :rtype: float, int
-        :returns: Range is between **0.0** and **1.0**. For **<0.5**, the black line is on the right of the line follower, otherwise it's on the left. **0.5** suggests the black line is in the middle. The 2nd returned value is **0** if it detects both black
-         and white, **1** if it's all black, or **2** for only white.
+        :returns: Range is between **0.0** and **1.0**. For **<0.5**, the black line is on the right of the line follower, otherwise it's on the left. 
+            **0.5** suggests the black line is in the middle. The 2nd returned value is **0** if it detects both black.
+            and white, **1** if it's all black, or **2** for only white.
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         return self.read(representation="weighted-avg")
-
-    def set_calibration(self, color, inplace = True):
-        """
-        Calibrate the sensor for the given ``color`` and save the values to file.
-
-        :param str color: Either ``"white"`` for calibrating white or ``"black"`` for black.
-        :param bool inplace = True: Apply the calibration values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` and :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` attributes
-         to access the calibration values.
-
-        """
-        vals = self.read()
-        
-        if color == 'white':
-            fname = self.file_white_calibration
-        elif color == 'black':
-            fname = self.file_black_calibration
-        else:
-            fname = ''
-        
-        if fname != '':
-            with open(fname, 'wb') as f:
-                pickle.dump(vals, f)
-                if inplace is True:
-                    if color == 'white':
-                        self.white_calibration = vals
-                    if color == 'black':
-                        self.black_calibration = vals
-                    self._calculate_threshold()
-    
-    def get_calibration(self, color, inplace = True):
-        """
-        Read the calibration values from the disk for the given ``color``.
-
-        :param str color: Either ``"white"`` for reading the calibration values for white or ``"black"`` for black.
-        :param bool inplace = True: Apply the read values to this instantiated object too. Use :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.white_calibration` :py:attr:`~di_sensors.easy_line_follower.EasyLineFollower.black_calibration` to access the calibration values.
-        :rtype: 5/6-element list depending on which line follower is used.
-        :returns: The calibrated values for the given color.
-        :raises ~exception.ValueError: When the read file is incompatible with what the line follower expects. This can happen if a line follower has been calibrated and then switched with another one of a different type (like going from the black -> red or vice-versa).
-
-        """
-        line = []
-        try:
-            if color == 'white':
-                fname = self.file_white_calibration
-            elif color == 'black':
-                fname = self.file_black_calibration
-            if color == 'white' or color == 'black':
-                with open(fname, 'rb') as f:
-                    line = pickle.load(f)
-        except:
-            if color == 'white':
-                line = [1.0] * self._no_vals
-            elif color == 'black':
-                line = [0.0] * self._no_vals
-
-        if len(line) != self._no_vals:
-            raise ValueError('incompatible calibration file')
-        else:
-            if inplace is True:
-                if color == 'white':
-                    self.white_calibration = line
-                if color == 'black':
-                    self.black_calibration = line
-                self._calculate_threshold()
-            return line
-

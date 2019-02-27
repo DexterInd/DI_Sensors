@@ -79,6 +79,6 @@ All these submodules that are being referenced in this section were used for cre
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
 .. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
-.. _black line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor/
-.. _red line follower sensor: https://www.dexterindustries.com/product/line-follower-for-gopigo/
+.. _line follower sensor (black board): https://www.dexterindustries.com/shop/line-follower-sensor/
+.. _line follower sensor (red board): https://www.dexterindustries.com/product/line-follower-for-gopigo/
 .. _github repo: https://github.com/DexterInd/DI_Sensors
