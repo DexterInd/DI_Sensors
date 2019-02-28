@@ -19,7 +19,7 @@ class LineFollower(object):
 
     .. important::
 
-        This sensor is the replacement for the red one :py:class:`~di_sensors.line_follower.RedLineFollower`, which is getting retired, 
+        This sensor is the replacement for the red one :py:class:`~di_sensors.line_follower.LineFollowerRed`, which is getting retired, 
         but we'll still support it. The improvements of this one over the red one are:
 
         1. Much faster poll rate - **~130** times a second vs the red one at **~60Hz**.
@@ -52,8 +52,11 @@ class LineFollower(object):
         for s in range(6):
             array[s] = (array[s] << 2) | ((array[6 + int(s / 4)] >> (2 * (s % 4))) & 0x03)
             array[s] = (1023 - array[s]) / 1023.0
+        
+        array = array[:6]
+        array = array[::-1]
 
-        return array[:6]
+        return array
 
     def get_manufacturer(self):
         """
@@ -105,15 +108,15 @@ class LineFollower(object):
         return self.i2c_bus.read_32()
 
 
-class RedLineFollower(object):
+class LineFollowerRed(object):
     """
-    Class for interfacing with the `Line Follower Sensor (red board)`_.
+    Class for interfacing with the depreciated `Line Follower Sensor (red board)`_.
     """
     def __init__(self, bus = "RPI_1SW"):
         """
-        Constructor for initializing an object to interface with the `Line Follower Sensor (red board)`_.
+        Constructor for initializing an object to interface with the depreciated `Line Follower Sensor (red board)`_.
 
-        :param str bus = "RPI_1SW": The bus to which the `Line Follower Sensor (red board)`_ is connected to. By default, it's set to ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str bus = "RPI_1SW": The bus to which the depreciated `Line Follower Sensor (red board)`_ is connected to. By default, it's set to ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         """
 
         # create an I2C bus object and set the address
@@ -123,9 +126,9 @@ class RedLineFollower(object):
         """
         Read the line follower's values.
 
-        :returns: A 5-element tuple with the 1st element starting from the right of the sensor going to the left of it **(check the markings on the sensor)** with values between **0** (for black) and **1** (for white).
+        :returns: A 5-element tuple with the 1st element starting from the left of the sensor going to the right of it **(check the markings on the sensor)** with values between **0** (for black) and **1** (for white).
         :rtype: tuple
-        :raises ~exceptions.OSError: When the `Line Follower Sensor (red board)`_ is not reachable.
+        :raises ~exceptions.OSError: When the depreciated `Line Follower Sensor (red board)`_ is not reachable.
         """
 
         self.i2c_bus.write_reg_list(0x01, [0x03] + 3 * [0x00])
@@ -138,4 +141,4 @@ class RedLineFollower(object):
             temp = array[2 * step] * 256 + array[2 * step + 1]
             output.append((1023 - temp) / 1023.0)
 
-        return output
+        return output[::-1]

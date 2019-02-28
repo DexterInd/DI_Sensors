@@ -245,9 +245,9 @@ Line Follower Black/Red
 
 .. autosummary::
 
-   di_sensors.line_follower.RedLineFollower
-   di_sensors.line_follower.RedLineFollower.__init__
-   di_sensors.line_follower.RedLineFollower.read_sensors
+   di_sensors.line_follower.LineFollowerRed
+   di_sensors.line_follower.LineFollowerRed.__init__
+   di_sensors.line_follower.LineFollowerRed.read_sensors
 
 
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/

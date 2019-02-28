@@ -54,7 +54,7 @@ LineFollower
    :special-members:
    :exclude-members: __weakref__
 
-.. autoclass:: di_sensors.line_follower.RedLineFollower
+.. autoclass:: di_sensors.line_follower.LineFollowerRed
    :members:
    :show-inheritance:
    :special-members:

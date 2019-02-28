@@ -7,7 +7,7 @@ import pickle
 
 class EasyLineFollower(object):
     """
-    Higher-level of abstraction class for either the :py:class:`~di_sensors.line_follower.LineFollower` or :py:class:`~di_sensors.line_follower.RedLineFollower`.
+    Higher-level of abstraction class for either the :py:class:`~di_sensors.line_follower.LineFollower` or :py:class:`~di_sensors.line_follower.LineFollowerRed`.
     """
 
     def __init__(self, 
@@ -18,10 +18,10 @@ class EasyLineFollower(object):
         black_file = 'black_line.txt',
         use_mutex = True):
         """
-        Initialize a class to interface with either the :py:class:`~di_sensors.line_follower.LineFollower` or the :py:class:`~di_sensors.line_follower.RedLineFollower`.
+        Initialize a class to interface with either the :py:class:`~di_sensors.line_follower.LineFollower` or the :py:class:`~di_sensors.line_follower.LineFollowerRed`.
 
         :param str port = "I2C": The port to which the line follower is connected. The ``"I2C"`` port corresponds to ``"RPI_1SW"`` bus. Can also choose port ``"AD1"``/``"AD2"`` only if it's connected to the GoPiGo3 and the line follower sensor (black board) is used. To find out more, check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :param int sensor_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the line follower (red board) (:py:class:`~di_sensors.line_follower.RedLineFollower`) or to **2** for the line follower (black board) (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
+        :param int sensor_id = -1: **-1** to automatically detect the connected line follower - this is the default value. It can also set to **1** to only use it with the line follower (red board) (:py:class:`~di_sensors.line_follower.LineFollowerRed`) or to **2** for the line follower (black board) (:py:class:`~di_sensors.line_follower.LineFollower`) [#]_.
         :param str calib_dir = "/home/pi/Dexter/": Directory where the calibration files are saved. It already has a default value set.
         :param str white_file = "white_line.txt": The name of the calibration file for the white line.
         :param str black_file = "black_line.txt": The name of the calibration file for the black line.
@@ -194,7 +194,7 @@ class EasyLineFollower(object):
         :param str representation="raw": It's set by-default to ``"raw"`` , but it can also be ``"bivariate"``, ``"bivariate-str"`` or ``"weighted-avg"``.
         :raises ~exceptions.OSError: If the line follower sensor is not reachable.
 
-        Each of the line followers' order of the sensors is the same as the one in each read method of them both: :py:meth:`di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`di_sensors.line_follower.RedLineFollower.read_sensors`.
+        Each of the line followers' order of the sensors' values is the same as the one in each read method of them both: :py:meth:`di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`di_sensors.line_follower.LineFollowerRed.read_sensors`.
         
 
         For ``representation="raw"``
@@ -211,10 +211,10 @@ class EasyLineFollower(object):
             Returns a 2-element tuple. The first element is an estimated position of the line. 
             
             The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used), 
-            so that if the black line is on the right of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the left, 
+            so that if the black line is on the left of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the right, 
             it's in the **0.5-1.0** range, thus making **0.5** the center point of the black line. Keep in mind that the sensor's orientation is determined by the order
             of the returned sensor values and not by how the sensor is positioned on the robot. 
-            Check :py:meth:`~di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`~di_sensors.line_follower.RedLineFollower.read_sensors` methods to see
+            Check :py:meth:`~di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`~di_sensors.line_follower.LineFollowerRed.read_sensors` methods to see
             how the values are returned. 
             
             If the line follower sensor ends up on a surface with an homogeneous color  (or shade of grey), the returned value will circle around **0.5**.
@@ -325,9 +325,9 @@ class EasyLineFollower(object):
             if estimated_position >= 0.4 and estimated_position <= 0.6:
                 return "center"
             if estimated_position >= 0.0 and estimated_position < 0.4:
-                return "right"
-            if estimated_position > 0.6 and estimated_position <= 1.0:
                 return "left"
+            if estimated_position > 0.6 and estimated_position <= 1.0:
+                return "right"
         
         return "unknown"
 
@@ -345,20 +345,20 @@ class EasyLineFollower(object):
 
     def get_white_calibration(self):
         self.set_calibration('white')
-        return self.white_calibration[::-1]
+        return self.white_calibration
 
     def get_black_calibration(self):
         self.set_calibration('black')
-        return self.black_calibration[::-1]
+        return self.black_calibration
 
     def read_raw_sensors(self):
-        return self.read()[::-1]
+        return self.read()
 
     def read_binary(self):
-        return self.position_01()[::-1]
+        return self.position_01()
 
     def read_position(self):
         return self.position()
 
     def read_position_str(self):
-        return self.position_bw()[::-1]
+        return self.position_bw()
