@@ -345,11 +345,11 @@ class EasyLineFollower(object):
 
     def get_white_calibration(self):
         self.set_calibration('white')
-        return self.get_calibration('white')[::-1]
+        return self.white_calibration[::-1]
 
     def get_black_calibration(self):
         self.set_calibration('black')
-        return self.get_calibration('black')[::-1]
+        return self.black_calibration[::-1]
 
     def read_raw_sensors(self):
         return self.read()[::-1]
