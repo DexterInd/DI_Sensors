@@ -242,7 +242,10 @@ class EasyLineFollower(object):
             elif representation == 'weighted-avg':
                 raw_vals = self.sensor.read_sensors()
                 for i in range(self._no_vals):
-                    raw_vals[i] = (raw_vals[i] - self.black_calibration[i]) / (self.white_calibration[i] - self.black_calibration[i])
+                    try:
+                        raw_vals[i] = (raw_vals[i] - self.black_calibration[i]) / (self.white_calibration[i] - self.black_calibration[i])
+                    except ZeroDivisionError:
+                        raw_vals[i] = 0.0
                     if raw_vals[i] < 0: raw_vals[i] = 0.0
                     if raw_vals[i] > 1: raw_vals[i] = 1.0
                     raw_vals[i] = 1.0 - raw_vals[i]
