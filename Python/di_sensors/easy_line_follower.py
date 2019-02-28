@@ -56,14 +56,14 @@ class EasyLineFollower(object):
             self._test_dev = line_follower.LineFollower(bus)
             if sensor_id == 1:
                 self._sensor_id = sensor_id
-                self.sensor = line_follower.RedLineFollower(bus)
+                self.sensor = line_follower.LineFollowerRed(bus)
             elif sensor_id == 2:
                 self._sensor_id = sensor_id
                 self.sensor = line_follower.LineFollower(bus)
             elif sensor_id == -1:
                 self._sensor_id = self._detect_line_follower()
                 if self._sensor_id == 1:
-                    self.sensor = line_follower.RedLineFollower(bus)
+                    self.sensor = line_follower.LineFollowerRed(bus)
                 else: # sensor_module can only be 2, because otherwise an exception is raised
                     self.sensor = line_follower.LineFollower(bus)
         except Exception as e:
