@@ -342,3 +342,23 @@ class EasyLineFollower(object):
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         return self.read(representation="weighted-avg")
+
+    def get_white_calibration(self):
+        self.set_calibration('white')
+        return self.get_calibration('white')[::-1]
+
+    def get_black_calibration(self):
+        self.set_calibration('black')
+        return self.get_calibration('black')[::-1]
+
+    def read_raw_sensors(self):
+        return self.read()[::-1]
+
+    def read_binary(self):
+        return self.position_01()[::-1]
+
+    def read_position(self):
+        return self.position()
+
+    def read_position_str(self):
+        return self.position_bw()[::-1]
