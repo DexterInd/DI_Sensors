@@ -88,6 +88,52 @@ sensor_buffer = [ [], [], [], [], [] ]
 # keep a maximum of 20 readings for each IR sensor on the line follower
 max_buffer_length = 20
 
+def __detect_line_follower__(self):
+	"""
+	returns
+	0 - for no line follower detected
+	1 - for detecting the line follower (red board)
+	2 - for detecting the line follower (black board)
+	"""
+	i2c = I2C('/dev/i2c-' + str(bus_number))
+	address = 0x06
+
+	# see if the device is up and running
+	device_on = False
+	try:
+		read_byte = [0]
+		msg1 = [I2C.Message(read_byte, read=True)]
+		i2c.transfer(address, msg1)
+		device_on = True
+	except:
+		pass
+	
+	if device_on is True:
+		# then it means we have a line follower connected
+		# we still don't know whether it is the black one or the red one
+		board = 1
+		try:
+			read_bytes = 20 * [0]
+			msg1 = [I2C.Message([0x12])]
+			msg2 = [I2C.Message(read_bytes, read=True)]
+			i2c.transfer(msg1)
+			i2c.transfer(msg2)
+
+			name = ""
+			for c in range(20):
+				if msg2[0].data[c] != 0:
+					name += chr(msg2[0].data[c])
+				else:
+					break
+
+			if name == 'Line Follower':
+				board = 2
+		except:
+			pass
+		return board
+	else:
+		return 0
+
 # Function for removing outlier values
 # For bigger std_factor_threshold, the filtering is less aggressive
 # For smaller std_factor_threshold, the filtering is more aggressive
@@ -116,6 +162,12 @@ def read_sensor():
     register = 0x01
     command = 0x03
     unused = 0x00
+
+	sensor_id = __detect_line_follower__()
+	if sensor_id == 2:
+		raise NotImplementedError('line follower (black board) is not supported with the line_follower.line_sensor module\n\
+			please use the di_sensors.easy_line_follower.EasyLineFollower class to interface with both line followers (black + red boards)\n\
+			check https://di-sensors.readthedocs.io documentation to find out more')
 
     try:
         i2c = I2C('/dev/i2c-' + str(bus_number))
