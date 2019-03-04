@@ -43,7 +43,7 @@ class LineFollower(object):
         """
         Read the line follower's values.
 
-        :returns: A 6-element tuple with the 1st element starting at index 1 and going up to 6 **(check the line follower's markings)** with values between **0** (for black) and **1** (for white).
+        :returns: A 6-element tuple with line sensors 1 through 6 **(from left to right)** with values between **0** (for black) and **1** (for white). The little curved arrow on the line follower indicates the direction of where the line sensors should be pointed to.
         :rtype: tuple
         :raises ~exceptions.OSError: When the `Line Follower Sensor (black board)`_ is not reachable.
         """
