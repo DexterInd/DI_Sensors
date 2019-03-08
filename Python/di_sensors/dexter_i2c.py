@@ -6,6 +6,8 @@
 #
 # Python I2C drivers
 
+# Deprecated module - use the one in github.com/DexterInd/RFR_Tools instead that's called di_i2c.py
+
 from __future__ import print_function
 from __future__ import division
 
