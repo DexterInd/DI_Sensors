@@ -28,14 +28,15 @@ If there's nothing to be shown when ``pip show``-ing or you get an import error 
 Hardware interface
 ==================
 
-Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matter of choosing the right bus. Thus, there are 3 buses to choose from, depending on the context:
+Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matter of choosing the right bus. Thus, there are 4 buses to choose from, depending on the context:
 
-   * The ``"RPI_1"`` bus - this bus can be used on all 4 platforms we have (the GoPiGo3, GoPiGo, BrickPi3 & GrovePi). This bus corresponds to the ``"I2C"`` port.
+   * The ``"RPI_1SW"`` bus - this can be used along all 5 platforms we have (the GoPiGo3, GoPiGo, BrickPi3, GrovePi & PivotPi). This bus corresponds to the ``"I2C"`` port.
+   * The ``"RPI_1"`` bus - this bus can be used along all 5 platforms we have (the GoPiGo3, GoPiGo, BrickPi3, GrovePi & PivotPi). Does not correspond to the ``"I2C"`` port.
    * The ``"GPG3_AD1"``/``"GPG3_AD2"`` buses - these buses can **only** be used on the GoPiGo3 platform. The advantage of using these ones is that the interface between the Raspberry Pi and the sensor is more stable. These buses correspond to the ``"AD1"`` and ``"AD2"`` ports of the GoPiGo3.
 
 .. important::
 
-   These notations for ports (``"RPI_1"``, ``"GPG3_AD1"`` and ``"GPG3_AD2"``) are only required for classes that *don't start* with the **Easy** word,
+   These notations for ports (``"RPI_1SW"``, ``"RPI_1"``, ``"GPG3_AD1"`` and ``"GPG3_AD2"``) are only required for classes that *don't start* with the **Easy** word,
    specifically for:
 
    * :py:class:`~di_sensors.distance_sensor.DistanceSensor`
@@ -45,8 +46,13 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
 
    If you choose to use a sensor library *that starts* with the **Easy** word, you can use the same notations as those used and mentioned in the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`, such as:
 
-   * ``"I2C"`` instead of ``"RPI_1"``.
+   * ``"I2C"`` instead of ``"RPI_1SW"``.
    * ``"AD1/AD2"`` instead of ``"GPG3_AD1/GPG3_AD2"``.
+
+
+Also, you may notice that for the ``"I2C"`` port we only support the ``"RPI_1SW"``, which is a software implementation for the I2C so that the hardware one can be avoided.
+The problem with the hardware implementation (the ``"RPI_1"`` bus) is that it's riddled with bugs and if you don't want your application to crash, use the software implemented one.
+The software implemented driver for the I2C is as fast the HW one and it doesn't take much CPU time at all. 
 
 For seeing where the ``"AD1"``/``"AD2"`` are located on the GoPiGo3, please check the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`.
 
@@ -71,11 +77,13 @@ between different classes. We can notice 3 groups of classes:
    di_sensors.distance_sensor
    di_sensors.easy_inertial_measurement_unit
    di_sensors.easy_temp_hum_press
+   di_sensors.easy_line_follower
    di_sensors.inertial_measurement_unit
    di_sensors.easy_light_color_sensor
    di_sensors.light_color_sensor
-   di_sensors.easy_mutex
+   di_sensors.line_follower
    di_sensors.temp_hum_press
+   di_sensors.easy_mutex
    di_sensors.VL53L0X
    di_sensors.BME280
    di_sensors.BNO055
@@ -149,6 +157,22 @@ Easy - IMU
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_read_magnetometer
    di_sensors.easy_inertial_measurement_unit.EasyIMUSensor.safe_north_point
 
+^^^^^^^^^^^^^^^^^^^^
+Easy - Line Follower
+^^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+   di_sensors.easy_line_follower.EasyLineFollower
+   di_sensors.easy_line_follower.EasyLineFollower.__init__
+   di_sensors.easy_line_follower.EasyLineFollower.set_calibration
+   di_sensors.easy_line_follower.EasyLineFollower.get_calibration
+   di_sensors.easy_line_follower.EasyLineFollower.read
+   di_sensors.easy_line_follower.EasyLineFollower.position_01
+   di_sensors.easy_line_follower.EasyLineFollower.position_bw
+   di_sensors.easy_line_follower.EasyLineFollower.position
+   di_sensors.easy_line_follower.EasyLineFollower.position_val
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 TempHumPress
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -205,8 +229,31 @@ IMU
    di_sensors.inertial_measurement_unit.InertialMeasurementUnit.read_temperature
 
 
+^^^^^^^^^^^^^^^^^^^^^^^
+Line Follower Black/Red
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autosummary::
+
+   di_sensors.line_follower.LineFollower
+   di_sensors.line_follower.LineFollower.__init__
+   di_sensors.line_follower.LineFollower.read_sensors
+   di_sensors.line_follower.LineFollower.get_manufacturer
+   di_sensors.line_follower.LineFollower.get_board
+   di_sensors.line_follower.LineFollower.get_version_firmware
+
+
+.. autosummary::
+
+   di_sensors.line_follower.LineFollowerRed
+   di_sensors.line_follower.LineFollowerRed.__init__
+   di_sensors.line_follower.LineFollowerRed.read_sensors
+
+
 .. _distance sensor: https://www.dexterindustries.com/shop/distance-sensor/
 .. _imu sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
+.. _line follower sensor (black board): https://www.dexterindustries.com/shop/line-follower-sensor/
+.. _line follower sensor (red board): https://www.dexterindustries.com/product/line-follower-for-gopigo/

@@ -7,7 +7,7 @@ Using the IMU Sensor
 In order to run this example program, we need to have a `GoPiGo3`_ because bus ``"GPG3_AD1"`` is used in this case and it's specific to the `GoPiGo3`_ platform.
 The ``"GPG3_AD1"`` bus translates to port ``"AD1"`` on the GoPiGo3, so the `IMU Sensor`_ has to be connected to port ``"AD1"``.
 
-We could have gone with the default ``"RPI_1"`` bus so it can be used on any platform, but since this is an example, we might as-well show how it's being done with a `GoPiGo3`_.
+We could have gone with the default ``"RPI_1SW"`` bus so it can be used on any platform, but since this is an example, we might as-well show how it's being done with a `GoPiGo3`_.
 
 The source file for this example program can be found `here on github <https://github.com/DexterInd/DI_Sensors/blob/master/Python/Examples/IMUSensor.py>`__.
 

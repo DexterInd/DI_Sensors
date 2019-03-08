@@ -22,16 +22,6 @@ LightColorSensor
    :special-members:
    :exclude-members: __weakref__
 
-============
-TempHumPress
-============
-
-.. autoclass:: di_sensors.temp_hum_press.TempHumPress
-  :members:
-  :show-inheritance:
-  :special-members:
-  :exclude-members: __weakref__
-
 =======================
 InertialMeasurementUnit
 =======================
@@ -43,6 +33,32 @@ InertialMeasurementUnit
    :exclude-members: __weakref__
 
    .. automethod:: di_sensors.BNO055.BNO055.get_calibration_status
+
+============
+TempHumPress
+============
+
+.. autoclass:: di_sensors.temp_hum_press.TempHumPress
+  :members:
+  :show-inheritance:
+  :special-members:
+  :exclude-members: __weakref__
+
+============
+LineFollower
+============
+
+.. autoclass:: di_sensors.line_follower.LineFollower
+   :members:
+   :show-inheritance:
+   :special-members:
+   :exclude-members: __weakref__
+
+.. autoclass:: di_sensors.line_follower.LineFollowerRed
+   :members:
+   :show-inheritance:
+   :special-members:
+   :exclude-members: __weakref__
 
 ========
 More ...
@@ -63,4 +79,6 @@ All these submodules that are being referenced in this section were used for cre
 .. _light color sensor: https://www.dexterindustries.com/shop/light-color-sensor/
 .. _temperature humidity pressure sensor: https://www.dexterindustries.com/shop/temperature-humidity-pressure-sensor/
 .. _inertialmeasurementunit sensor: https://www.dexterindustries.com/shop/imu-sensor/
+.. _line follower sensor (black board): https://www.dexterindustries.com/shop/line-follower-sensor/
+.. _line follower sensor (red board): https://www.dexterindustries.com/product/line-follower-for-gopigo/
 .. _github repo: https://github.com/DexterInd/DI_Sensors

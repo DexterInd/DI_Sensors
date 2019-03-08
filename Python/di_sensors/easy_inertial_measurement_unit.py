@@ -15,7 +15,6 @@
 
 from di_sensors import inertial_measurement_unit
 from di_sensors import BNO055
-import I2C_mutex
 from math import atan2, pi
 from time import sleep
 
