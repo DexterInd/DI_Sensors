@@ -198,7 +198,7 @@ class EasyLineFollower(object):
         
 
         For ``representation="raw"``
-            For this, raw values are returned from the line follower sensor. Values range between **0** and **1023** and there can be 5 or 6 values returned depending on what line follower sensor is used.
+            For this, raw values are returned from the line follower sensor. Values range between **0** and **1** and there can be 5 or 6 values returned depending on what line follower sensor is used.
         
         For ``representation="bivariate"``
             In this case, a list with the length equal to the number of sensors present on the given line follower is returned. Values are either **0** (for black) or **1** (for white). 
