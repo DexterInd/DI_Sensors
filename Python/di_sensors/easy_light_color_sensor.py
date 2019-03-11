@@ -15,7 +15,6 @@
 
 from di_sensors import light_color_sensor
 from di_sensors import VL53L0X
-import I2C_mutex
 from time import sleep
 from math import sqrt
 
@@ -79,7 +78,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         try:
             bus = ports[port]
         except KeyError:
-            bus = "RPI_1"
+            bus = "RPI_1SW"
 
         # in case there's a distance sensor that hasn't been instanciated yet
         # attempt to move it to another address

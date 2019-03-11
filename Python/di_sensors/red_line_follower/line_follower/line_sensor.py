@@ -88,6 +88,52 @@ sensor_buffer = [ [], [], [], [], [] ]
 # keep a maximum of 20 readings for each IR sensor on the line follower
 max_buffer_length = 20
 
+def detect_line_follower():
+	"""
+	returns
+	0 - for no line follower detected
+	1 - for detecting the line follower (red board)
+	2 - for detecting the line follower (black board)
+	"""
+	i2c = I2C('/dev/i2c-' + str(bus_number))
+	address = 0x06
+
+	# see if the device is up and running
+	device_on = False
+	try:
+		read_byte = [0]
+		msg1 = [I2C.Message(read_byte, read=True)]
+		i2c.transfer(address, msg1)
+		device_on = True
+	except:
+		pass
+	
+	if device_on is True:
+		# then it means we have a line follower connected
+		# we still don't know whether it is the black one or the red one
+		board = 1
+		try:
+			read_bytes = 20 * [0]
+			msg1 = [I2C.Message([0x12])]
+			msg2 = [I2C.Message(read_bytes, read=True)]
+			i2c.transfer(address, msg1)
+			i2c.transfer(address, msg2)
+
+			name = ""
+			for c in range(20):
+				if msg2[0].data[c] != 0:
+					name += chr(msg2[0].data[c])
+				else:
+					break
+					
+			if name == 'Line Follower':
+				board = 2
+		except:
+			pass
+		return board
+	else:
+		return 0
+
 # Function for removing outlier values
 # For bigger std_factor_threshold, the filtering is less aggressive
 # For smaller std_factor_threshold, the filtering is more aggressive
@@ -112,46 +158,53 @@ def statisticalNoiseReduction(values, std_factor_threshold = 2):
 
 # Function for reading line follower's values off of its IR sensor
 def read_sensor():
-    address = 0x06
-    register = 0x01
-    command = 0x03
-    unused = 0x00
+	address = 0x06
+	register = 0x01
+	command = 0x03
+	unused = 0x00
 
-    try:
-        i2c = I2C('/dev/i2c-' + str(bus_number))
+	sensor_id = detect_line_follower()
 
-        read_bytes = 10 * [0]
-        msg1 = [ I2C.Message([register, command] + 3 * [unused]) ]
-        msg2 = [ I2C.Message(read_bytes, read=True) ]
-        # we meed to do 2 transfers so we can avoid using repeated starts
-        # repeated starts don't go hand in hand with the line follower
-        i2c.transfer(address, msg1)
-        i2c.transfer(address, msg2)
-        
-    except I2CError as error:
-        return 5 * [-1]
+	if sensor_id == 2:
+		raise NotImplementedError('line follower (black board) is not supported with the line_follower.line_sensor module\n\
+			please use the di_sensors.easy_line_follower.EasyLineFollower class to interface with both line followers (black + red boards)\n\
+			check https://di-sensors.readthedocs.io documentation to find out more')
 
-    # unpack bytes received and process them
-    # bytes_list = struct.unpack('10B',read_results[0])
-    output_values = []
-    input_values = msg2[0].data
+	try:
+		i2c = I2C('/dev/i2c-' + str(bus_number))
 
-    for step in range(5):
-        # calculate the 16-bit number we got
-        sensor_buffer[step].append(input_values[2 * step] * 256 + input_values[2 * step + 1])
+		read_bytes = 10 * [0]
+		msg1 = [ I2C.Message([register, command] + 3 * [unused]) ]
+		msg2 = [ I2C.Message(read_bytes, read=True) ]
+		# we meed to do 2 transfers so we can avoid using repeated starts
+		# repeated starts don't go hand in hand with the line follower
+		i2c.transfer(address, msg1)
+		i2c.transfer(address, msg2)
 
-        # if there're too many elements in the list
-        # then remove one
-        if len(sensor_buffer[step]) > max_buffer_length:
-            sensor_buffer[step].pop(0)
+	except I2CError as error:
+		return 5 * [-1]
 
-        # eliminate outlier values and select the most recent one
-        filtered_value = statisticalNoiseReduction(sensor_buffer[step], 2)[-1]
+	# unpack bytes received and process them
+	# bytes_list = struct.unpack('10B',read_results[0])
+	output_values = []
+	input_values = msg2[0].data
 
-        # append the value to the corresponding IR sensor
-        output_values.append(filtered_value)
+	for step in range(5):
+		# calculate the 16-bit number we got
+		sensor_buffer[step].append(input_values[2 * step] * 256 + input_values[2 * step + 1])
 
-    return output_values
+		# if there're too many elements in the list
+		# then remove one
+		if len(sensor_buffer[step]) > max_buffer_length:
+			sensor_buffer[step].pop(0)
+
+		# eliminate outlier values and select the most recent one
+		filtered_value = statisticalNoiseReduction(sensor_buffer[step], 2)[-1]
+
+		# append the value to the corresponding IR sensor
+		output_values.append(filtered_value)
+
+	return output_values
 
 def get_sensorval():
 

@@ -9,7 +9,7 @@
 from __future__ import print_function
 from __future__ import division
 
-from di_sensors import dexter_i2c
+import di_i2c
 import time
 
 # Constants
@@ -79,65 +79,65 @@ REG_HUMIDITY_DATA = 0xFD
 
 
 class BME280(object):
-    
-    def __init__(self, bus = "RPI_1", t_mode = OSAMPLE_1, h_mode = OSAMPLE_1, p_mode = OSAMPLE_1,
+
+    def __init__(self, bus = "RPI_1SW", t_mode = OSAMPLE_1, h_mode = OSAMPLE_1, p_mode = OSAMPLE_1,
                  standby = STANDBY_250, filter = FILTER_off):
         """Initialize the sensor
-        
+
         Keyword arguments:
-        bus (default "RPI_1") -- The I2C bus
+        bus (default "RPI_1SW") -- The I2C bus
         t_mode (default OSAMPLE_1) -- The temperature measurement mode
         h_mode (default OSAMPLE_1) -- The humidity measurement mode
         p_mode (default OSAMPLE_1) -- The pressure measurement mode
         standby (default STANDBY_250) -- The delay constant for waiting between taking readings
         filter (default FILTER_off) -- The filter mode"""
-        
+
         # confirm that all the values are valid
         if t_mode not in [OSAMPLE_1, OSAMPLE_2, OSAMPLE_4, OSAMPLE_8, OSAMPLE_16]:
             raise ValueError('Unexpected t_mode %d. Valid modes are OSAMPLE_1, OSAMPLE_2, OSAMPLE_4, OSAMPLE_8, and OSAMPLE_16.' % t_mode)
         self._t_mode = t_mode
-        
+
         if h_mode not in [OSAMPLE_1, OSAMPLE_2, OSAMPLE_4, OSAMPLE_8, OSAMPLE_16]:
             raise ValueError('Unexpected h_mode %d. Valid modes are OSAMPLE_1, OSAMPLE_2, OSAMPLE_4, OSAMPLE_8, and OSAMPLE_16.' % h_mode)
         self._h_mode = h_mode
-        
+
         if p_mode not in [OSAMPLE_1, OSAMPLE_2, OSAMPLE_4, OSAMPLE_8, OSAMPLE_16]:
             raise ValueError('Unexpected p_mode %d. Valid modes are OSAMPLE_1, OSAMPLE_2, OSAMPLE_4, OSAMPLE_8, and OSAMPLE_16.' % p_mode)
         self._p_mode = p_mode
-        
+
         if standby not in [STANDBY_0p5, STANDBY_62p5, STANDBY_125, STANDBY_250,
                         STANDBY_500, STANDBY_1000, STANDBY_10, STANDBY_20]:
             raise ValueError('Unexpected standby value %d. Valid values are STANDBY_0p5, STANDBY_10, STANDBY_20, STANDBY_62p5, STANDBY_125, STANDBY_250, STANDBY_500, and STANDBY_1000.' % standby)
         self._standby = standby
-        
+
         if filter not in [FILTER_off, FILTER_2, FILTER_4, FILTER_8, FILTER_16]:
             raise ValueError('Unexpected filter value %d. Valid values are FILTER_off, FILTER_2, FILTER_4, FILTER_8, and FILTER_16' % filter)
         self._filter = filter
-        
+
         # create an I2C bus object and set the address
-        self.i2c_bus = dexter_i2c.Dexter_I2C(bus = bus, address = ADDRESS, big_endian = False) # little endian
-        
+        self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = ADDRESS, big_endian = False) # little endian
+
         # load calibration values.
         self._load_calibration()
         self.i2c_bus.write_reg_8(REG_CONTROL, 0x24)  # Sleep mode
         time.sleep(0.002)
-        
+
         # set the standby time
         self.i2c_bus.write_reg_8(REG_CONFIG, ((standby << 5) | (filter << 2)))
         time.sleep(0.002)
-        
+
         # set the sample modes
         self.i2c_bus.write_reg_8(REG_CONTROL_HUM, h_mode)  # Set Humidity Oversample
         self.i2c_bus.write_reg_8(REG_CONTROL, ((t_mode << 5) | (p_mode << 2) | 3))  # Set Temp/Pressure Oversample and enter Normal mode
         self.t_fine = 0.0
-    
+
     def _load_calibration(self):
         # Read calibration data
-        
+
         self.dig_T1 = self.i2c_bus.read_16(REG_DIG_T1)
         self.dig_T2 = self.i2c_bus.read_16(REG_DIG_T2, signed = True)
         self.dig_T3 = self.i2c_bus.read_16(REG_DIG_T3, signed = True)
-        
+
         self.dig_P1 = self.i2c_bus.read_16(REG_DIG_P1)
         self.dig_P2 = self.i2c_bus.read_16(REG_DIG_P2, signed = True)
         self.dig_P3 = self.i2c_bus.read_16(REG_DIG_P3, signed = True)
@@ -147,45 +147,45 @@ class BME280(object):
         self.dig_P7 = self.i2c_bus.read_16(REG_DIG_P7, signed = True)
         self.dig_P8 = self.i2c_bus.read_16(REG_DIG_P8, signed = True)
         self.dig_P9 = self.i2c_bus.read_16(REG_DIG_P9, signed = True)
-        
+
         self.dig_H1 = self.i2c_bus.read_8(REG_DIG_H1)
         self.dig_H2 = self.i2c_bus.read_16(REG_DIG_H2, signed = True)
         self.dig_H3 = self.i2c_bus.read_8(REG_DIG_H3)
         self.dig_H6 = self.i2c_bus.read_8(REG_DIG_H7, signed = True)
-        
+
         h4 = self.i2c_bus.read_8(REG_DIG_H4, signed = True)
         h4 = (h4 << 4)
         self.dig_H4 = h4 | (self.i2c_bus.read_8(REG_DIG_H5) & 0x0F)
-        
+
         h5 = self.i2c_bus.read_8(REG_DIG_H6, signed = True)
         h5 = (h5 << 4)
         self.dig_H5 = h5 | (
         self.i2c_bus.read_8(REG_DIG_H5) >> 4 & 0x0F)
-    
+
     def _read_raw_temp(self):
         # read raw temperature data once it's available
         while (self.i2c_bus.read_8(REG_STATUS) & 0x08):
             time.sleep(0.002)
         data = self.i2c_bus.read_list(REG_TEMP_DATA, 3)
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4
-    
+
     def _read_raw_pressure(self):
         # read raw pressure data once it's available
         while (self.i2c_bus.read_8(REG_STATUS) & 0x08):
             time.sleep(0.002)
         data = self.i2c_bus.read_list(REG_PRESSURE_DATA, 3)
         return ((data[0] << 16) | (data[1] << 8) | data[2]) >> 4
-    
+
     def _read_raw_humidity(self):
         # read raw humidity data once it's available
         while (self.i2c_bus.read_8(REG_STATUS) & 0x08):
             time.sleep(0.002)
         data = self.i2c_bus.read_list(REG_HUMIDITY_DATA, 2)
         return (data[0] << 8) | data[1]
-    
+
     def read_temperature(self):
         """Get the temperature
-        
+
         Returns temperature in degrees celsius."""
         # float in Python is double precision
         UT = float(self._read_raw_temp())
@@ -194,10 +194,10 @@ class BME280(object):
         UT / 131072.0 - float(self.dig_T1) / 8192.0)) * float(self.dig_T3)
         self.t_fine = int(var1 + var2)
         return (var1 + var2) / 5120.0
-    
+
     def read_humidity(self):
         """Get the humidity
-        
+
         Returns the temperature-compensated humidity. read_temperature must be called to update the temperature compensation."""
         adc = float(self._read_raw_humidity())
         # print 'Raw humidity = {0:d}'.format (adc)
@@ -211,10 +211,10 @@ class BME280(object):
         elif h < 0:
             h = 0
         return h
-    
+
     def read_pressure(self):
         """Get the pressure
-        
+
         Returns the temperature-compensated pressure in Pascals. read_temperature must be called to update the temperature compensation."""
         adc = float(self._read_raw_pressure())
         var1 = float(self.t_fine) / 2.0 - 64000.0
@@ -231,19 +231,19 @@ class BME280(object):
         var1 = float(self.dig_P9) * p * p / 2147483648.0
         var2 = p * float(self.dig_P8) / 32768.0
         return p + (var1 + var2 + float(self.dig_P7)) / 16.0
-    
+
     def read_temperature_f(self):
         # Wrapper to get temp in F
         return self.read_temperature() * 1.8 + 32
-    
+
     def read_dewpoint(self):
         # Return calculated dewpoint in C, only accurate at > 50% RH
         return self.read_temperature() - ((100 - self.read_humidity()) / 5)
-    
+
     def read_dewpoint_f(self):
         # Return calculated dewpoint in F, only accurate at > 50% RH
         return self.read_dewpoint() * 1.8 + 32
-    
+
     def read_pressure_inches(self):
         # Wrapper to get pressure in inches of Hg
         return self.read_pressure() * 0.0002953
