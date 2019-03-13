@@ -289,7 +289,8 @@ class EasyLineFollower(object):
             * ``"right"`` - when the black line is located on the right of the sensor.
 
         """
-        return self._position(self.read('weighted-avg'))
+        estimated_position, lost_line = self.read('weighted-avg')
+        return self._position(estimated_position, lost_line)
 
     def position_val(self):
         """
