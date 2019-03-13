@@ -288,21 +288,9 @@ class EasyLineFollower(object):
             * ``"right"`` - when the black line is located on the right of the sensor.
 
         """
-        estimated_position, lost_line = self.read('weighted-avg')
+        return _position(self.read('weighted-avg'))
 
-        if lost_line == 1:
-            return "black"
-        elif lost_line == 2:
-            return "white"
-        else:
-            if estimated_position >= 0.4 and estimated_position <= 0.6:
-                return "center"
-            if estimated_position >= 0.0 and estimated_position < 0.4:
-                return "left"
-            if estimated_position > 0.6 and estimated_position <= 1.0:
-                return "right"
-        
-        return "unknown"
+
 
     def position_val(self):
         """
@@ -377,3 +365,18 @@ class EasyLineFollower(object):
             lost_line_type = 2
 
         return position, lost_line_type
+
+    def _position(self, estimated_position, lost_line):
+        if lost_line == 1:
+            return "black"
+        elif lost_line == 2:
+            return "white"
+        else:
+            if estimated_position >= 0.4 and estimated_position <= 0.6:
+                return "center"
+            if estimated_position >= 0.0 and estimated_position < 0.4:
+                return "left"
+            if estimated_position > 0.6 and estimated_position <= 1.0:
+                return "right"
+        
+        return "unknown"
