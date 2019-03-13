@@ -226,48 +226,18 @@ class EasyLineFollower(object):
         try:
             if representation == 'raw':
                 return self.sensor.read_sensors()
+
             elif representation == 'bivariate':
                 raw_vals = self.sensor.read_sensors()
-                six_vals = [0] * self._no_vals
-                for i in range(self._no_vals):
-                    if raw_vals[i] > self._threshold[i]:
-                        six_vals[i] = 1
-                    else:
-                        six_vals[i] = 0
-                return six_vals
+                return _bivariate(raw_vals)
+
             elif representation == 'bivariate-str':
                 raw_vals = self.read('bivariate')
-                string_vals = ''.join(['b' if sensor_val == 0 else 'w' for sensor_val in raw_vals])
-                return string_vals
+                return _bivariate_str(raw_vals)
+
             elif representation == 'weighted-avg':
                 raw_vals = self.sensor.read_sensors()
-                for i in range(self._no_vals):
-                    try:
-                        raw_vals[i] = (raw_vals[i] - self.black_calibration[i]) / (self.white_calibration[i] - self.black_calibration[i])
-                    except ZeroDivisionError:
-                        raw_vals[i] = 0.0
-                    if raw_vals[i] < 0: raw_vals[i] = 0.0
-                    if raw_vals[i] > 1: raw_vals[i] = 1.0
-                    raw_vals[i] = 1.0 - raw_vals[i]
-                norm_vals = raw_vals
-
-                numerator = sum([i * norm_vals[i] for i in range(self._no_vals)])
-                denominator = float(sum(norm_vals))
-                try:
-                    position = numerator / (denominator * (self._no_vals - 1))
-                except ZeroDivisionError:
-                    position = 0.5
-                
-                hits = 0
-                lost_line_type = 0
-                for i in range(self._no_vals):
-                    hits += 1 if raw_vals[i] > self._threshold[i] else 0
-                if hits == self._no_vals:
-                    lost_line_type = 1
-                if hits == 0:
-                    lost_line_type = 2
-
-                return position, lost_line_type
+                return _weighted_avg(raw_vals)
             else:
                 pass
         except Exception as e:
@@ -365,3 +335,45 @@ class EasyLineFollower(object):
 
     def read_position_str(self):
         return self.position_bw()
+
+    def _bivariate(self, raw_vals):
+        six_vals = [0] * self._no_vals
+        for i in range(self._no_vals):
+            if raw_vals[i] > self._threshold[i]:
+                six_vals[i] = 1
+            else:
+                six_vals[i] = 0
+        return six_vals
+
+    def _bivariate_str(self, raw_vals):
+        string_vals = ''.join(['b' if sensor_val == 0 else 'w' for sensor_val in raw_vals])
+        return string_vals
+
+    def _weighted_avg(self, raw_vals):
+        for i in range(self._no_vals):
+            try:
+                raw_vals[i] = (raw_vals[i] - self.black_calibration[i]) / (self.white_calibration[i] - self.black_calibration[i])
+            except ZeroDivisionError:
+                raw_vals[i] = 0.0
+            if raw_vals[i] < 0: raw_vals[i] = 0.0
+            if raw_vals[i] > 1: raw_vals[i] = 1.0
+            raw_vals[i] = 1.0 - raw_vals[i]
+        norm_vals = raw_vals
+
+        numerator = sum([i * norm_vals[i] for i in range(self._no_vals)])
+        denominator = float(sum(norm_vals))
+        try:
+            position = numerator / (denominator * (self._no_vals - 1))
+        except ZeroDivisionError:
+            position = 0.5
+        
+        hits = 0
+        lost_line_type = 0
+        for i in range(self._no_vals):
+            hits += 1 if raw_vals[i] > self._threshold[i] else 0
+        if hits == self._no_vals:
+            lost_line_type = 1
+        if hits == 0:
+            lost_line_type = 2
+
+        return position, lost_line_type
