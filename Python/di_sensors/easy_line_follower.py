@@ -229,17 +229,18 @@ class EasyLineFollower(object):
 
             elif representation == 'bivariate':
                 raw_vals = self.sensor.read_sensors()
-                return _bivariate(raw_vals)
+                return self._bivariate(raw_vals)
 
             elif representation == 'bivariate-str':
                 raw_vals = self.read('bivariate')
-                return _bivariate_str(raw_vals)
+                return self._bivariate_str(raw_vals)
 
             elif representation == 'weighted-avg':
                 raw_vals = self.sensor.read_sensors()
-                return _weighted_avg(raw_vals)
+                return self._weighted_avg(raw_vals)
             else:
                 pass
+
         except Exception as e:
             raise
         finally:
@@ -289,8 +290,6 @@ class EasyLineFollower(object):
 
         """
         return self._position(self.read('weighted-avg'))
-
-
 
     def position_val(self):
         """
