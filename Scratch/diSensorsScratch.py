@@ -46,7 +46,7 @@ def detect_light_color_sensor():
     try:
         # setting led_state to True just to give feedback to the user.
         scratch_lightcolor = easy_light_color_sensor.EasyLightColorSensor(led_state = True)
-        print("Light Color sensor is detected")
+        print("Light Color Sensor is detected")
     except:
         pass
 
