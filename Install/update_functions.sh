@@ -6,12 +6,13 @@ SCRIPT_TOOLS=$DEXTER_PATH/lib/Dexter/script_tools
 source $SCRIPT_TOOLS/functions_library.sh
 
 configure_line_follower(){
-  # Install GoPiGo Line Follower Calibration
+  # Install Line Follower Calibration
   if [ -d /home/pi/Desktop ]; then
     delete_file $PIHOME/Desktop/line_follow.desktop
-    sudo cp $PIHOME/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower/line_follow.desktop $PIHOME/Desktop/
-    sudo chmod +x $PIHOME/Desktop/line_follow.desktop
-    sudo chmod +x $PIHOME/Dexter/DI_Sensors/Python/di_sensors/red_line_follower/line_follower/line_sensor_gui.py
+    delete_file $PIHOME/Desktop/line_follower_calibration.desktop
+    sudo cp $PIHOME/$DEXTER/DI_Sensors/Python/di_sensors/line_follower_calibration/line_follower_calibration.desktop $PIHOME/Desktop/
+    sudo chmod +x $PIHOME/Desktop/line_follower_calibration.desktop
+    sudo chmod +x $PIHOME/Dexter/DI_Sensors/Python/di_sensors/line_sensor_calibration_gui.py
   fi
 
   # if the configuration files exist in the home directory

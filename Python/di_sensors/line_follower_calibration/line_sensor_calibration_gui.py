@@ -3,7 +3,7 @@
 try:
     import wx
 except ImportError:
-    raise ImportError,"The wxPython module is required to run this program"
+    raise (ImportError,"The wxPython module is required to run this program")
 
 from di_sensors import easy_line_follower
 
