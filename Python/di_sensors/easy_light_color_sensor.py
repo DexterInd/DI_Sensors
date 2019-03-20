@@ -44,21 +44,21 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     #: The 6 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
     #: method may return upon reading and interpreting a new set of color values.
     known_colors = {
-        "red":(255,0,0),
-        "green":(0,255,0),
-        "blue":(0,0,255),
-        "yellow":(255,255,0),
-        "cyan":(0,255,255),
-        "fuchsia":(255,0,255)
+        "red":     (255,0,0),
+        "green":   (0,255,0),
+        "blue":    (0,0,255),
+        "yellow":  (255,255,0),
+        "cyan":    (0,255,255),
+        "fuchsia": (255,0,255)
     }
 
     known_hsv = {
-        "red":(0,100,100),
-        "green":(120,100,100),
-        "blue":(240,100,100),
-        "yellow":(60,100,100),
-        "cyan":(180,100,100),
-        "fuchsia":(300,100,100)
+        "red":     (0,100,100),
+        "green":   (120,100,100),
+        "blue":    (240,100,100),
+        "yellow":  (60,100,100),
+        "cyan":    (180,100,100),
+        "fuchsia": (300,100,100)
     }
 
     def __init__(self, port="I2C", led_state = False, use_mutex=False):

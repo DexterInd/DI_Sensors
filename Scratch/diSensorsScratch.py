@@ -11,9 +11,17 @@ try:
 except:
     print("Cannot find light_color_sensor library")
 
-en_debug = 1
-scratch_lightcolor=None
+try: 
+    from di_sensors import easy_line_follower
+except:
+    print("Cannot find easy_line_follower library")
 
+en_debug = 1
+scratch_lightcolor = None
+scratch_linefollower = None
+
+
+# LIGHT COLOR SENSOR
 # possible commands are:
 # i2c color, i2c colour, color, colour
 # i2c rgb, rgb
@@ -25,7 +33,12 @@ scratch_lightcolor=None
 # group 4 = light
 regexlightcolor = "^\s*(i2c)?\s*((colou?r)|(rgb)|(light|lite))\s*$"
 
-regexdisensors = regexlightcolor
+
+# LINE FOLLOWER SENSOR
+regexlinefollower = "(^\s*(i2c)?\s*(line)\s*$)"
+
+# ALL SENSORS
+regexdisensors = "("+ regexlightcolor+")|(" + regexlinefollower + ")"
 compiled_disensors = re.compile(regexdisensors, re.IGNORECASE)
 
 def detect_light_color_sensor():
@@ -33,17 +46,28 @@ def detect_light_color_sensor():
     try:
         # setting led_state to True just to give feedback to the user.
         scratch_lightcolor = easy_light_color_sensor.EasyLightColorSensor(led_state = True)
-        print("Light Color sensor detected")
-        lightcolor_name = "Light Color Sensor"  # used for dictionary key in the return value
+        print("Light Color Sensor is detected")
     except:
         pass
 
+def detect_line_follower():
+    # force line follower to I2C port for now
+    global scratch_linefollower
+    try:
+        scratch_linefollower = easy_line_follower.EasyLineFollower()
+        print("Line Follower is detected")
+    except:
+        pass
+
+def detect_all():
+    detect_light_color_sensor()
+    detect_line_follower()
 
 def isDiSensorsMsg(msg):
     '''
-    Is the msg supposed to be handled by Light Color Sensor?
+    Is the msg supposed to be handled by Light Color Sensor or the Line Follower?
     Return: Boolean 
-        True if valid for Light Color
+        True if valid for Light Color or Line Follower
         False otherwise
     '''
     retval = compiled_disensors.match(msg)
@@ -74,17 +98,21 @@ def handleDiSensors(msg):
             print ("matching done")
     
     if regObj:
-        # print (regObj.groups())
-        port = regObj.group(1)  # port goes from 0 to 3 from now on
+        print (regObj.groups())
+
+        # handling a light color sensor
+        port = regObj.group(1)  # port nb goes from 0 to 3 from now on
         # print("Port is %s" % port)
 
         # which method of the light color sensor is requested
         color_cmd = regObj.group(3)
         rgb_cmd = regObj.group(4)
         light_cmd = regObj.group(5)
-        # print(color_cmd, rgb_cmd, light_cmd)
+        line_cmd = regObj.group(7)
+        print(color_cmd, rgb_cmd, light_cmd, line_cmd)
+
     else:
-        print( "%s: unknown regex error" % (lightcolor_name))
+        print( "DI Sensors: unknown regex error ")
         return None
 
     retdict = {}
@@ -100,19 +128,19 @@ def handleDiSensors(msg):
                 color = scratch_lightcolor.safe_raw_colors()
                 if color != [-1,-1,-1,-1]:
                     retdict["color"] = scratch_lightcolor.guess_color_hsv(color)[0]
-                    retdict["color_error"] = ""
+                    retdict["color status"] = ""
                 else:
                     # sensor got disconnected
                     retdict["color"] = "unknown"
                     scratch_lightcolor = None
-                    retdict["color_error"] = "sensor not found"
+                    retdict["color status"] = "sensor not found"
             except Exception as e:
                 print("color_cmd failed: ",e)
                 retdict["color"] = "unknown"
                 scratch_lightcolor = None
-                retdict["color_error"] = "sensor not found"
+                retdict["color status"] = "sensor not found"
         else:
-            retdict["color_error"] = "sensor not found"
+            retdict["color status"] = "sensor not found"
 
 
     elif rgb_cmd != None:
@@ -127,19 +155,19 @@ def handleDiSensors(msg):
                     # sensor got disconnected
                     red, green, blue = [-1,-1,-1]
                     scratch_lightcolor = None
-                    retdict["rgb_error"] = ""
+                    retdict["rgb status"] = ""
             except Exception as e:
                 print("rgb_cmd failed: ",e)
                 red, green, blue = [-1,-1,-1]
                 scratch_lightcolor = None
-                retdict["rgb_error"] = "sensor not found"
+                retdict["rgb status"] = "sensor not found"
 
             # print(red, green, blue)
-            retdict["rgb_red"] = red
-            retdict["rgb_green"] = green
-            retdict["rgb_blue"] = blue
+            retdict["rgb red"] = red
+            retdict["rgb green"] = green
+            retdict["rgb blue"] = blue
         else:
-            retdict["rgb_error"] = "sensor not found"
+            retdict["rgb status"] = "sensor not found"
 
     elif light_cmd != None:
         # detecting the light color sensor as needed allows for hotplugging
@@ -153,18 +181,39 @@ def handleDiSensors(msg):
                 scratch_lightcolor.set_led(True)
                 if a != -1:
                     retdict["light"]= int(a*100)  # return as a percent value
-                    retdict["light_error"] = ""
+                    retdict["light status"] = "ok"
                 else:
                     # sensor got disconnected
                     retdict["light"]=int(a)
                     scratch_lightcolor = None
-                    retdict["light_error"] = "sensor not found"
+                    retdict["light status"] = "sensor not found"
             except Exception as e:
                 print("light_cmd failed: ", e)
                 scratch_lightcolor = None
-                retdict["light_error"] = "sensor not found"
+                retdict["light status"] = "sensor not found"
         else:
-            retdict["light_error"] = "sensor not found"
+            retdict["light status"] = "sensor not found"
+
+    elif line_cmd != None:
+        # print("Found line follower cmd")
+        if not scratch_linefollower:
+            detect_line_follower()
+
+        if scratch_linefollower:
+            line_values = scratch_linefollower.read()
+            estimated_position, lost_line = scratch_linefollower._weighted_avg(line_values)
+            retdict["LINE position"] = scratch_linefollower._position(estimated_position, lost_line )
+            retdict["line sensors bw"] = scratch_linefollower._bivariate_str(line_values)
+            retdict["line sensor 1"] = line_values[0]
+            retdict["line sensor 2"] = line_values[1]
+            retdict["line sensor 3"] = line_values[2]
+            retdict["line sensor 4"] = line_values[3]
+            retdict["line sensor 5"] = line_values[4]
+            if len(line_values) == 6:
+                retdict["line sensor 6"] = line_values[5]
+            retdict["LINE status"] = "ok"
+        else:
+            retdict["LINE status"] = "line follower not found"
 
     return (retdict)
 
@@ -185,19 +234,19 @@ if __name__ == '__main__':
         try:
             s = scratch.Scratch()
             if s.connected:
-                print ("Light Color Scratch: Connected to Scratch successfully")
+                print ("DI Sensors Scratch: Connected to Scratch successfully")
             connected = 1	# We are succesfully connected!  Exit Away!
             # time.sleep(1)
         
         except scratch.ScratchError:
             arbitrary_delay = 10 # no need to issue error statement if at least 10 seconds haven't gone by.
             if (time.time() - startTime > arbitrary_delay):  
-                print ("Light Color Scratch: Scratch is either not opened or remote sensor connections aren't enabled")
+                print ("DI Sensors Scratch: Scratch is either not opened or remote sensor connections aren't enabled")
 
     try:
         s.broadcast('READY')
     except NameError:
-        print ("Light Color Scratch: Unable to Broadcast")
+        print ("DI Sensors Scratch: Unable to Broadcast")
 
 
     while True:
@@ -211,25 +260,26 @@ if __name__ == '__main__':
             if en_debug:
                 print("Rx:{}".format(msg))
          
-            sensors = handleDiSensors(msg)
-            if sensors != None:
-                s.sensorupdate(sensors)
+            if isDiSensorsMsg(msg):
+                sensors = handleDiSensors(msg)
+                if sensors != None:
+                    s.sensorupdate(sensors)
                 
         except KeyboardInterrupt:
             running= False
-            print ("Light Color Scratch: Disconnected from Scratch")
+            print ("DI Sensors Scratch: Disconnected from Scratch")
             break
         except (scratch.scratch.ScratchConnectionError,NameError) as e:
             while True:
                 #thread1.join(0)
-                print ("Light Color Scratch: Scratch connection error, Retrying")
+                print ("DI Sensors Scratch: Scratch connection error, Retrying")
                 time.sleep(5)
                 try:
                     s = scratch.Scratch()
                     s.broadcast('READY')
-                    print ("Light Color Scratch: Connected to Scratch successfully")
+                    print ("DI Sensors Scratch: Connected to Scratch successfully")
                     break
                 except scratch.ScratchError:
-                    print ("Light Color Scratch: Scratch is either not opened or remote sensor connections aren't enabled\n..............................\n")
+                    print ("DI Sensors Scratch: Scratch is either not opened or remote sensor connections aren't enabled\n..............................\n")
         except Exception as e:
-            print ("Light Color Scratch: Error %s" % e	)
+            print ("DI Sensors Scratch: Error %s" % e	)
