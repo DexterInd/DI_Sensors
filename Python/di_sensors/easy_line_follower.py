@@ -211,8 +211,10 @@ class EasyLineFollower(object):
             Returns a 2-element tuple. The first element is an estimated position of the line. 
             
             The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used), 
-            so that if the black line is on the left of the line follower, the returned value will be in the **0.0-0.5** range and if it's on the right, 
-            it's in the **0.5-1.0** range, thus making **0.5** the center point of the black line. Keep in mind that the sensor's orientation is determined by the order
+            so that if the black line is on the left of the line follower, the returned value will be in the **0.0-0.5** range and 
+            if it's on the right, it's in the **0.5-1.0** range, 
+            thus making **0.5** the center point of the black line. 
+            Keep in mind that the sensor's orientation is determined by the order
             of the returned sensor values and not by how the sensor is positioned on the robot. 
             Check :py:meth:`~di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`~di_sensors.line_follower.LineFollowerRed.read_sensors` methods to see
             how the values are returned. 
@@ -297,8 +299,12 @@ class EasyLineFollower(object):
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("weighted-avg")``.
 
         :rtype: int 
-        :returns: Range is between **0** and **10**. For **<5**, the black line is on the right of the line follower, otherwise it's on the left. 
-            **5** suggests the black line is in the middle. It can also return **20** if it's all black, or **30** for only white.
+        :returns: Range is between **0** and **30**. 
+            When following a line the values will be between 0 and 10.
+            For values smaller than **5**, the black line is on the left of the robot, 
+            and for values bigger than **5** but no more than **10** the line is to the right. 
+            **5** suggests the black line is in the middle. 
+            It can also return **20** if it's all black, or **30** for all white.
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         weights = self.read(representation="weighted-avg") 
