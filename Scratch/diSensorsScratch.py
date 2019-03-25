@@ -94,11 +94,11 @@ def handleDiSensors(msg):
         print ("DI Sensors: Command %s is not recognized" % (msg))
         return None
     else:
-        if en_debug:
-            print ("matching done")
+        # if en_debug:
+            # print ("matching done")
     
-    if regObj:
-        print (regObj.groups())
+    # if regObj:
+    #     print (regObj.groups())
 
         # handling a light color sensor
         port = regObj.group(1)  # port nb goes from 0 to 3 from now on
@@ -202,8 +202,9 @@ def handleDiSensors(msg):
         if scratch_linefollower:
             line_values = scratch_linefollower.read()
             estimated_position, lost_line = scratch_linefollower._weighted_avg(line_values)
-            retdict["LINE position"] = scratch_linefollower._position(estimated_position, lost_line )
+            retdict["line position"] = scratch_linefollower._position(estimated_position, lost_line )
             retdict["line sensors bw"] = scratch_linefollower._bivariate_str(line_values)
+            retdict["line number"] = scratch_linefollower.position_val()
             retdict["line sensor 1"] = line_values[0]
             retdict["line sensor 2"] = line_values[1]
             retdict["line sensor 3"] = line_values[2]
@@ -211,9 +212,9 @@ def handleDiSensors(msg):
             retdict["line sensor 5"] = line_values[4]
             if len(line_values) == 6:
                 retdict["line sensor 6"] = line_values[5]
-            retdict["LINE status"] = "ok"
+            retdict["line status"] = "ok"
         else:
-            retdict["LINE status"] = "line follower not found"
+            retdict["line status"] = "line follower not found"
 
     return (retdict)
 
