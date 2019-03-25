@@ -296,13 +296,13 @@ class EasyLineFollower(object):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("weighted-avg")``.
 
-        :rtype: float/int ie float (for 0->1) or int (for 2 or 3)
-        :returns: Range is between **0.0** and **1.0**. For **<0.5**, the black line is on the right of the line follower, otherwise it's on the left. 
-            **0.5** suggests the black line is in the middle. It can also return **2** if it's all black, or **3** for only white.
+        :rtype: int 
+        :returns: Range is between **0** and **10**. For **<5**, the black line is on the right of the line follower, otherwise it's on the left. 
+            **5** suggests the black line is in the middle. It can also return **20** if it's all black, or **30** for only white.
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         weights = self.read(representation="weighted-avg") 
-        return weights[0] if weights[1] == 0 else weights[1] + 1
+        return round(weights[0]*10,0) if weights[1] == 0 else round(weights[1] + 1,0)*10
 
     def get_white_calibration(self):
         self.set_calibration('white')
