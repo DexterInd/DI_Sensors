@@ -97,7 +97,7 @@ def handleDiSensors(msg):
         # if en_debug:
             # print ("matching done")
     
-    # if regObj:
+    if regObj:
     #     print (regObj.groups())
 
         # handling a light color sensor
