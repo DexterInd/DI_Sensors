@@ -93,7 +93,7 @@ def handleDiSensors(msg):
     if regObj == None:
         print ("DI Sensors: Command %s is not recognized" % (msg))
         return None
-    else:
+    # else:
         # if en_debug:
             # print ("matching done")
     
