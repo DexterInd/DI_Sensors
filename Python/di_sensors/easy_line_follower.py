@@ -308,7 +308,7 @@ class EasyLineFollower(object):
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         weights = self.read(representation="weighted-avg") 
-        return round(weights[0]*10,0) if weights[1] == 0 else round(weights[1] + 1,0)*10
+        return round(weights[0] * 10, 0) if weights[1] == 0 else round(weights[1] + 1, 0) * 10
 
     def get_white_calibration(self):
         self.set_calibration('white')
