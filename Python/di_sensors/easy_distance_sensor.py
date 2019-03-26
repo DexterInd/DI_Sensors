@@ -55,7 +55,8 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         try:
             distance_sensor.DistanceSensor.__init__(self, bus=bus)
         except Exception as e:
-            print("Distance Sensor init: {}".format(e))
+            # remove print so that it doesn't show when starting Scratch
+            # print("Distance Sensor init: {}".format(e))
             raise
         finally:
              ifMutexRelease(self.use_mutex)
