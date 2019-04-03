@@ -217,7 +217,7 @@ def handleDiSensors(msg):
             else:
                 retdict["line status"] = "line follower not found"
         except Exception as e:
-            retdict["line status"] = e
+            retdict["line status"] = str(e)
 
     return (retdict)
 
