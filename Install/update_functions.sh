@@ -12,7 +12,7 @@ configure_line_follower(){
     delete_file $PIHOME/Desktop/line_follower_calibration.desktop
     sudo cp $PIHOME/$DEXTER/DI_Sensors/Python/di_sensors/line_follower_calibration/line_follower_calibration.desktop $PIHOME/Desktop/
     sudo chmod +x $PIHOME/Desktop/line_follower_calibration.desktop
-    sudo chmod +x $PIHOME/Dexter/DI_Sensors/Python/di_sensors/line_sensor_calibration_gui.py
+    sudo chmod +x $PIHOME/Dexter/DI_Sensors/Python/di_sensors/line_follower_calibration/line_sensor_calibration_gui.py
   fi
 
   # if the configuration files exist in the home directory
