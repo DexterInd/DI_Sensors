@@ -199,22 +199,25 @@ def handleDiSensors(msg):
         if not scratch_linefollower:
             detect_line_follower()
 
-        if scratch_linefollower:
-            line_values = scratch_linefollower.read()
-            estimated_position, lost_line = scratch_linefollower._weighted_avg(line_values)
-            retdict["line position"] = scratch_linefollower._position(estimated_position, lost_line )
-            retdict["line sensors bw"] = scratch_linefollower._bivariate_str(line_values)
-            retdict["line number"] = scratch_linefollower.position_val()
-            retdict["line sensor 1"] = line_values[0]
-            retdict["line sensor 2"] = line_values[1]
-            retdict["line sensor 3"] = line_values[2]
-            retdict["line sensor 4"] = line_values[3]
-            retdict["line sensor 5"] = line_values[4]
-            if len(line_values) == 6:
-                retdict["line sensor 6"] = line_values[5]
-            retdict["line status"] = "ok"
-        else:
-            retdict["line status"] = "line follower not found"
+        try:
+            if scratch_linefollower:
+                line_values = scratch_linefollower.read()
+                estimated_position, lost_line = scratch_linefollower._weighted_avg(line_values)
+                retdict["line position"] = scratch_linefollower._position(estimated_position, lost_line )
+                retdict["line sensors bw"] = scratch_linefollower._bivariate_str(line_values)
+                retdict["line number"] = scratch_linefollower.position_val()
+                retdict["line sensor 1"] = line_values[0]
+                retdict["line sensor 2"] = line_values[1]
+                retdict["line sensor 3"] = line_values[2]
+                retdict["line sensor 4"] = line_values[3]
+                retdict["line sensor 5"] = line_values[4]
+                if len(line_values) == 6:
+                    retdict["line sensor 6"] = line_values[5]
+                retdict["line status"] = "ok"
+            else:
+                retdict["line status"] = "line follower not found"
+        except Exception as e:
+            retdict["line status"] = e
 
     return (retdict)
 
