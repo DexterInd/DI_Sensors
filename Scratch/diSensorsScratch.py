@@ -98,7 +98,7 @@ def handleDiSensors(msg):
             # print ("matching done")
     
     if regObj:
-        print (regObj.groups())
+    #     print (regObj.groups())
 
         # handling a light color sensor
         port = regObj.group(1)  # port nb goes from 0 to 3 from now on
@@ -151,7 +151,6 @@ def handleDiSensors(msg):
             # print ("Query rgb values")
             try:
                 red, green, blue = scratch_lightcolor.safe_rgb()
-                print(red,green,blue)
                 if red != -1 and green != -1 and blue != -1:
                     retdict["rgb status"] = "ok"
             except Exception as e:
