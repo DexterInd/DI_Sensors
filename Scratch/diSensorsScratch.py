@@ -105,9 +105,9 @@ def handleDiSensors(msg):
         # print("Port is %s" % port)
 
         # which method of the light color sensor is requested
-        color_cmd = regObj.group(3)
-        rgb_cmd = regObj.group(4)
-        light_cmd = regObj.group(5)
+        color_cmd = regObj.group(4)
+        rgb_cmd = regObj.group(5)
+        light_cmd = regObj.group(6)
         line_cmd = regObj.group(7)
         print(color_cmd, rgb_cmd, light_cmd, line_cmd)
 
@@ -152,10 +152,7 @@ def handleDiSensors(msg):
             try:
                 red, green, blue = scratch_lightcolor.safe_rgb()
                 if red != -1 and green != -1 and blue != -1:
-                    # sensor got disconnected
-                    red, green, blue = [-1,-1,-1]
-                    scratch_lightcolor = None
-                    retdict["rgb status"] = ""
+                    retdict["rgb status"] = "ok"
             except Exception as e:
                 print("rgb_cmd failed: ",e)
                 red, green, blue = [-1,-1,-1]
@@ -177,6 +174,7 @@ def handleDiSensors(msg):
             try:
                 # print("Query light value")
                 scratch_lightcolor.set_led(False, True)
+                time.sleep(0.01)
                 _,_,_,a = scratch_lightcolor.safe_raw_colors()
                 scratch_lightcolor.set_led(True)
                 if a != -1:
@@ -215,9 +213,9 @@ def handleDiSensors(msg):
                     retdict["line sensor 6"] = line_values[5]
                 retdict["line status"] = "ok"
             else:
-                retdict["line status"] = "line follower not found"
+                retdict["line status"] = "Oops! Could not find the line follower"
         except Exception as e:
-            retdict["line status"] = str(e)
+            retdict["line status"] = "Oops! Could not read the line follower: " + str(e)
 
     return (retdict)
 
