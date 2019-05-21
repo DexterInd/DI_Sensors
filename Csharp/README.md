@@ -1,6 +1,6 @@
 # .NET Core IoT implementation for Dexter Industries Sensors
 
-You will find a full implantation of  Dexter Industries Sensors on [.NET Core IoT repository](https://github.com/dotnet/iot). You will be able to program GoPiGo using C#. The full documentation and example is located into the main repository.
+You will find a full implantation of  Dexter Industries Sensors on [.NET Core IoT repository](https://github.com/dotnet/iot). You will be able to program GoPiGo, GrovePi, and BrickPi using C#. The full documentation and example is located into the main repository.
 
 .NET Core is open source. .NET Core is best thought of as 'agile .NET'. Generally speaking it is the same as the Desktop .NET Framework distributed as part of the Windows operating system, but it is a cross platform (Windows, Linux, macOS) and cross architecture (x86, x64, ARM) subset that can be deployed as part of the application (if desired), and thus can be updated quickly to fix bugs or add features. It is a perfect fit for boards like Raspberry running Raspbian. Check the [.NET Core IoT documentation](https://github.com/dotnet/iot/tree/master/Documentation) if you are not familiar with .NET Core.
 
