@@ -279,16 +279,16 @@ def handleDiSensors(msg):
             if temp_cmd or thp_cmd :
                 ''' temperature sensor'''
                 dilogger.debug("temperature sensor")
-                retdict["Temperature (C)"] = scratch_thp.safe_celsius()
-                retdict["Temperature (F)"] = scratch_thp.safe_fahrenheit()
+                retdict["temperature (C)"] = scratch_thp.safe_celsius()
+                retdict["temperature (F)"] = scratch_thp.safe_fahrenheit()
 
             if pressure_cmd or thp_cmd:
                 ''' pressure sensor '''
-                retdict["Pressure (Pa)"] = scratch_thp.safe_pressure()
+                retdict["pressure (Pa)"] = scratch_thp.safe_pressure()
 
             if humidity_cmd or thp_cmd:
                 ''' humidity sensor '''
-                retdict["Humidity (%)"] = scratch_thp.safe_humidity()
+                retdict["humidity (%)"] = scratch_thp.safe_humidity()
 
             retdict["THP Status"] = "ok"
 
