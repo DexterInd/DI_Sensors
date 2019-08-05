@@ -21,6 +21,6 @@ my_sensor = EasyDistanceSensor()
 # and read the sensor iteratively
 while True:
   read_distance = my_sensor.read()
-  print("distance from object: {} mm".format(read_distance))
+  print("distance from object: {} cm".format(read_distance))
 
   sleep(0.1)
