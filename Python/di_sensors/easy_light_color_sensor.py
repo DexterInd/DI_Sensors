@@ -72,7 +72,6 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         :param str port = "I2C": The port to which the distance sensor is connected to. Can also be connected to ports ``"AD1"`` or ``"AD2"`` of the `GoPiGo3`_. If you're passing an **invalid port**, then the sensor resorts to an ``"I2C"`` connection. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned off.
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
-        
         :raises ~exceptions.OSError: When the `Light Color Sensor`_ is not reachable.
         :raises ~exceptions.RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `Light Color Sensor`_.
         """
@@ -110,9 +109,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         Standard algorithm to switch from one color system (**RGB**) to another (**HSV**).
         
         :param tuple(float,float,float) in_color: The RGB tuple list that gets translated to HSV system. The values of each element of the tuple is between **0** and **1**.
-        
         :return: The translated HSV tuple list. Returned values are *H(0-360)*, *S(0-100)*, *V(0-100)*.
-        
         :rtype: tuple(int, int, int)
         
         .. important::
@@ -155,7 +152,6 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         The colors detected vary depending on the lighting conditions of the nearby environment.
         
         :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**. **-1** means an error occured.
-        
         :rtype: tuple(float,float,float,float)
         """
         ifMutexAcquire(self.use_mutex)
@@ -174,7 +170,6 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         Detect the RGB color off of the `Light Color Sensor`_.
         
         :returns: The RGB color in 8-bit format.
-        
         :rtype: tuple(int,int,int)
         """
         colors = self.safe_raw_colors()
@@ -211,9 +206,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         It does work exactly the same as KNN (K-Nearest-Neighbors) algorithm, where `K = 1`.
         
         :param tuple(float,float,float,float) in_color: A 4-element tuple list for the *Red*, *Green*, *Blue* and *Alpha* channels. The elements are all valued between **0** and **1**.
-        
         :returns: The detected color in string format and then a 3-element tuple describing the color in RGB format. The values of the RGB tuple are between **0** and **1**.
-        
         :rtype: tuple(str,(float,float,float))
         
         .. important::
