@@ -40,10 +40,8 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     object to be accessed simultaneously from multiple threads/processes.
     Apart from this difference, there may also be functions that are more user-friendly than the latter.
     """
-
-    # lJM: I've added <black> and <white> back in to these lists as I have a different way of dealing with them
     
-    #: The 6 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
+    #: The 8 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
     #: method may return upon reading and interpreting a new set of color values.
     known_colors = {
         "black":   (0,0,0),
