@@ -21,7 +21,7 @@ ICON_PATH = "/".join( (PIHOME, DEXTER,"lib",DEXTER, RFR_TOOLS, "icons")  )+"/"
 class MainPanel(wx.Panel):
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
-        self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
+        # self.SetBackgroundStyle(wx.BG_STYLE_CUSTOM)
         self.SetBackgroundColour(wx.WHITE)
         self.frame = parent
 
@@ -58,7 +58,7 @@ class MainPanel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.white_line_set_button_OnButtonClick, self.white_line_set_button)
         buttonSizer.Add(self.white_line_set_button,0)
         buttonSizer.AddSpacer(10)
-        
+
         self.line_position_set_button = wx.Button(self, -1, label="Read Line Position")
         self.Bind(wx.EVT_BUTTON, self.line_position_set_button_OnButtonClick, self.line_position_set_button)
         buttonSizer.Add(self.line_position_set_button, 0)
@@ -71,7 +71,7 @@ class MainPanel(wx.Panel):
         # Set up labels: This is where the output of sensor readings will be printed.
         self.label = wx.StaticText(self,-1,label=u'  ')	# Prints line sensor information out.
         vSizer.Add( self.label )
-        
+
                 # Exit
         self.exit_button = wx.Button(self, label="Exit")
         self.exit_button.Bind(wx.EVT_BUTTON, self.onClose)
@@ -121,7 +121,9 @@ class MainFrame(wx.Frame):
 
         wx.Icon(ICON_PATH+'favicon.ico', wx.BITMAP_TYPE_ICO)
         wx.Log.SetVerbose(False)
-        wx.Frame.__init__(self, None, title="Line Follower Calibration", size=(530,600))		# Set the fram size
+
+        # Set the frame size
+        wx.Frame.__init__(self, None, title="Line Follower Calibration", size=(630,600))
         panel = MainPanel(self)
         self.Center()
 
