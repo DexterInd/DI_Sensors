@@ -4,12 +4,16 @@
 Using the Line Follower
 #######################
 
+******************
+Reading the Sensor
+******************
+
 In order to run this example program, we need to have a `GoPiGo3`_ because bus ``"GPG3_AD1"`` is used in this case and it's specific to the `GoPiGo3`_ platform.
-The ``"GPG3_AD1"`` bus translates to port ``"AD1"`` on the GoPiGo3, so the `IMU Sensor`_ has to be connected to port ``"AD1"``.
+The ``"GPG3_AD1"`` bus translates to port ``"AD1"`` on the GoPiGo3, so the `Line Follower Sensor`_ has to be connected to port ``"AD1"``.
 
 The default ``"RPI_1SW"`` bus could have been used, but since this is an example, let's do it with a `GoPiGo3`_.
 
-This is the exact same scenarion as the one in :ref:`IMU sensor example <examples-imu-sensor>`.
+This is the exact same scenario as the one in :ref:`IMU sensor example <examples-imu-sensor>`.
 
 The source file for this example program can be found `here on github <https://github.com/DexterInd/DI_Sensors/blob/master/Python/Examples/LineFollower.py>`__.
 
@@ -53,6 +57,41 @@ The console output of this script should look like:
     0.061 0.298 0.331 0.096 0.109 0.117
     0.275 0.239 0.102 0.112 0.144 0.170
 
+
+******************************
+Basic Line Follower Controller
+******************************
+
+The simplest way to make the GoPiGo3 follow a line with the `Line Follower Sensor`_ is by having a controller that can output 3 different states: one for the **left**, one for the **center** when it's properly aligned and another one for the **right**.
+When the line that the robot is following is on the left side, then command the robot to go to the left, otherwise go to the right.
+
+That simple! Now, let's see how that code looks like. The following example was done for the GoPiGo3 but it can easily be adapted for any other robot that has motors.
+
+.. code-block:: python
+
+    import easygopigo3 as easy
+    from di_sensors.easy_line_follower import EasyLineFollower
+
+    gpg = easy.EasyGoPiGo3()
+    my_linefollower = EasyLineFollower()
+
+    gpg.forward()
+    while not  my_linefollower.position() == "black":
+        line_pos = my_linefollower.position()
+        if line_pos == 'center':
+            gpg.forward()
+        elif line_pos == 'left':
+            gpg.left()
+        elif line_pos == 'right':
+            gpg.right()
+    gpg.stop()
+
+
+When running this in reality, the result is going to be choppy, so if you need a better control of the robot's trajectory, go on and check the next section.
+
+********************
+PID-Based Controller
+********************
 
 Also, doing something more advanced with the line follower is possible by using the :py:class:`~di_sensors.easy_line_follower.EasyLineFollower` class. With an object of such type,
 a estimated position of the black line can be returned and then feed this estimate into a PID controller. Consequently, a robot (such as the GoPiGo3) can be precisely controlled.
@@ -100,7 +139,7 @@ a estimated position of the black line can be returned and then feed this estima
 With something like the above code, you can make a pretty reliable control system for the line follower. 
 
 
-.. _imu sensor: https://www.dexterindustries.com/shop/imu-sensor/
+.. _line follower sensor: https://www.dexterindustries.com/shop/line-follower-sensor
 .. _gopigo3: https://www.dexterindustries.com/gopigo3/
 .. _grovepi: https://www.dexterindustries.com/grovepi/
 .. _brickpi3: https://www.dexterindustries.com/brickpi/

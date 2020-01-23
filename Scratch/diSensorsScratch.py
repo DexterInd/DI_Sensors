@@ -5,20 +5,29 @@ from __future__ import division
 import time
 import re
 import sys
+import logging
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+dilogger = logging.getLogger("Sensors")
 
 try:
     from di_sensors import easy_light_color_sensor
 except:
-    print("Cannot find light_color_sensor library")
+    dilogger.debug("Cannot find light_color_sensor library")
 
 try: 
     from di_sensors import easy_line_follower
 except:
-    print("Cannot find easy_line_follower library")
+    dilogger.debug("Cannot find easy_line_follower library")
 
-en_debug = 1
+try: 
+    from di_sensors import easy_temp_hum_press
+except:
+    dilogger.debug("Cannot find easy_temp_hum_press library")
+
 scratch_lightcolor = None
 scratch_linefollower = None
+scratch_thp = None
 
 
 # LIGHT COLOR SENSOR
@@ -37,8 +46,15 @@ regexlightcolor = "^\s*(i2c)?\s*((colou?r)|(rgb)|(light|lite))\s*$"
 # LINE FOLLOWER SENSOR
 regexlinefollower = "(^\s*(i2c)?\s*(line)\s*$)"
 
+# THP SENSOR
+regexthp = "(^\s*(i2c)?\s*(temp)|(pressure)|(humidity)|(thp)\s*$)"
+
 # ALL SENSORS
-regexdisensors = "("+ regexlightcolor+")|(" + regexlinefollower + ")"
+regexdisensors = "(" + \
+                 regexlightcolor + ")|(" + \
+                 regexlinefollower + ")|(" + \
+                 regexthp + ")"
+
 compiled_disensors = re.compile(regexdisensors, re.IGNORECASE)
 
 def detect_light_color_sensor():
@@ -46,22 +62,53 @@ def detect_light_color_sensor():
     try:
         # setting led_state to True just to give feedback to the user.
         scratch_lightcolor = easy_light_color_sensor.EasyLightColorSensor(led_state = True)
-        print("Light Color Sensor is detected")
+        dilogger.info("Light Color Sensor is detected")
+        try:
+            ''' attempt to broadcast commands'''
+            s.broadcast('color')
+            s.broadcast('rgb')
+            s.broadcast('light')
+        except:
+            ''' no big deal at this stage '''
+            pass
     except:
-        pass
+        dilogger.debug("Light Color Sensor not found")
 
 def detect_line_follower():
     # force line follower to I2C port for now
     global scratch_linefollower
     try:
         scratch_linefollower = easy_line_follower.EasyLineFollower()
-        print("Line Follower is detected")
+        dilogger.info("Line Follower is detected")
+        try:
+            s.broadcast('line')
+        except:
+            pass
     except:
+        dilogger.debug("Line Follower not found")
+
+def detect_thp():
+    # force THP sensor to I2C port for now
+    global scratch_thp
+    try:
+        scratch_thp = easy_temp_hum_press.EasyTHPSensor()
+        dilogger.info("THP is detected")
+        try:
+            s.broadcast('temp')
+            s.broadcast('humidity')
+            s.broadcast('pressure')
+            s.broadcast('thp')
+        except:
+            pass
+    except Exception as e:
+        dilogger.debug("THP not found")
+        dilogger.debug(e)
         pass
 
 def detect_all():
     detect_light_color_sensor()
     detect_line_follower()
+    detect_thp()
 
 def isDiSensorsMsg(msg):
     '''
@@ -84,35 +131,41 @@ def handleDiSensors(msg):
     Use regex to validate it and take it apart
     '''
     global scratch_lightcolor
-    if en_debug:
-        print ("handleDiSensors Rx: {}".format(msg))
+    dilogger.debug ("handleDiSensors Rx: {}".format(msg))
     
     retdict = {}
     
     regObj = compiled_disensors.match(msg)
     if regObj == None:
-        print ("DI Sensors: Command %s is not recognized" % (msg))
+        dilogger.info ("DI Sensors: Command %s is not recognized" % (msg))
         return None
-    # else:
-        # if en_debug:
-            # print ("matching done")
+    else:
+        dilogger.debug ("matching done")
     
     if regObj:
-    #     print (regObj.groups())
+        dilogger.debug (regObj.groups())
 
         # handling a light color sensor
         port = regObj.group(1)  # port nb goes from 0 to 3 from now on
-        # print("Port is %s" % port)
+        dilogger.debug("Port is %s" % port)
 
         # which method of the light color sensor is requested
         color_cmd = regObj.group(4)
         rgb_cmd = regObj.group(5)
         light_cmd = regObj.group(6)
         line_cmd = regObj.group(7)
+        temp_cmd = regObj.group(14)
+        pressure_cmd = regObj.group(15)
+        humidity_cmd = regObj.group(16)
+        thp_cmd = regObj.group(17)
+
+        # don't use logger here as many of the arguments are None
+        # and it crashes the logger
         print(color_cmd, rgb_cmd, light_cmd, line_cmd)
+        print(temp_cmd, pressure_cmd, humidity_cmd, thp_cmd)
 
     else:
-        print( "DI Sensors: unknown regex error ")
+        dilogger.info( "DI Sensors: unknown regex error ")
         return None
 
     retdict = {}
@@ -122,7 +175,7 @@ def handleDiSensors(msg):
         if scratch_lightcolor == None:
             detect_light_color_sensor()
         if scratch_lightcolor != None:
-            # print("Query color command")
+            dilogger.debug("Query color command")
             try:
                 scratch_lightcolor.set_led(True)
                 color = scratch_lightcolor.safe_raw_colors()
@@ -135,7 +188,7 @@ def handleDiSensors(msg):
                     scratch_lightcolor = None
                     retdict["color status"] = "sensor not found"
             except Exception as e:
-                print("color_cmd failed: ",e)
+                dilogger.info("color_cmd failed: ",e)
                 retdict["color"] = "unknown"
                 scratch_lightcolor = None
                 retdict["color status"] = "sensor not found"
@@ -148,18 +201,18 @@ def handleDiSensors(msg):
         if scratch_lightcolor == None:
             detect_light_color_sensor()
         if scratch_lightcolor != None:
-            # print ("Query rgb values")
+            dilogger.debug ("Query rgb values")
             try:
                 red, green, blue = scratch_lightcolor.safe_rgb()
                 if red != -1 and green != -1 and blue != -1:
                     retdict["rgb status"] = "ok"
             except Exception as e:
-                print("rgb_cmd failed: ",e)
+                dilogger.info("rgb_cmd failed ")
+                dilogger.info(str(e))
                 red, green, blue = [-1,-1,-1]
                 scratch_lightcolor = None
                 retdict["rgb status"] = "sensor not found"
 
-            # print(red, green, blue)
             retdict["rgb red"] = red
             retdict["rgb green"] = green
             retdict["rgb blue"] = blue
@@ -172,7 +225,7 @@ def handleDiSensors(msg):
             detect_light_color_sensor()
         if scratch_lightcolor != None:
             try:
-                # print("Query light value")
+                dilogger.debug("Query light value")
                 scratch_lightcolor.set_led(False, True)
                 time.sleep(0.01)
                 _,_,_,a = scratch_lightcolor.safe_raw_colors()
@@ -186,14 +239,14 @@ def handleDiSensors(msg):
                     scratch_lightcolor = None
                     retdict["light status"] = "sensor not found"
             except Exception as e:
-                print("light_cmd failed: ", e)
+                dilogger.info("light_cmd failed: " + str(e) )
                 scratch_lightcolor = None
                 retdict["light status"] = "sensor not found"
         else:
             retdict["light status"] = "sensor not found"
 
     elif line_cmd != None:
-        # print("Found line follower cmd")
+        dilogger.debug("Found line follower cmd")
         if not scratch_linefollower:
             detect_line_follower()
 
@@ -215,10 +268,44 @@ def handleDiSensors(msg):
             else:
                 retdict["line status"] = "Oops! Could not find the line follower"
         except Exception as e:
-            retdict["line status"] = "Oops! Could not read the line follower: " + str(e)
+            retdict["line status"] = "Oops! Could not read the line follower" 
+            dilogger.info(str(e) )
+
+    elif thp_cmd or temp_cmd or pressure_cmd or humidity_cmd:
+        ''' any THP cmd '''
+        try: 
+            if not scratch_thp:
+                detect_thp()
+            if temp_cmd or thp_cmd :
+                ''' temperature sensor'''
+                dilogger.debug("temperature sensor")
+                retdict["temperature (C)"] = scratch_thp.safe_celsius()
+                retdict["temperature (F)"] = scratch_thp.safe_fahrenheit()
+
+            if pressure_cmd or thp_cmd:
+                ''' pressure sensor '''
+                retdict["pressure (Pa)"] = scratch_thp.safe_pressure()
+
+            if humidity_cmd or thp_cmd:
+                ''' humidity sensor '''
+                retdict["humidity (%)"] = scratch_thp.safe_humidity()
+
+            retdict["THP Status"] = "ok"
+
+        except Exception as e:
+            retdict["THP Status"] = "Oops! Could not read the THP sensor" 
+            dilogger.info(str(e))
 
     return (retdict)
 
+def broadcast(in_str):
+    global s
+    if s == None:
+        s = scratch.Scratch()
+    try:
+        s.broadcast(in_str)
+    except:
+        dilogger.debug("failed broadcasting")
 
 # this is used when developing.
 # the light color sensor is not supported as a standalone in Scratch
@@ -239,6 +326,7 @@ if __name__ == '__main__':
                 print ("DI Sensors Scratch: Connected to Scratch successfully")
             connected = 1	# We are succesfully connected!  Exit Away!
             # time.sleep(1)
+            detect_all()
         
         except scratch.ScratchError:
             arbitrary_delay = 10 # no need to issue error statement if at least 10 seconds haven't gone by.
@@ -259,8 +347,7 @@ if __name__ == '__main__':
                 m = s.receive()
             
             msg = m[1]
-            if en_debug:
-                print("Rx:{}".format(msg))
+            dilogger.debug("Rx:{}".format(msg))
          
             if isDiSensorsMsg(msg):
                 sensors = handleDiSensors(msg)
@@ -269,19 +356,19 @@ if __name__ == '__main__':
                 
         except KeyboardInterrupt:
             running= False
-            print ("DI Sensors Scratch: Disconnected from Scratch")
+            dilogger.info ("DI Sensors Scratch: Disconnected from Scratch")
             break
         except (scratch.scratch.ScratchConnectionError,NameError) as e:
             while True:
                 #thread1.join(0)
-                print ("DI Sensors Scratch: Scratch connection error, Retrying")
+                dilogger.info ("DI Sensors Scratch: Scratch connection error, Retrying")
                 time.sleep(5)
                 try:
                     s = scratch.Scratch()
                     s.broadcast('READY')
-                    print ("DI Sensors Scratch: Connected to Scratch successfully")
+                    dilogger.info ("DI Sensors Scratch: Connected to Scratch successfully")
                     break
                 except scratch.ScratchError:
-                    print ("DI Sensors Scratch: Scratch is either not opened or remote sensor connections aren't enabled\n..............................\n")
+                    dilogger.info ("DI Sensors Scratch: Scratch is either not opened or remote sensor connections aren't enabled\n..............................\n")
         except Exception as e:
-            print ("DI Sensors Scratch: Error %s" % e	)
+            dilogger.info ("DI Sensors Scratch: Error %s" % e	)
