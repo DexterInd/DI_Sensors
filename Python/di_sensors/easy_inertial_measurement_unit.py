@@ -191,6 +191,25 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
             ifMutexRelease(self.use_mutex)
         return x,y,z
 
+    def safe_read_accelerometer(self):
+        """
+        Read the acceleration in 3 axes.
+
+        :returns: Tuple of x,y,z axes.
+        :rtype: (float,float,float)
+        :raises ~exceptions.OSError: When the sensor is not reachable.
+
+        """
+
+        ifMutexAcquire(self.use_mutex)
+        try:
+            x, y, z = self.read_accelerometer()
+        except Exception as e:
+            raise
+        finally:
+            ifMutexRelease(self.use_mutex)
+        return x,y,z
+
     def safe_read_magnetometer(self):
         """
         Read the magnetometer values.
@@ -206,6 +225,27 @@ class EasyIMUSensor(inertial_measurement_unit.InertialMeasurementUnit):
         ifMutexAcquire(self.use_mutex)
         try:
             x, y, z = self.read_magnetometer()
+        except Exception as e:
+            x, y, z = 0, 0, 0
+        finally:
+            ifMutexRelease(self.use_mutex)
+        return x,y,z
+
+    def safe_read_gyroscope(self):
+        """
+        Read the angular velocity of the gyroscope.
+
+        :returns: The angular velocity as a tuple of X, Y, Z values in *degrees/s*. You can check the X, Y, Z axes on the sensor itself.
+        :rtype: (float,float,float)
+
+        .. note::
+
+           In case of an exception occurring within this method, a tuple of 3 elements where all values are set to **0** is returned.
+
+        """
+        ifMutexAcquire(self.use_mutex)
+        try:
+            x, y, z = self.read_gyroscope()
         except Exception as e:
             x, y, z = 0, 0, 0
         finally:
