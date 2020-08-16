@@ -195,9 +195,9 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
             h, s, v = colorsys.rgb_to_hsv(r/c, g/c, b/c)
             self.known_hsv[color] = [360*h, 100*s, 100*v]
         else:
-            print (f"Invalid color name: [{color}].")
+            print( "Invalid color name: [{}]".format(color))
             colorlist = ', '.join(self.known_hsv.keys())
-            print (f"color can only be one of {colorlist}.")
+            print( "color can only be one of {}".format(colorlist))
         
     def guess_color_hsv(self, in_color):
         """
@@ -216,10 +216,13 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
 
         r,g,b,c = in_color
         # print("incoming: {} {} {} {}".format(r,g,b,c))
-
-        # divide by luminosity(clarity) to minimize variations
-        # LJM: I've replaced code for HSV conversion but perhaps not necessary if we convert existing function to colorsys.rgb_to_hsv wrapper
-        h, s, v = colorsys.rgb_to_hsv(r/c, g/c, b/c)
+        try:
+            # divide by luminosity(clarity) to minimize variations
+            # LJM: I've replaced code for HSV conversion but perhaps not necessary if we convert existing function to colorsys.rgb_to_hsv wrapper
+            h, s, v = colorsys.rgb_to_hsv(r/c, g/c, b/c)
+        except:
+            print("division by 0; coping")
+            h, s, v = colorsys.rgb_to_hsv(r, g, b)
         
         min_distance = 255
         for color in self.known_hsv:
