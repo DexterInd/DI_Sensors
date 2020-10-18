@@ -79,7 +79,8 @@ def detect_line_follower():
     global scratch_linefollower
     try:
         scratch_linefollower = easy_line_follower.EasyLineFollower()
-        dilogger.info("Line Follower is detected")
+        if scratch_linefollower._detect_line_follower() != 0:
+            dilogger.info("Line Follower is detected")
         try:
             s.broadcast('line')
         except:
