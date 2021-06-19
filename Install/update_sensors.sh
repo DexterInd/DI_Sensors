@@ -199,11 +199,11 @@ clone_disensors() {
 
 # called by <<install_python_pkgs_and_dependencies>>
 install_python_packages() {
-  [[ $systemwide = "true" ]] && sudo python setup.py install \
+  [[ $systemwide = "true" ]] && sudo python2 setup.py install \
               && [[ $usepython3exec = "true" ]] && sudo python3 setup.py install
-  [[ $userlocal = "true" ]] && python setup.py install --user \
+  [[ $userlocal = "true" ]] && python2 setup.py install --user \
               && [[ $usepython3exec = "true" ]] && python3 setup.py install --user
-  [[ $envlocal = "true" ]] && python setup.py install \
+  [[ $envlocal = "true" ]] && python2 setup.py install \
               && [[ $usepython3exec = "true" ]] && python3 setup.py install
 }
 
@@ -217,10 +217,10 @@ remove_python_packages() {
   # saves output to file because we want to have the syntax highlight working
   # does this for both root and the current user because packages can be either system-wide or local
   # later on the strings used with the python command can be put in just one string that gets used repeatedly
-  python -c "import pkgutil; import os; \
+  python2 -c "import pkgutil; import os; \
               eggs_loader = pkgutil.find_loader('$1'); found = eggs_loader is not None; \
               output = os.path.dirname(os.path.realpath(eggs_loader.get_filename('$1'))) if found else ''; print(output);" >> $PIHOME/.pypaths
-  sudo python -c "import pkgutil; import os; \
+  sudo python2 -c "import pkgutil; import os; \
               eggs_loader = pkgutil.find_loader('$1'); found = eggs_loader is not None; \
               output = os.path.dirname(os.path.realpath(eggs_loader.get_filename('$1'))) if found else ''; print(output);" >> $PIHOME/.pypaths
   if [[ $usepython3exec = "true" ]]; then
