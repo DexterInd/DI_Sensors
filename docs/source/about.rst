@@ -10,7 +10,7 @@ Who we are and what we do.
 
 .. the image size was extracted from the image manually
 .. without the image size, the scale cannot be set
-.. image:: https://i.imgur.com/V1LUKyq.jpg
+.. image:: images/dexterlogo_big.jpg
    :scale: 100
    :width: 1695
    :height: 300
