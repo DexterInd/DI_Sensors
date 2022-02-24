@@ -7,7 +7,7 @@
 Dexter Industries DI-Sensors Documentation!
 ###########################################
 
-.. image:: https://i.imgur.com/V1LUKyql.jpg
+.. image:: images/dexterlogo_small.jpg
 
 .. toctree::
    :maxdepth: 2
