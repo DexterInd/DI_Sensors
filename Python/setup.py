@@ -23,8 +23,8 @@ setup(
     description = "Drivers and examples for using DI_Sensors in Python",
     long_description = description,
 
-    author = "Dexter Industries",
-    author_email = "contact@dexterindustries.com",
+    author = "Modular Robotics",
+    author_email = "info@modrobotics.com",
 
     license = "MIT",
     classifiers = [
@@ -41,7 +41,7 @@ setup(
     url = "https://github.com/DexterInd/DI_Sensors",
 
     keywords = [
-        "Dexter",
+        "Modular Robotics",
         "Distance Sensor",
         "Inertial Measurement Unit",
         "IMU",
