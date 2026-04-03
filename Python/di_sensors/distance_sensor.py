@@ -6,9 +6,6 @@
 #
 # Python drivers for the Dexter Industries Distance Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 from di_sensors import VL53L0X
 import time
 
@@ -17,15 +14,32 @@ class DistanceSensor(object):
     Class for interfacing with the `Distance Sensor`_.
     """
 
-    def __init__(self, bus = "RPI_1SW"):
+    # Maps user-facing port names to the internal di_i2c bus identifier.
+    # Accepts both friendly names ("I2C", "AD1", "AD2") and raw bus names.
+    PORT_ALIASES = {
+        "I2C":      "RPI_1",      # hardware I2C header
+        "RPI_1":    "RPI_1",
+        "RPI_1SW":  "RPI_1",      # deprecated; redirected by di_i2c on Trixie
+        "RPI_1HW":  "RPI_1",
+        "AD1":      "GPG3_AD1",   # GoPiGo3 Grove port 1
+        "GPG3_AD1": "GPG3_AD1",
+        "AD2":      "GPG3_AD2",   # GoPiGo3 Grove port 2
+        "GPG3_AD2": "GPG3_AD2",
+    }
+
+    def __init__(self, port="I2C"):
         """
         Constructor for initializing a :py:class:`~di_sensors.distance_sensor.DistanceSensor` class.
 
-        :param str bus = "RPI_1SW": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
-        :raises ~exceptions.OSError: When the distance sensor is not connected to the designated bus/port. Most probably, this means the distance sensor is not connected at all.
+        :param str port = "I2C": The port/bus to which the distance sensor is connected.
+            Accepted values: ``"I2C"`` (hardware I2C header, default), ``"AD1"`` (GoPiGo3 Grove port 1),
+            ``"AD2"`` (GoPiGo3 Grove port 2). Raw di_i2c bus names (``"RPI_1"``, ``"GPG3_AD1"``,
+            ``"GPG3_AD2"``) are also accepted for backwards compatibility.
+        :raises ~exceptions.OSError: When the distance sensor is not connected to the designated port.
 
         """
-        self.VL53L0X = VL53L0X.VL53L0X(bus = bus)
+        bus = self.PORT_ALIASES.get(port.upper(), port)
+        self.VL53L0X = VL53L0X.VL53L0X(bus=bus)
 
         # set to long range (about 2.3 meters)
         self.VL53L0X.set_signal_rate_limit(0.1)
