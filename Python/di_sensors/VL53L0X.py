@@ -6,9 +6,6 @@
 #
 # Python drivers for the VL53L0X laser distance sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import di_i2c
 import time
 
@@ -104,21 +101,19 @@ class VL53L0X(object):
     VcselPeriodPreRange   = 0
     VcselPeriodFinalRange = 1
 
-    # "global variables"
-    io_timeout = 0
-    did_timeout = False
-
-    # The I2C address is software programmable (volatile), and defaults to 0x52 >> 1 = 0x29.
-    # __init__ changes the address (default to 0x54 >> 1 = 0x2A) to prevent conflicts.
-    ADDRESS = ADDRESS_DEFAULT
-
-    def __init__(self, address = 0x2A, timeout = 0.5, bus = "RPI_1SW"):
+    def __init__(self, address = 0x2A, timeout = 0.5, bus = "RPI_1"):
+        self.io_timeout = 0
+        self.did_timeout = False
+        self.ADDRESS = ADDRESS_DEFAULT
+        self.timeout_start = 0
+        self.stop_variable = 0
+        self.measurement_timing_budget_us = 0
         self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = address)
 
         try:
             self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00) # try resetting from 0x2A
             time.sleep(0.002)
-        except IOError:
+        except OSError:
             pass
 
         self.ADDRESS = ADDRESS_DEFAULT
@@ -131,7 +126,7 @@ class VL53L0X(object):
         self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x01) # release reset
 
         time.sleep(0.005)
-       # delay added because threaded instantiation would fail,even with mutex in place
+        # delay added because threaded instantiation would fail,even with mutex in place
 
         self.set_address(address)
 
@@ -144,7 +139,7 @@ class VL53L0X(object):
             self.i2c_bus.write_reg_8(I2C_SLAVE_DEVICE_ADDRESS, address)
             self.ADDRESS = address
             self.i2c_bus.set_address(self.ADDRESS)
-        except IOError:
+        except OSError:
             self.i2c_bus.set_address(address)
             self.i2c_bus.write_reg_8(I2C_SLAVE_DEVICE_ADDRESS, address)
             self.ADDRESS = address
@@ -204,8 +199,8 @@ class VL53L0X(object):
             if i < first_spad_to_enable or spads_enabled == spad_count:
                 # This bit is lower than the first one that should be enabled, or
                 # (reference_spad_count) bits have already been enabled, so zero this bit
-                ref_spad_map[int(i / 8)] &= ~(1 << (i % 8))
-            elif (ref_spad_map[int(i / 8)] >> (i % 8)) & 0x1:
+                ref_spad_map[i // 8] &= ~(1 << (i % 8))
+            elif (ref_spad_map[i // 8] >> (i % 8)) & 0x1:
                 spads_enabled += 1
 
         self.i2c_bus.write_reg_list(GLOBAL_CONFIG_SPAD_ENABLES_REF_0, ref_spad_map)
@@ -506,10 +501,10 @@ class VL53L0X(object):
 
     # Get the VCSEL pulse period in PCLKs for the given period type.
     # based on VL53L0X_get_vcsel_pulse_period()
-    def get_vcsel_pulse_period(self, type):
-        if type == self.VcselPeriodPreRange:
+    def get_vcsel_pulse_period(self, period_type):
+        if period_type == self.VcselPeriodPreRange:
             return self.decode_vcsel_period(self.i2c_bus.read_8(PRE_RANGE_CONFIG_VCSEL_PERIOD))
-        elif type == self.VcselPeriodFinalRange:
+        elif period_type == self.VcselPeriodFinalRange:
             return self.decode_vcsel_period(self.i2c_bus.read_8(FINAL_RANGE_CONFIG_VCSEL_PERIOD))
         else:
             return 255
@@ -617,13 +612,12 @@ class VL53L0X(object):
         ms_byte = 0
 
         if timeout_mclks > 0:
-            ls_byte = timeout_mclks - 1
+            ls_byte = int(timeout_mclks) - 1
 
-            while ((int(ls_byte) & 0xFFFFFF00) > 0):
-                ls_byte /= 2 # >>=
-                ms_byte += 1
+            while ((ls_byte & 0xFFFFFF00) > 0):
+                ls_byte >>= 1
 
-            return ((ms_byte << 8) | (int(ls_byte) & 0xFF))
+            return ((ms_byte << 8) | (ls_byte & 0xFF))
         else:
             return 0
 
@@ -693,15 +687,15 @@ class VL53L0X(object):
         while ((self.i2c_bus.read_8(RESULT_INTERRUPT_STATUS) & 0x07) == 0):
             if self.check_timeout_expired():
                 self.did_timeout = True
-                raise IOError("read_range_continuous_millimeters timeout")
+                raise OSError("read_range_continuous_millimeters timeout")
 
         # assumptions: Linearity Corrective Gain is 1000 (default)
         # fractional ranging is not enabled
-        range = self.i2c_bus.read_16(RESULT_RANGE_STATUS + 10)
+        range_mm = self.i2c_bus.read_16(RESULT_RANGE_STATUS + 10)
 
         self.i2c_bus.write_reg_8(SYSTEM_INTERRUPT_CLEAR, 0x01)
 
-        return range
+        return range_mm
 
     # Did a timeout occur in one of the read functions since the last call to
     # timeout_occurred()?
@@ -717,7 +711,7 @@ class VL53L0X(object):
     #  pre:  12 to 18 (initialized default: 14)
     #  final: 8 to 14 (initialized default: 10)
     # based on VL53L0X_setVcselPulsePeriod()
-    def set_vcsel_pulse_period(self, type, period_pclks):
+    def set_vcsel_pulse_period(self, period_type, period_pclks):
         vcsel_period_reg = self.encode_vcsel_period(period_pclks)
 
         enables = self.get_sequence_step_enables()
@@ -735,7 +729,7 @@ class VL53L0X(object):
         # For the MSRC timeout, the same applies - this timeout being
         # dependant on the pre-range vcsel period."
 
-        if type == self.VcselPeriodPreRange:
+        if period_type == self.VcselPeriodPreRange:
             # "Set phase check limits"
             if period_pclks == 12:
                 self.i2c_bus.write_reg_8(PRE_RANGE_CONFIG_VALID_PHASE_HIGH, 0x18)
@@ -775,7 +769,7 @@ class VL53L0X(object):
                 self.i2c_bus.write_reg_8(MSRC_CONFIG_TIMEOUT_MACROP, (new_msrc_timeout_mclks - 1))
 
             # set_sequence_step_timeout() end
-        elif type == self.VcselPeriodFinalRange:
+        elif period_type == self.VcselPeriodFinalRange:
             if period_pclks == 8:
                 self.i2c_bus.write_reg_8(FINAL_RANGE_CONFIG_VALID_PHASE_HIGH, 0x10)
                 self.i2c_bus.write_reg_8(FINAL_RANGE_CONFIG_VALID_PHASE_LOW,  0x08)
@@ -872,7 +866,7 @@ class VL53L0X(object):
         while (self.i2c_bus.read_8(SYSRANGE_START) & 0x01):
             if self.check_timeout_expired():
                 self.did_timeout = True
-                raise IOError("read_range_single_millimeters timeout")
+                raise OSError("read_range_single_millimeters timeout")
         return self.read_range_continuous_millimeters()
 
     # Set the return signal rate limit check value in units of MCPS (mega counts
@@ -887,7 +881,7 @@ class VL53L0X(object):
         if limit_Mcps < 0 or limit_Mcps > 511.99:
             raise ValueError("set_signal_rate_limit limit out of range (0 - 511.99)")
         # Q9.7 fixed point format (9 integer bits, 7 fractional bits)
-        self.i2c_bus.write_reg_16(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, (limit_Mcps * (1 << 7)))# writeReg16Bit(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, limit_Mcps * (1 << 7));
+        self.i2c_bus.write_reg_16(FINAL_RANGE_CONFIG_MIN_COUNT_RATE_RTN_LIMIT, int(limit_Mcps * (1 << 7)))
 
     # Encode VCSEL pulse period register value from period in PCLKs
     # based on VL53L0X_encode_vcsel_period()

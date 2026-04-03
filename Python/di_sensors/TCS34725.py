@@ -6,9 +6,6 @@
 #
 # Python drivers for the TCS34725 light color sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import di_i2c
 import time
 
@@ -72,13 +69,13 @@ GAIN_60X         = 0x03 # 60x gain
 class TCS34725(object):
     """Drivers for TCS34725 light color sensor"""
 
-    def __init__(self, integration_time = 0.0024, gain = GAIN_16X, bus = "RPI_1SW"):
+    def __init__(self, integration_time = 0.0024, gain = GAIN_16X, bus = "RPI_1"):
         """Initialize the sensor
 
         Keyword arguments:
         integration_time (default 0.0024 seconds) -- Time in seconds for each sample. 0.0024 second (2.4ms) increments. Clipped to the range of 0.0024 to 0.6144 seconds.
         gain (default GAIN_16X) -- The gain constant. Valid values are GAIN_1X, GAIN_4X, GAIN_16X, and GAIN_60X
-        bus (default "RPI_1SW") -- The I2C bus"""
+        bus (default "RPI_1") -- The I2C bus"""
         self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = ADDRESS, big_endian = False)
 
         # Make sure we're connected to the right sensor.

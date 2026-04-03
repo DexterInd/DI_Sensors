@@ -6,9 +6,6 @@
 #
 # Python drivers for the Dexter Industries Inertial Measurement Unit sensor
 
-from __future__ import print_function
-from __future__ import division
-
 from di_sensors import BNO055
 
 
@@ -16,11 +13,11 @@ class InertialMeasurementUnit(object):
     """
     Class for interfacing with the `InertialMeasurementUnit Sensor`_.
     """
-    def __init__(self, bus = "RPI_1SW"):
+    def __init__(self, bus = "RPI_1"):
         """
         Constructor for initializing link with the `InertialMeasurementUnit Sensor`_.
 
-        :param str bus = "RPI_1SW": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str bus = "RPI_1": The bus to which the distance sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :raises RuntimeError: When the chip ID is incorrect. This happens when we have a device pointing to the same address, but it's not a `InertialMeasurementUnit Sensor`_.
         :raises ~exceptions.OSError: When the `InertialMeasurementUnit Sensor`_ is not reachable.
 

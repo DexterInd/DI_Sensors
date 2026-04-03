@@ -14,7 +14,6 @@
 
 
 from di_sensors import temp_hum_press
-from time import sleep
 
 from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 
@@ -22,6 +21,7 @@ from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
 PORT TRANSLATION
 '''
 ports = {
+    "I2C": "RPI_1",
     "AD1": "GPG3_AD1",
     "AD2": "GPG3_AD2"
 }
@@ -51,7 +51,7 @@ class EasyTHPSensor(temp_hum_press.TempHumPress):
         try:
             bus = ports[port]
         except KeyError:
-            bus = "RPI_1SW"
+            bus = "RPI_1"
 
         ifMutexAcquire(self.use_mutex)
         try:

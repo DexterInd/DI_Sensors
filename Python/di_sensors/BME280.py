@@ -6,9 +6,6 @@
 #
 # Python drivers for the BME280 Temperature Humidity Pressure sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import di_i2c
 import time
 
@@ -80,7 +77,7 @@ REG_HUMIDITY_DATA = 0xFD
 
 class BME280(object):
 
-    def __init__(self, bus = "RPI_1SW", t_mode = OSAMPLE_1, h_mode = OSAMPLE_1, p_mode = OSAMPLE_1,
+    def __init__(self, bus = "RPI_1", t_mode = OSAMPLE_1, h_mode = OSAMPLE_1, p_mode = OSAMPLE_1,
                  standby = STANDBY_250, filter = FILTER_off):
         """Initialize the sensor
 
