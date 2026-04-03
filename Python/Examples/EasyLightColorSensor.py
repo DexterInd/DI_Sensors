@@ -8,9 +8,6 @@
 #
 # Python example program for the Dexter Industries Light Color Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 from time import sleep
 from di_sensors.easy_light_color_sensor import EasyLightColorSensor
 

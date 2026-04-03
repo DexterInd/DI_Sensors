@@ -8,9 +8,6 @@
 #
 # Python example program for the Dexter Industries Temperature Humidity Pressure Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import time
 from di_sensors.temp_hum_press import TempHumPress
 

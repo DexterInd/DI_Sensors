@@ -8,9 +8,6 @@
 #
 # Python example program for the Dexter Industries IMU Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import time
 from di_sensors.inertial_measurement_unit import InertialMeasurementUnit
 

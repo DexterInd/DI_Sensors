@@ -8,9 +8,6 @@
 #
 # Python example program for the Dexter Industries Line Follower sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import time
 from di_sensors import line_follower
 

@@ -8,9 +8,6 @@
 #
 # Python example program for the Dexter Industries Distance Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import time
 from di_sensors.distance_sensor import DistanceSensor
 

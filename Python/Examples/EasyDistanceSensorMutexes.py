@@ -8,9 +8,6 @@
 #
 # Python example program for the Dexter Industries Temperature Humidity Pressure Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 # do the import stuff
 from di_sensors.easy_distance_sensor import EasyDistanceSensor
 from time import time, sleep
