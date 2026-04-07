@@ -111,14 +111,16 @@ class VL53L0X(object):
         self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = address)
 
         try:
-            self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00) # try resetting from 0x2A
+            self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00) # assert reset at non-default address
             time.sleep(0.002)
+            self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x01) # release reset → sensor reboots to 0x29
+            time.sleep(0.100) # wait for sensor to fully reboot at default address
         except OSError:
             pass
 
         self.ADDRESS = ADDRESS_DEFAULT
         self.i2c_bus.set_address(self.ADDRESS)
-        self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00) # reset default 0x29
+        self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00) # reset at default 0x29
 
         time.sleep(0.005)
         # delay added because threaded instantiation would fail,even with mutex in place
@@ -144,6 +146,23 @@ class VL53L0X(object):
             self.i2c_bus.write_reg_8(I2C_SLAVE_DEVICE_ADDRESS, address)
             self.ADDRESS = address
             self.i2c_bus.set_address(self.ADDRESS)
+
+    def close(self):
+        """Reset the sensor to its factory default address (0x29) and close the bus.
+
+        Uses SOFT_RESET which is more reliable than a register-based address change,
+        especially when the sensor may be in a partially failed state.
+        Call this before the program exits so the next run can find the sensor.
+        """
+        try:
+            self.i2c_bus.set_address(self.ADDRESS)
+            self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x00)  # assert reset
+            time.sleep(0.002)
+            self.i2c_bus.write_reg_8(SOFT_RESET_GO2_SOFT_RESET_N, 0x01)  # release → sensor reboots to 0x29
+            time.sleep(0.010)  # allow reboot to complete
+        except Exception:
+            pass
+        self.i2c_bus.close()
 
     def init(self):
         self.i2c_bus.write_reg_8(VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV, (self.i2c_bus.read_8(VHV_CONFIG_PAD_SCL_SDA__EXTSUP_HV) | 0x01)) # set bit 0

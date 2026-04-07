@@ -109,6 +109,17 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         cm = self.read_mm()//10
         return (cm)
 
+    def close(self):
+        """
+        Reset the sensor to its default I2C address and release the bus.
+        Call this on program exit to leave the sensor in a clean state for the next run.
+        """
+        ifMutexAcquire(self.use_mutex)
+        try:
+            super().close()
+        finally:
+            ifMutexRelease(self.use_mutex)
+
     def read_inches(self):
         """
         Reads the distance in inches.

@@ -114,3 +114,10 @@ class DistanceSensor(object):
 
         """
         return self.VL53L0X.timeout_occurred()
+
+    def close(self):
+        """
+        Reset the sensor to its default I2C address and release the bus.
+        Call this on program exit to leave the sensor in a clean state for the next run.
+        """
+        self.VL53L0X.close()
