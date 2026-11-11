@@ -11,9 +11,14 @@
 import time
 from di_sensors import line_follower
 
-print("Example program for reading a Dexter Industries Line Follower sensor on GPG3 AD1 port")
+print("Example program for reading a Modular Robotics black Line Follower sensor on GPG3 AD1 port")
 
-lf = line_follower.LineFollower(bus = "GPG3_AD1")
+try:
+    lf = line_follower.LineFollower(bus = "GPG3_AD1")
+except OSError:
+    print("Could not connect to the Line Follower sensor.")
+    print("Check that it is connected to port AD1 on the GoPiGo3.")
+    raise SystemExit(1)
 
 '''
 cd ~/Dexter/DI_Sensors/Python
@@ -27,12 +32,15 @@ print("Manufacturer     : %s" % lf.get_manufacturer())
 print("Name             : %s" % lf.get_board())
 print("Firmware Version : %d" % lf.get_version_firmware())
 
-while True:
-    # Read the line sensors values
-    values = lf.read_sensors()
-    str = ""
-    for v in range(len(values)):
-        str += "%.3f " % values[v]
-    print(str)
+try:
+    while True:
+        # Read the line sensors values
+        values = lf.read_sensors()
+        str = ""
+        for v in range(len(values)):
+            str += "%.3f " % values[v]
+        print(str)
 
-    time.sleep(0.1)
+        time.sleep(0.1)
+except KeyboardInterrupt:
+    pass

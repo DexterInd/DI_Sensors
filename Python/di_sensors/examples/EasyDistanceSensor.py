@@ -16,8 +16,10 @@ from time import sleep
 my_sensor = EasyDistanceSensor()
 
 # and read the sensor iteratively
-while True:
-  read_distance = my_sensor.read()
-  print("distance from object: {} cm".format(read_distance))
-
-  sleep(0.1)
+try:
+    while True:
+        read_distance = my_sensor.read()
+        print("distance from object: {} cm".format(read_distance))
+        sleep(0.1)
+except KeyboardInterrupt:
+    pass

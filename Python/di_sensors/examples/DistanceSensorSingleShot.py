@@ -15,7 +15,10 @@ print("Example program for reading a Dexter Industries Distance Sensor on an I2C
 
 ds = DistanceSensor()
 
-while True:
-    # read the distance as a single-shot sample
-    read_distance = ds.read_range_single()
-    print("distance from object: {} mm".format(read_distance))
+try:
+    while True:
+        # read the distance as a single-shot sample
+        read_distance = ds.read_range_single()
+        print("distance from object: {} mm".format(read_distance))
+except KeyboardInterrupt:
+    pass

@@ -19,7 +19,10 @@ ds = DistanceSensor()
 # set the sensor in fast-polling-mode
 ds.start_continuous()
 
-while True:
-    # read the distance in millimeters
-    read_distance = ds.read_range_continuous()
-    print("distance from object: {} mm".format(read_distance))
+try:
+    while True:
+        # read the distance in millimeters
+        read_distance = ds.read_range_continuous()
+        print("distance from object: {} mm".format(read_distance))
+except KeyboardInterrupt:
+    pass

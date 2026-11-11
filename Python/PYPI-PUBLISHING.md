@@ -34,7 +34,7 @@ password = pypi-<your-testpypi-token>
 Edit `version` in `pyproject.toml` before every release:
 
 ```toml
-version = "0.0.0"
+version = "0.0.1"
 ```
 
 ## Step 2 — build the distribution

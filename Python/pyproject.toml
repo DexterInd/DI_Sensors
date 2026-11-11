@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mr-di-sensors"
-version = "0.0.0"
+version = "0.0.3"
 description = "Python drivers for Modular Robotics sensors (Distance, IMU, Light/Color, Temp/Hum/Press, Line Follower)"
 license = "MIT"
 authors = [{ name = "Modular Robotics", email = "support@modularrobotics.com" }]
@@ -32,7 +32,7 @@ keywords = [
 
 # mr_rfr-tools provides di_i2c and I2C_mutex, the I2C layer used by all sensor drivers.
 dependencies = [
-    "mr_rfr-tools>=2.0.1",
+    "mr-rfr-tools>=2.0.2",
 ]
 
 [project.urls]
@@ -42,4 +42,5 @@ Homepage = "https://www.modrobotics.com/"
 [tool.setuptools.packages.find]
 where = ["."]
 # red_line_follower/ ships its own standalone setup.py and is not part of this distribution.
-exclude = ["di_sensors.red_line_follower*"]
+# examples/ is included as di_sensors.examples.
+exclude = ["red_line_follower*"]

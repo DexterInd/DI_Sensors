@@ -15,17 +15,20 @@ print("Example program for reading a Dexter Industries Temperature Humidity Pres
 
 thp = TempHumPress()
 
-while True:
-    # Read the temperature
-    temp = thp.get_temperature_celsius()
+try:
+    while True:
+        # Read the temperature
+        temp = thp.get_temperature_celsius()
 
-    # Read the relative humidity
-    hum = thp.get_humidity()
+        # Read the relative humidity
+        hum = thp.get_humidity()
 
-    # Read the pressure
-    press = thp.get_pressure()
+        # Read the pressure
+        press = thp.get_pressure()
 
-    # Print the values
-    print("Temperature: {:5.3f} Humidity: {:5.3f} Pressure: {:5.3f}".format(temp, hum, press))
+        # Print the values
+        print("Temperature: {:5.3f} Humidity: {:5.3f} Pressure: {:5.3f}".format(temp, hum, press))
 
-    time.sleep(0.02)
+        time.sleep(0.02)
+except KeyboardInterrupt:
+    pass

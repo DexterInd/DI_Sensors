@@ -15,11 +15,14 @@ print("Example program for reading a Dexter Industries Light Color Sensor on an 
 
 my_lcs = EasyLightColorSensor(led_state = True)
 
-while True:
-    # Read the R, G, B, C color values
-    red, green, blue, clear = my_lcs.safe_raw_colors()
+try:
+    while True:
+        # Read the R, G, B, C color values
+        red, green, blue, clear = my_lcs.safe_raw_colors()
 
-    # Print the values
-    print("Red: {:5.3f} Green: {:5.3f} Blue: {:5.3f} Clear: {:5.3f}".format(red, green, blue, clear))
+        # Print the values
+        print("Red: {:5.3f} Green: {:5.3f} Blue: {:5.3f} Clear: {:5.3f}".format(red, green, blue, clear))
 
-    sleep(0.02)
+        sleep(0.02)
+except KeyboardInterrupt:
+    pass
