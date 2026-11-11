@@ -1,12 +1,16 @@
 docs/build/*
 *.pyc
 *.json
+.vscode
 .vscode/.ropeproject/config.py
 .vscode/.ropeproject/objectdb
+Python/dist
 Python/dist/mr_di_sensors-0.0.0-py3-none-any.whl
 Python/dist/mr_di_sensors-0.0.0.tar.gz
+Python/mr_di_sensors.egg-info
 Python/mr_di_sensors.egg-info/dependency_links.txt
 Python/mr_di_sensors.egg-info/PKG-INFO
 Python/mr_di_sensors.egg-info/requires.txt
 Python/mr_di_sensors.egg-info/SOURCES.txt
 Python/mr_di_sensors.egg-info/top_level.txt
+Python/PYPI-PUBLISHING.md
