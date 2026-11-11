@@ -6,9 +6,6 @@
 #
 # Python drivers for the Dexter Industries Temperature Humidity Pressure Sensor
 
-from __future__ import print_function
-from __future__ import division
-
 from di_sensors import BME280
 
 
@@ -17,11 +14,11 @@ class TempHumPress(object):
     Class for interfacing with the `Temperature Humidity Pressure Sensor`_.
     """
 
-    def __init__(self, bus = "RPI_1SW"):
+    def __init__(self, bus = "RPI_1"):
         """
         Constructor for initializing link with the `Temperature Humidity Pressure Sensor`_.
 
-        :param str bus = "RPI_1SW": The bus to which the THP sensor is connected to. By default, it's set to bus ``"RPI_1SW"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
+        :param str bus = "RPI_1": The bus to which the THP sensor is connected to. By default, it's set to bus ``"RPI_1"``. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :raises ~exceptions.OSError: When the sensor cannot be reached.
 
         """

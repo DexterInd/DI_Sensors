@@ -6,9 +6,6 @@
 #
 # Python drivers for the BNO055 IMU sensor
 
-from __future__ import print_function
-from __future__ import division
-
 import di_i2c
 import time
 
@@ -203,11 +200,11 @@ OPERATION_MODE_NDOF         = 0x0C
 
 class BNO055(object):
 
-    def __init__(self, bus = "RPI_1SW", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
+    def __init__(self, bus = "RPI_1", address = ADDRESS_A, mode = OPERATION_MODE_NDOF, units = 0):
         """Initialize the sensor
 
         Keyword arguments:
-        bus (default "RPI_1SW") -- The I2C bus
+        bus (default "RPI_1") -- The I2C bus
         address (default ADDRESS_A) -- The BNO055 I2C address
         mode (default OPERATION_MODE_NDOF) -- The operation mode
         units (default 0) -- The value unit selection bits"""
@@ -222,8 +219,8 @@ class BNO055(object):
         # commands (this seems to be necessary after a hard power down).
         try:
             self.i2c_bus.write_reg_8(REG_PAGE_ID, 0)
-        except IOError:
-            # pass on an I2C IOError
+        except OSError:
+            # pass on an I2C OSError
             pass
 
         # switch to config mode

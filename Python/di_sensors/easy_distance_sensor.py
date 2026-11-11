@@ -32,34 +32,15 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         """
         self.descriptor = "Distance Sensor"
         self.use_mutex = use_mutex
-
-        # let's be kind to the user who may get confused between ports and buses 
-        # let's allow for all of them
-        possible_ports = { "I2C" : "RPI_1SW",
-                            "AD1" : "GPG3_AD1",
-                            "AD2" : "GPG3_AD2",
-                            "RPI_1SW": "RPI_1SW",
-                            "RPI_1" : "RPI_1",
-                            "RPI_1HW" : "RPI_1",   # doesn't really exist but can be a reflex for some users as we do have RPI_1SW
-                            "GPG3_AD1": "GPG3_AD1",
-                            "GPG3_AD2": "GPG3_AD2"}
-
-        port = port.upper() # force to uppercase
-        # switch quietly to default value if we receive gibberish
-        if port in possible_ports.keys():
-            bus = possible_ports[port]
-        else:
-            bus = "RPI_1SW"
+        self._readings = []
 
         ifMutexAcquire(self.use_mutex)
         try:
-            distance_sensor.DistanceSensor.__init__(self, bus=bus)
-        except Exception as e:
-            # remove print so that it doesn't show when starting Scratch
-            # print("Distance Sensor init: {}".format(e))
+            distance_sensor.DistanceSensor.__init__(self, port=port)
+        except Exception:
             raise
         finally:
-             ifMutexRelease(self.use_mutex)
+            ifMutexRelease(self.use_mutex)
 
     # Returns the values in cms
     def read_mm(self):
@@ -79,7 +60,6 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         # 8190 is what the sensor sends when it's out of range
         # we're just setting a default value
         mm = 8190
-        readings = []
         attempt = 0
 
         # try 3 times to have a reading that is
@@ -100,13 +80,13 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
         # add the reading to our last 3 readings
         # a 0 value is possible when sensor is not found
         if (mm < 8000 and mm > 5) or mm == 0:
-            readings.append(mm)
-        if len(readings) > 3:
-            readings.pop(0)
+            self._readings.append(mm)
+        if len(self._readings) > 3:
+            self._readings.pop(0)
 
         # calculate an average and limit it to 5 > X > 3000
-        if len(readings) > 1: # avoid division by 0
-            mm = round(sum(readings) / float(len(readings)))
+        if len(self._readings) > 1: # avoid division by 0
+            mm = round(sum(self._readings) / float(len(self._readings)))
         if mm > 3000:
             mm = 3000
 
@@ -128,6 +108,17 @@ class EasyDistanceSensor(distance_sensor.DistanceSensor):
 
         cm = self.read_mm()//10
         return (cm)
+
+    def close(self):
+        """
+        Reset the sensor to its default I2C address and release the bus.
+        Call this on program exit to leave the sensor in a clean state for the next run.
+        """
+        ifMutexAcquire(self.use_mutex)
+        try:
+            super().close()
+        finally:
+            ifMutexRelease(self.use_mutex)
 
     def read_inches(self):
         """

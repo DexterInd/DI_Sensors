@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mr-di-sensors"
+version = "0.0.3"
+description = "Python drivers for Modular Robotics sensors (Distance, IMU, Light/Color, Temp/Hum/Press, Line Follower)"
+license = "MIT"
+authors = [{ name = "Modular Robotics", email = "support@modularrobotics.com" }]
+readme = { file = "package_description.rst", content-type = "text/x-rst" }
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Embedded Systems",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+keywords = [
+    "Dexter",
+    "Modular Robotics",
+    "Distance Sensor",
+    "Inertial Measurement Unit",
+    "IMU",
+    "Light Color Sensor",
+    "Temperature Humidity Pressure Sensor",
+    "Line Follower",
+]
+
+# mr_rfr-tools provides di_i2c and I2C_mutex, the I2C layer used by all sensor drivers.
+dependencies = [
+    "mr-rfr-tools>=2.0.2",
+]
+
+[project.urls]
+Homepage = "https://www.modrobotics.com/"
+"Source Code" = "https://github.com/DexterInd/DI_Sensors"
+
+[tool.setuptools.packages.find]
+where = ["."]
+# red_line_follower/ ships its own standalone setup.py and is not part of this distribution.
+# examples/ is included as di_sensors.examples.
+exclude = ["red_line_follower*"]

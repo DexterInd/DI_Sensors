@@ -6,9 +6,6 @@
 #
 # Python drivers for the PCA9570 I2C output expander
 
-from __future__ import print_function
-from __future__ import division
-
 import di_i2c
 
 # Constants
@@ -18,11 +15,11 @@ ADDRESS = 0x24
 class PCA9570(object):
     """Drivers for PCA9570 I2C output expander"""
 
-    def __init__(self, bus = "RPI_1SW"):
+    def __init__(self, bus = "RPI_1"):
         """Initialize the I2C output expander
 
         Keyword arguments:
-        bus (default RPI_1SW) -- The I2C bus"""
+        bus (default RPI_1) -- The I2C bus"""
         self.i2c_bus = di_i2c.DI_I2C(bus = bus, address = ADDRESS)
 
     def set_pins(self, value):

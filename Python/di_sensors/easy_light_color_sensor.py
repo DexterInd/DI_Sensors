@@ -40,7 +40,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     object to be accessed simultaneously from multiple threads/processes.
     Apart from this difference, there may also be functions that are more user-friendly than the latter.
     """
-    
+
     #: The 8 colors that :py:meth:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.guess_color_hsv`
     #: method may return upon reading and interpreting a new set of color values.
     known_colors = {
@@ -68,7 +68,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     def __init__(self, port="I2C", led_state = False, use_mutex=False):
         """
         Constructor for initializing a link to the `Light Color Sensor`_.
-        
+
         :param str port = "I2C": The port to which the distance sensor is connected to. Can also be connected to ports ``"AD1"`` or ``"AD2"`` of the `GoPiGo3`_. If you're passing an **invalid port**, then the sensor resorts to an ``"I2C"`` connection. Check the :ref:`hardware specs <hardware-interface-section>` for more information about the ports.
         :param bool led_state = False: The LED state. If it's set to ``True``, then the LED will turn on, otherwise the LED will stay off. By default, the LED is turned off.
         :param bool use_mutex = False: When using multiple threads/processes that access the same resource/device, mutexes should be enabled.
@@ -81,7 +81,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         try:
             bus = ports[port]
         except KeyError:
-            bus = "RPI_1SW"
+            bus = "RPI_1"
 
         # in case there's a distance sensor that hasn't been instanciated yet
         # attempt to move it to another address
@@ -107,11 +107,11 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     def translate_to_hsv(self, in_color):
         """
         Standard algorithm to switch from one color system (**RGB**) to another (**HSV**).
-        
+
         :param tuple(float,float,float) in_color: The RGB tuple list that gets translated to HSV system. The values of each element of the tuple is between **0** and **1**.
         :return: The translated HSV tuple list. Returned values are *H(0-360)*, *S(0-100)*, *V(0-100)*.
         :rtype: tuple(int, int, int)
-        
+
         .. important::
            For finding out the differences between **RGB** *(Red, Green, Blue)* color scheme and **HSV** *(Hue, Saturation, Value)*
            please check out `this link <https://www.kirupa.com/design/little_about_color_hsv_rgb.htm>`__.
@@ -150,7 +150,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         """
         Returns the color as read by the `Light Color Sensor`_.
         The colors detected vary depending on the lighting conditions of the nearby environment.
-        
+
         :returns: The RGBA values from the sensor. RGBA = Red, Green, Blue, Alpha (or Clear). Range of each element is between **0** and **1**. **-1** means an error occured.
         :rtype: tuple(float,float,float,float)
         """
@@ -168,7 +168,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
     def safe_rgb(self):
         """
         Detect the RGB color off of the `Light Color Sensor`_.
-        
+
         :returns: The RGB color in 8-bit format.
         :rtype: tuple(int,int,int)
         """
@@ -178,7 +178,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         else:
             r,g,b,c = colors
         return r,g,b
-    
+
     # LJM: a new function that calibrates for a single color
     # (suggestion: for feedback, take a subsequent reading, identify color and illuminate eyes to prove it has worked)
     # Rather than devise rules for black and white as exceptions, which may not be applicable to all environments
@@ -189,7 +189,7 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         Replace the HSV centroid for a given color with the sensor reading obtained from an example of that color in the current lighting environment
         <color> can be one of black | white | red | green | blue | yellow | cyan | fuschia
         """
-        
+
         if color in self.known_hsv:
             r, g, b, c = self.safe_raw_colors()
             h, s, v = colorsys.rgb_to_hsv(r/c, g/c, b/c)
@@ -198,17 +198,17 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
             print( "Invalid color name: [{}]".format(color))
             colorlist = ', '.join(self.known_hsv.keys())
             print( "color can only be one of {}".format(colorlist))
-        
+
     def guess_color_hsv(self, in_color):
         """
         Determines which color `in_color` parameter is closest to in the :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
         This method uses the euclidean algorithm for detecting the nearest center to it out of :py:attr:`~di_sensors.easy_light_color_sensor.EasyLightColorSensor.known_colors` list.
         It does work exactly the same as KNN (K-Nearest-Neighbors) algorithm, where `K = 1`.
-        
+
         :param tuple(float,float,float,float) in_color: A 4-element tuple list for the *Red*, *Green*, *Blue* and *Alpha* channels. The elements are all valued between **0** and **1**.
         :returns: The detected color in string format and then a 3-element tuple describing the color in RGB format. The values of the RGB tuple are between **0** and **1**.
         :rtype: tuple(str,(float,float,float))
-        
+
         .. important::
            For finding out the differences between **RGB** *(Red, Green, Blue)* color scheme and **HSV** *(Hue, Saturation, Value)*
            please check out `this link <https://www.kirupa.com/design/little_about_color_hsv_rgb.htm>`__.
@@ -223,13 +223,13 @@ class EasyLightColorSensor(light_color_sensor.LightColorSensor):
         except:
             print("division by 0; coping")
             h, s, v = colorsys.rgb_to_hsv(r, g, b)
-        
+
         min_distance = 255
         for color in self.known_hsv:
             # LJM: extra line for improved readability in calculation below
             centroid = self.known_hsv[color]
             #print ("Testing {}".format(color))
-            # only <h> term in distance_to_hsv was previously used. I can see why when you had dealt with black and white separately. 
+            # only <h> term in distance_to_hsv was previously used. I can see why when you had dealt with black and white separately.
             # Added <s> and <v> terms back in to cater for black and white.
             distance_to_hsv = sqrt( ((360*h) - centroid[0])**2 + ((100*s) - centroid[1])**2 + ((100*v) - centroid[2])**2 )
             #print((h,s,v), distance_to_hsv)

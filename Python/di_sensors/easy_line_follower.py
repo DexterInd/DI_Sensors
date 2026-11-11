@@ -1,5 +1,3 @@
-from __future__ import print_function
-from __future__ import division
 
 from di_sensors import line_follower
 from di_sensors.easy_mutex import ifMutexAcquire, ifMutexRelease
@@ -10,9 +8,9 @@ class EasyLineFollower(object):
     Higher-level of abstraction class for either the :py:class:`~di_sensors.line_follower.LineFollower` or :py:class:`~di_sensors.line_follower.LineFollowerRed`.
     """
 
-    def __init__(self, 
-        port = 'I2C', 
-        sensor_id = -1, 
+    def __init__(self,
+        port = 'I2C',
+        sensor_id = -1,
         calib_dir = '/home/pi/Dexter/',
         white_file = 'white_line.txt',
         black_file = 'black_line.txt',
@@ -28,9 +26,9 @@ class EasyLineFollower(object):
         :param bool use_mutex = True: Whether to use a mutex on the sensor or not. Recommended when the same sensor is called from multiple threads/processes. It's meant for the I2C line and does not protect the file I/O in multi-threaded applications.
 
         Upon instantiating an object of this class, after detecting the line follower, the calibration values are read and if they are not compatible with those required for the given line follower,
-        default/generic calibration values will be set for both colors computed by taking the average of the 2 extremes. 
-        
-        Important to keep in mind is that both line followers' 
+        default/generic calibration values will be set for both colors computed by taking the average of the 2 extremes.
+
+        Important to keep in mind is that both line followers'
         calibration files are incompatible, because one uses 5 sensors and the other one 6 - there are also, more factors to consider, such as the kind of sensors used in the
         line follower, but for the most part, the incompatibility comes from the different number of sensors.
 
@@ -43,7 +41,7 @@ class EasyLineFollower(object):
         self.use_mutex = use_mutex
 
         if port == "I2C":
-            bus = "RPI_1SW"
+            bus = "RPI_1"
         elif port == "AD1":
             bus = "GPG3_AD1"
         elif port == "AD2":
@@ -91,7 +89,7 @@ class EasyLineFollower(object):
         """
         self._threshold = [(a + b) / 2.0 for a,b in zip(self.black_calibration, self.white_calibration)]
 
-    
+
     def _detect_line_follower(self):
         """
         returns
@@ -106,7 +104,7 @@ class EasyLineFollower(object):
             device_on = True
         except:
             pass
-        
+
         if device_on is True:
             # then it means we have a line follower connected
             # we still don't know whether it is the black one or the red one
@@ -130,14 +128,14 @@ class EasyLineFollower(object):
 
         """
         vals = self.read()
-        
+
         if color == 'white':
             fname = self.file_white_calibration
         elif color == 'black':
             fname = self.file_black_calibration
         else:
             fname = ''
-        
+
         if fname != '':
             with open(fname, 'wb') as f:
                 pickle.dump(vals, f)
@@ -147,7 +145,7 @@ class EasyLineFollower(object):
                     if color == 'black':
                         self.black_calibration = vals
                     self._calculate_threshold()
-    
+
     def get_calibration(self, color, inplace = True):
         """
         Read the calibration values from the disk for the given ``color``.
@@ -195,32 +193,32 @@ class EasyLineFollower(object):
         :raises ~exceptions.OSError: If the line follower sensor is not reachable.
 
         Each of the line followers' order of the sensors' values is the same as the one in each read method of them both: :py:meth:`di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`di_sensors.line_follower.LineFollowerRed.read_sensors`.
-        
+
 
         For ``representation="raw"``
             For this, raw values are returned from the line follower sensor. Values range between **0** and **1** and there can be 5 or 6 values returned depending on what line follower sensor is used.
-        
+
         For ``representation="bivariate"``
-            In this case, a list with the length equal to the number of sensors present on the given line follower is returned. Values are either **0** (for black) or **1** (for white). 
+            In this case, a list with the length equal to the number of sensors present on the given line follower is returned. Values are either **0** (for black) or **1** (for white).
             In order to get good results, make sure the line follower is properly calibrated.
 
         For ``representation="bivariate-str"``
             Same as ``"bivariate"`` except that **0** is replaced with letter `b` (for black) and **1** with `w` (for white).
 
         For ``representation="weighted-avg"``
-            Returns a 2-element tuple. The first element is an estimated position of the line. 
-            
-            The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used), 
-            so that if the black line is on the left of the line follower, the returned value will be in the **0.0-0.5** range and 
-            if it's on the right, it's in the **0.5-1.0** range, 
-            thus making **0.5** the center point of the black line. 
+            Returns a 2-element tuple. The first element is an estimated position of the line.
+
+            The estimate is computed using a weighted average of each sensor value (regardless of which line follower sensor is used),
+            so that if the black line is on the left of the line follower, the returned value will be in the **0.0-0.5** range and
+            if it's on the right, it's in the **0.5-1.0** range,
+            thus making **0.5** the center point of the black line.
             Keep in mind that the sensor's orientation is determined by the order
-            of the returned sensor values and not by how the sensor is positioned on the robot. 
+            of the returned sensor values and not by how the sensor is positioned on the robot.
             Check :py:meth:`~di_sensors.line_follower.LineFollower.read_sensors` and :py:meth:`~di_sensors.line_follower.LineFollowerRed.read_sensors` methods to see
-            how the values are returned. 
-            
+            how the values are returned.
+
             If the line follower sensor ends up on a surface with an homogeneous color  (or shade of grey), the returned value will circle around **0.5**.
-            
+
             The 2nd element is an integer taking 3 values: **1** if the line follower only detects black, **2** if it only detects white and **0** for the rest of cases.
 
         """
@@ -257,7 +255,7 @@ class EasyLineFollower(object):
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
         return self.read(representation="bivariate")
-    
+
     def position_bw(self):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("bivariate-str")``.
@@ -298,16 +296,16 @@ class EasyLineFollower(object):
         """
         Same as calling :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read` method like ``read("weighted-avg")``.
 
-        :rtype: int 
-        :returns: Range is between **0** and **30**. 
+        :rtype: int
+        :returns: Range is between **0** and **30**.
             When following a line the values will be between 0 and 10.
-            For values smaller than **5**, the black line is on the left of the robot, 
-            and for values bigger than **5** but no more than **10** the line is to the right. 
-            **5** suggests the black line is in the middle. 
+            For values smaller than **5**, the black line is on the left of the robot,
+            and for values bigger than **5** but no more than **10** the line is to the right.
+            **5** suggests the black line is in the middle.
             It can also return **20** if it's all black, or **30** for all white.
         :raises: Check :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`.
         """
-        weights = self.read(representation="weighted-avg") 
+        weights = self.read(representation="weighted-avg")
         return round(weights[0] * 10, 0) if weights[1] == 0 else round(weights[1] + 1, 0) * 10
 
     def get_white_calibration(self):
@@ -360,7 +358,7 @@ class EasyLineFollower(object):
             position = numerator / (denominator * (self._no_vals - 1))
         except ZeroDivisionError:
             position = 0.5
-        
+
         hits = 0
         lost_line_type = 0
         for i in range(self._no_vals):
@@ -384,5 +382,5 @@ class EasyLineFollower(object):
                 return "left"
             if estimated_position > 0.6 and estimated_position <= 1.0:
                 return "right"
-        
+
         return "unknown"

@@ -57,12 +57,12 @@ EasyLineFollower
 .. warning::
 
   The Line Follower class was originally held in :py:mod:`easysensors` module of the GoPiGo3 library, but has been moved here.
-  The :py:meth:`easygopigo3.EasyGoPiGo3.init_line_follower` method now returns an object of the 
-  :py:class:`~di_sensors.easy_line_follower.EasyLineFollower` class instead of instantiating the original Line Follower class from 
+  The :py:meth:`easygopigo3.EasyGoPiGo3.init_line_follower` method now returns an object of the
+  :py:class:`~di_sensors.easy_line_follower.EasyLineFollower` class instead of instantiating the original Line Follower class from
   :py:mod:`easysensors` module.
 
   In order to prevent breaking others' code, we kept the support for the older methods that are soon-to-be-deprecated in :py:class:`~di_sensors.easy_line_follower.EasyLineFollower` class.
-  The mapping between the old methods and the new ones is as follows: 
+  The mapping between the old methods and the new ones is as follows:
 
     1. :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read_raw_sensors` <=> :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read`
     2. :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.read_binary` <=> :py:meth:`~di_sensors.easy_line_follower.EasyLineFollower.position_01`
