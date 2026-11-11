@@ -52,7 +52,7 @@ Instantiating the :ref:`4 sensors<getting-started-chapter>` in Python is a matte
 
 Also, you may notice that for the ``"I2C"`` port we only support the ``"RPI_1SW"``, which is a software implementation for the I2C so that the hardware one can be avoided.
 The problem with the hardware implementation (the ``"RPI_1"`` bus) is that it's riddled with bugs and if you don't want your application to crash, use the software implemented one.
-The software implemented driver for the I2C is as fast the HW one and it doesn't take much CPU time at all. 
+The software implemented driver for the I2C is as fast the HW one and it doesn't take much CPU time at all.
 
 For seeing where the ``"AD1"``/``"AD2"`` are located on the GoPiGo3, please check the GoPiGo3's :ref:`documentation <gopigo3:hardware-ports-section>`.
 
